@@ -213,6 +213,16 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/payments-ui.md`.
 
+## Phase 29 — Notifications UI
+
+- Admin: `/notifications` tenant-wide list + order debugger feed
+- Customer: `/notifications` + per-order feed on order detail
+- Merchant: `/notifications` tenant-wide (business owner roles)
+- `NotificationCard` + `OrderNotificationsPanel` in `@commerce/ui`
+- api-client: `listNotifications`
+
+**Status:** implemented — `docs/notifications-ui.md`.
+
 ---
 
 ## MVP status

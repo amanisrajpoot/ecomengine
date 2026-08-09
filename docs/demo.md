@@ -126,6 +126,13 @@ If no rider was online at Ready, use **Request rider** on merchant order detail 
 3. Status moves to `PAYMENT_CONFIRMED` → continue food flow with merchant/rider
 4. **Admin** debugger → Payment actions for verify/refund if needed
 
+## Notifications (SMS mock)
+
+1. **Customer** (:3000) → place COD order → **Alerts** nav or order detail notification panel
+2. See `OrderCreated` / `PaymentCaptured` mock SMS entries
+3. **Merchant** (:3001) → **Alerts** → tenant-wide delivery log
+4. **Admin** (:3003) → **Notifications** or order debugger feed
+
 ## End-to-end courier flow
 
 1. **Rider** — Go online

@@ -4,6 +4,7 @@ import { ApiError } from "@commerce/api-client";
 import type { Order } from "@commerce/types";
 import {
   Button,
+  OrderNotificationsPanel,
   OrderStatusStepper,
   OrderTrackingPanel,
   PaymentPanel,
@@ -116,6 +117,11 @@ export default function OrderDetailPage() {
           />
 
           <OrderTrackingPanel order={order} api={api()} />
+
+          <OrderNotificationsPanel
+            orderId={order.id}
+            loadNotifications={(orderId) => api().listNotifications({ order_id: orderId })}
+          />
 
           <PriceBreakdown snapshot={order.pricing_snapshot} />
 
