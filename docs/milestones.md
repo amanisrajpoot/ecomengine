@@ -282,6 +282,14 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/catalog-addons.md`.
 
+## Phase 36 — Business settings UI
+
+- Merchant PWA: `/settings`, business profile, locations CRUD + hours editor
+- `LocationCard` in `@commerce/ui`
+- api-client: `updateBusiness`, `getLocation`, `createLocation`, `updateLocation`
+
+**Status:** implemented — `docs/business-settings-ui.md`.
+
 ---
 
 ## MVP status

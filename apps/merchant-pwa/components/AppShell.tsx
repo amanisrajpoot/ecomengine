@@ -17,6 +17,7 @@ const links = [
   { href: "/inventory", label: "Inventory" },
   { href: "/ledger", label: "Ledger" },
   { href: "/settlements", label: "Settlements" },
+  { href: "/settings", label: "Settings" },
   { href: "/notifications", label: "Alerts" },
 ];
 

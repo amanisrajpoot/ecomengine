@@ -37,6 +37,12 @@ export default function HomePage() {
           Settlements
         </Link>
         <Link
+          href="/settings"
+          className="rounded-xl border border-amber-200/20 px-5 py-3 text-sm font-medium text-amber-50/90 hover:bg-white/5"
+        >
+          Settings
+        </Link>
+        <Link
           href="/login"
           className="rounded-xl border border-amber-200/20 px-5 py-3 text-sm font-medium text-amber-50/90 hover:bg-white/5"
         >
