@@ -1,9 +1,9 @@
 {
-  "name": "Commerce Engine — Merchant PWA",
-  "short_name": "Merchant PWA",
+  "name": "Commerce — Merchant",
+  "short_name": "Merchant",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f1c14",
-  "theme_color": "#0f1c14",
+  "background_color": "#1a1408",
+  "theme_color": "#1a1408",
   "icons": []
 }

@@ -93,6 +93,27 @@ export interface Order {
     unit_price_paise: MoneyPaise;
     variant_id: VariantId | null;
   }>;
+  status_events?: Array<{
+    from_status: string | null;
+    to_status: string;
+    actor_role: string | null;
+    created_at: string;
+  }>;
+}
+
+export interface Business {
+  id: BusinessId;
+  name: string;
+  type: BusinessType | string;
+  status: string;
+  capabilities: Record<string, unknown>;
+}
+
+export interface Fulfillment {
+  id: string;
+  order_id: OrderId;
+  type: string;
+  status: string;
 }
 
 export interface PriceBreakdown {

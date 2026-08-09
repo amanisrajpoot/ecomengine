@@ -1,8 +1,10 @@
 /** Thin fetch wrapper against the Commerce Engine API. */
 
 import type {
+  Business,
   Cart,
   CourierQuote,
+  Fulfillment,
   NearbyStore,
   Order,
   Product,
@@ -168,9 +170,25 @@ export function createApiClient(options: ApiClientOptions = {}) {
         body: JSON.stringify(body),
       }),
 
-    listOrders: () => request<Order[]>("/api/v1/orders"),
+    listOrders: (params?: { business_id?: string; status?: string }) =>
+      request<Order[]>(`/api/v1/orders${toQuery(params ?? {})}`),
 
     getOrder: (orderId: string) => request<Order>(`/api/v1/orders/${orderId}`),
+
+    transitionOrder: (
+      orderId: string,
+      body: { to_status: string; actor?: string; reason?: string },
+    ) =>
+      request<Order>(`/api/v1/orders/${orderId}/transitions`, {
+        method: "POST",
+        body: JSON.stringify({ actor: "merchant", ...body }),
+      }),
+
+    listBusinesses: (params?: { status?: string; type?: string }) =>
+      request<Business[]>(`/api/v1/businesses${toQuery(params ?? {})}`),
+
+    getOrderFulfillment: (orderId: string) =>
+      request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),
 
     courierQuote: (body: Record<string, unknown>) =>
       request<CourierQuote>("/api/v1/courier/quote", {

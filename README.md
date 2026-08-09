@@ -30,6 +30,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 14** — Hyperlocal (store discovery + inventory reserve/consume on order lifecycle)
 - **Phase 15** — Courier (quote by distance/weight/vehicle + pickup/drop on shared engines)
 - **Phase 16** — Customer PWA (browse, cart checkout, courier book, orders)
+- **Phase 17** — Merchant PWA (order queue + kitchen transitions)
 
 ## Prerequisites
 

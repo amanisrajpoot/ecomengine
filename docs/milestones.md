@@ -117,9 +117,12 @@ Dependency order matters more than calendar duration. Implement sequentially.
 ## Phases 16–19 — Experience apps
 
 - **Phase 16** — Customer PWA: browse nearby Food/Grocery, cart COD checkout, courier quote/book, orders
-- Merchant PWA, Rider PWA, Admin (incl. order debugger)
+- **Phase 17** — Merchant PWA: business order queue, accept → prepare/pick → ready transitions
+- Rider PWA, Admin (incl. order debugger)
 
 **Phase 16 status:** implemented — Customer PWA screens + `catalog.read` / food discovery for customers.
+
+**Phase 17 status:** implemented — Merchant PWA kitchen queue + order transitions.
 
 ## Phase 20 — ONDC adapter
 
