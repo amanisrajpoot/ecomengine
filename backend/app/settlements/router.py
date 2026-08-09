@@ -14,7 +14,9 @@ from app.settlements import service
 from app.settlements.access import (
     assert_settlement_read_readable,
     is_merchant_settlement_viewer,
+    is_rider_settlement_viewer,
     merchant_business_ids,
+    rider_partner_ids,
 )
 from app.settlements.schemas import SettlementCreate, SettlementRead, SettlementTransitionBody
 
@@ -63,6 +65,16 @@ async def list_settlements(
         if party_id:
             scoped_party_id = party_id
             scoped_party_ids = None
+    elif is_rider_settlement_viewer(ctx):
+        scoped_party_type = "RIDER"
+        scoped_party_ids = await rider_partner_ids(db, tenant_id=tid, ctx=ctx)
+        if not scoped_party_ids:
+            return []
+        if party_id and party_id not in scoped_party_ids:
+            return []
+        if party_id:
+            scoped_party_id = party_id
+            scoped_party_ids = None
     rows = await service.list_settlements(
         db,
         tenant_id=tid,
@@ -83,7 +95,17 @@ async def get_settlement(
 ) -> SettlementRead:
     tid = _require_tenant(tenant_id)
     read = await service.get_settlement(db, tenant_id=tid, settlement_id=settlement_id)
-    assert_settlement_read_readable(ctx, party_type=read.party_type, party_id=read.party_id)
+    rider_ids = (
+        await rider_partner_ids(db, tenant_id=tid, ctx=ctx)
+        if is_rider_settlement_viewer(ctx)
+        else None
+    )
+    assert_settlement_read_readable(
+        ctx,
+        party_type=read.party_type,
+        party_id=read.party_id,
+        rider_ids=rider_ids,
+    )
     return read
 
 
@@ -164,4 +186,7 @@ async def list_order_settlements(
     if is_merchant_settlement_viewer(ctx):
         allowed = set(merchant_business_ids(ctx))
         rows = [r for r in rows if r.party_type == "MERCHANT" and r.party_id in allowed]
+    elif is_rider_settlement_viewer(ctx):
+        allowed = set(await rider_partner_ids(db, tenant_id=tid, ctx=ctx))
+        rows = [r for r in rows if r.party_type == "RIDER" and r.party_id in allowed]
     return rows
