@@ -21,6 +21,7 @@ Agent-executable specifications for the Universal Commerce & Fulfillment Engine.
 | [coding-conventions.md](./coding-conventions.md) | Module layout, money, IDs, events, timezones |
 | [milestones.md](./milestones.md) | Phased delivery order and golden-flow acceptance |
 | [ondc.md](./ondc.md) | ONDC / Beckn BPP adapter (Phase 20) |
+| [notifications.md](./notifications.md) | Order lifecycle SMS fan-out (Phase 21) |
 
 ## Critical rules
 

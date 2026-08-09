@@ -77,7 +77,10 @@ async def checkout_from_cart(
             payload.payment_provider == "cod" or payload.payment_method == "COD"
         ) else "ONLINE",
         placed_at=datetime.now(UTC),
-        metadata_json={"created_by": str(user_id)},
+        metadata_json={
+            "created_by": str(user_id),
+            **({"customer_phone": payload.customer_phone} if payload.customer_phone else {}),
+        },
     )
     db.add(order)
     await db.flush()

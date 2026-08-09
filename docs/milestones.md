@@ -137,6 +137,20 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — golden-path test + `docs/ondc.md`.
 
+## Phase 21 — Notifications
+
+- Event bus fan-out on order lifecycle (`OrderCreated`, `PaymentCaptured`, …)
+- `sms_mock` channel adapter; `notifications` persistence + list API
+- Phone from order metadata / payment / customer user
+
+**Status:** implemented — golden test + `docs/notifications.md`.
+
+---
+
+## MVP status
+
+**MVP complete** — all three golden flows (Food, Hyperlocal, Courier) run on shared engines with experience apps (16–19), ONDC adapter (20), and lifecycle notifications (21).
+
 ---
 
 ## MVP definition

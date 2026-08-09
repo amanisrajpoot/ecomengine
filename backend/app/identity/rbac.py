@@ -219,6 +219,13 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.DELIVERY_PARTNER,
         Role.BUSINESS_MANAGER,
     },
+    "notifications.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.CUSTOMER,
+    },
 }
 
 
