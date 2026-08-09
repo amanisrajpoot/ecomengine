@@ -8,10 +8,17 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.businesses.models import Business
-from app.businesses.schemas import BusinessCreate, BusinessUpdate, default_capabilities
+from app.businesses.schemas import (
+    BusinessCreate,
+    BusinessUpdate,
+    StaffAssign,
+    StaffMemberRead,
+    default_capabilities,
+)
 from app.core.errors import AppError
-from app.identity.models import UserRoleBinding
+from app.identity.models import User, UserRoleBinding
 from app.identity.rbac import Role
+from app.identity.service import assign_role
 
 
 async def create_business(
@@ -112,3 +119,96 @@ async def update_business(
     await db.commit()
     await db.refresh(business)
     return business
+
+
+_STAFF_LIST_ROLES = (
+    Role.STAFF.value,
+    Role.BUSINESS_MANAGER.value,
+    Role.BUSINESS_OWNER.value,
+)
+
+
+async def list_business_staff(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    business_id: uuid.UUID,
+) -> list[StaffMemberRead]:
+    await get_business(db, tenant_id=tenant_id, business_id=business_id)
+    stmt = (
+        select(UserRoleBinding, User)
+        .join(User, User.id == UserRoleBinding.user_id)
+        .where(
+            UserRoleBinding.tenant_id == tenant_id,
+            UserRoleBinding.business_id == business_id,
+            UserRoleBinding.role.in_(_STAFF_LIST_ROLES),
+        )
+        .order_by(UserRoleBinding.created_at.asc())
+    )
+    rows = (await db.execute(stmt)).all()
+    return [
+        StaffMemberRead(
+            binding_id=binding.id,
+            user_id=user.id,
+            role=binding.role,
+            email=user.email,
+            phone=user.phone,
+            display_name=user.display_name,
+            created_at=binding.created_at,
+        )
+        for binding, user in rows
+    ]
+
+
+async def _resolve_staff_user(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    payload: StaffAssign,
+) -> User:
+    user: User | None = None
+    if payload.user_id is not None:
+        user = await db.get(User, payload.user_id)
+    elif payload.email is not None:
+        user = await db.scalar(
+            select(User).where(
+                User.tenant_id == tenant_id,
+                User.email == str(payload.email).lower(),
+            )
+        )
+    elif payload.phone is not None:
+        user = await db.scalar(
+            select(User).where(User.tenant_id == tenant_id, User.phone == payload.phone)
+        )
+    if not user:
+        raise AppError("USER_NOT_FOUND", "User not found", status_code=404)
+    if user.tenant_id != tenant_id:
+        raise AppError("FORBIDDEN", "User is not in this tenant", status_code=403)
+    return user
+
+
+async def assign_business_staff(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    business_id: uuid.UUID,
+    payload: StaffAssign,
+) -> StaffMemberRead:
+    await get_business(db, tenant_id=tenant_id, business_id=business_id)
+    user = await _resolve_staff_user(db, tenant_id=tenant_id, payload=payload)
+    binding = await assign_role(
+        db,
+        user_id=user.id,
+        role=payload.role,
+        tenant_id=tenant_id,
+        business_id=business_id,
+    )
+    return StaffMemberRead(
+        binding_id=binding.id,
+        user_id=user.id,
+        role=binding.role,
+        email=user.email,
+        phone=user.phone,
+        display_name=user.display_name,
+        created_at=binding.created_at,
+    )

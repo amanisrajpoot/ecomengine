@@ -7,7 +7,9 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
+
+from app.identity.rbac import Role
 
 
 class BusinessType(StrEnum):
@@ -117,3 +119,32 @@ class BusinessRead(BaseModel):
     status: str
     created_at: datetime
     updated_at: datetime
+
+
+class StaffMemberRead(BaseModel):
+    binding_id: uuid.UUID
+    user_id: uuid.UUID
+    role: str
+    email: str | None
+    phone: str | None
+    display_name: str | None
+    created_at: datetime
+
+
+class StaffAssign(BaseModel):
+    user_id: uuid.UUID | None = None
+    email: EmailStr | None = None
+    phone: str | None = Field(default=None, min_length=8, max_length=20)
+    role: Role = Role.STAFF
+
+    @model_validator(mode="after")
+    def _require_identifier(self) -> StaffAssign:
+        if self.user_id is None and self.email is None and self.phone is None:
+            raise ValueError("user_id, email, or phone is required")
+        return self
+
+    @model_validator(mode="after")
+    def _role_allowed(self) -> StaffAssign:
+        if self.role not in {Role.STAFF, Role.BUSINESS_MANAGER}:
+            raise ValueError("role must be STAFF or BUSINESS_MANAGER")
+        return self

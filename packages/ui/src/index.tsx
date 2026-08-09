@@ -28,6 +28,7 @@ export { ProductCard, VariantRow } from "./product-card";
 export { AddonCard } from "./addon-card";
 export { LocationCard } from "./location-card";
 export { PartnerCard } from "./partner-card";
+export { StaffCard } from "./staff-card";
 export { OrderNotificationsPanel } from "./order-notifications-panel";
 export { LedgerEntryCard } from "./ledger-entry-card";
 export { LedgerBalancesPanel } from "./ledger-balances-panel";

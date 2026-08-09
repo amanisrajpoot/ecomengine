@@ -205,6 +205,16 @@ export interface BusinessLocation {
   service_area?: Record<string, unknown> | null;
 }
 
+export interface StaffMember {
+  binding_id: string;
+  user_id: UserId;
+  role: string;
+  email: string | null;
+  phone: string | null;
+  display_name: string | null;
+  created_at: string;
+}
+
 export interface Fulfillment {
   id: string;
   order_id: OrderId;
