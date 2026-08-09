@@ -56,7 +56,12 @@ async def _ready_order_with_location(client: AsyncClient, slug: str):
         headers=headers,
         json={
             "name": "Store",
-            "address": {"line1": "12 Main", "city": "Bengaluru", "pincode": "560095"},
+            "address": {
+                "line1": "12 Main",
+                "city": "Bengaluru",
+                "state": "Karnataka",
+                "pincode": "560095",
+            },
             "lat": 12.9352,
             "lng": 77.6245,
             "hours": [],
