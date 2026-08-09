@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
-import { clearSession, getToken } from "../lib/session";
+import { api, clearSession, getSessionCart, getToken } from "../lib/session";
 
 const links = [
   { href: "/", label: "Home" },
@@ -18,9 +18,29 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [authed, setAuthed] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     setAuthed(Boolean(getToken()));
+    const session = getSessionCart();
+    if (!session?.cartId || !getToken()) {
+      setCartCount(session?.itemCount ?? 0);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const cart = await api().getCart(session.cartId);
+        if (cancelled) return;
+        const count = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+        setCartCount(count);
+      } catch {
+        if (!cancelled) setCartCount(session.itemCount ?? 0);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [pathname]);
 
   return (
@@ -36,17 +56,23 @@ export function AppShell({ children }: { children: ReactNode }) {
                 link.href === "/"
                   ? pathname === "/"
                   : pathname === link.href || pathname.startsWith(`${link.href}/`);
+              const isCart = link.href === "/cart";
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`rounded-lg px-2.5 py-1.5 transition ${
+                  className={`relative rounded-lg px-2.5 py-1.5 transition ${
                     active
                       ? "bg-emerald-400/15 text-emerald-50"
                       : "text-emerald-100/60 hover:text-emerald-50"
                   }`}
                 >
                   {link.label}
+                  {isCart && cartCount > 0 ? (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-400 px-1 text-[10px] font-bold text-emerald-950">
+                      {cartCount > 9 ? "9+" : cartCount}
+                    </span>
+                  ) : null}
                 </Link>
               );
             })}
@@ -57,6 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 onClick={() => {
                   clearSession();
                   setAuthed(false);
+                  setCartCount(0);
                   router.push("/login");
                 }}
               >

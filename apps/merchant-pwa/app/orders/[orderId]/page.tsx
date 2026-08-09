@@ -2,7 +2,13 @@
 
 import { ApiError } from "@commerce/api-client";
 import type { Fulfillment, Order } from "@commerce/types";
-import { Button, formatPaise } from "@commerce/ui";
+import {
+  Button,
+  formatPaise,
+  OrderStatusStepper,
+  Spinner,
+  StatusBadge,
+} from "@commerce/ui";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -15,6 +21,7 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [fulfillment, setFulfillment] = useState<Fulfillment | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -26,6 +33,7 @@ export default function OrderDetailPage() {
     } catch {
       setFulfillment(null);
     }
+    return data;
   }, [params.orderId]);
 
   useEffect(() => {
@@ -41,6 +49,8 @@ export default function OrderDetailPage() {
         if (!cancelled) {
           setError(err instanceof ApiError ? err.message : "Order not found");
         }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     })();
     return () => {
@@ -72,6 +82,14 @@ export default function OrderDetailPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <main className="mx-auto flex max-w-xl justify-center px-5 py-20">
+        <Spinner size="lg" className="text-amber-300" />
+      </main>
+    );
+  }
+
   const total =
     typeof order?.pricing_snapshot?.total_paise === "number"
       ? order.pricing_snapshot.total_paise
@@ -84,15 +102,18 @@ export default function OrderDetailPage() {
       {error ? <p className="mt-4 text-rose-300">{error}</p> : null}
       {order ? (
         <div className="mt-8 space-y-5">
-          <div>
-            <p className="text-2xl text-amber-50">{order.status}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <StatusBadge status={order.status} />
             <p className="text-sm text-amber-100/55">
               {order.state_machine_profile} · {order.payment_method}
             </p>
-            <p className="mt-2 font-display text-3xl text-amber-50">
-              {total != null ? formatPaise(total) : "—"}
-            </p>
           </div>
+
+          <OrderStatusStepper profile={order.state_machine_profile} status={order.status} />
+
+          <p className="font-display text-3xl text-amber-50">
+            {total != null ? formatPaise(total) : "—"}
+          </p>
 
           <ul className="divide-y divide-amber-200/10 rounded-2xl border border-amber-200/10">
             {order.items.map((item) => (
@@ -109,7 +130,7 @@ export default function OrderDetailPage() {
 
           {fulfillment ? (
             <p className="text-sm text-amber-100/55">
-              Fulfillment: {fulfillment.status} ({fulfillment.type})
+              Fulfillment: <StatusBadge status={fulfillment.status} /> ({fulfillment.type})
             </p>
           ) : null}
 

@@ -2,13 +2,15 @@
 
 import { ApiError } from "@commerce/api-client";
 import type { Business, Order } from "@commerce/types";
-import { formatPaise } from "@commerce/ui";
+import { EmptyState, formatPaise, Spinner, StatusBadge } from "@commerce/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { KITCHEN_STATUSES } from "../../lib/order-actions";
 import { api, getBusinessId, getToken, setBusinessId } from "../../lib/session";
+
+const POLL_MS = 8000;
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -17,6 +19,11 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const loadOrders = useCallback(async (businessId: string) => {
+    const rows = await api().listOrders({ business_id: businessId });
+    setOrders(rows);
+  }, []);
 
   useEffect(() => {
     if (!getToken()) {
@@ -34,10 +41,7 @@ export default function OrdersPage() {
           setSelected(current);
           setBusinessId(current);
         }
-        if (current) {
-          const rows = await api().listOrders({ business_id: current });
-          if (!cancelled) setOrders(rows);
-        }
+        if (current) await loadOrders(current);
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof ApiError ? err.message : "Failed to load orders");
@@ -49,10 +53,21 @@ export default function OrdersPage() {
     return () => {
       cancelled = true;
     };
-  }, [router, selected]);
+  }, [loadOrders, router, selected]);
+
+  useEffect(() => {
+    if (!selected || loading) return;
+    const timer = window.setInterval(() => {
+      loadOrders(selected).catch(() => undefined);
+    }, POLL_MS);
+    return () => window.clearInterval(timer);
+  }, [loadOrders, loading, selected]);
 
   const kitchen = useMemo(
-    () => orders.filter((o) => KITCHEN_STATUSES.includes(o.status as (typeof KITCHEN_STATUSES)[number])),
+    () =>
+      orders.filter((o) =>
+        KITCHEN_STATUSES.includes(o.status as (typeof KITCHEN_STATUSES)[number]),
+      ),
     [orders],
   );
 
@@ -62,8 +77,7 @@ export default function OrdersPage() {
     setLoading(true);
     setError(null);
     try {
-      const rows = await api().listOrders({ business_id: id });
-      setOrders(rows);
+      await loadOrders(id);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to load orders");
     } finally {
@@ -73,7 +87,12 @@ export default function OrdersPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-10">
-      <p className="font-display text-4xl text-amber-50">Orders</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <p className="font-display text-4xl text-amber-50">Kitchen board</p>
+        {!loading && selected ? (
+          <p className="text-xs text-amber-100/45">Auto-refresh every {POLL_MS / 1000}s</p>
+        ) : null}
+      </div>
       <label className="mt-6 flex flex-col gap-1.5 text-sm text-amber-50/80">
         <span>Business</span>
         <select
@@ -89,42 +108,59 @@ export default function OrdersPage() {
         </select>
       </label>
 
-      {loading ? <p className="mt-8 text-amber-100/50">Loading queue…</p> : null}
+      {loading ? (
+        <div className="mt-12 flex justify-center">
+          <Spinner size="lg" className="text-amber-300" />
+        </div>
+      ) : null}
       {error ? <p className="mt-4 text-rose-300">{error}</p> : null}
 
       <section className="mt-8">
         <h2 className="text-sm uppercase tracking-wide text-amber-200/50">
-          Kitchen queue ({kitchen.length})
+          Active ({kitchen.length})
         </h2>
-        <ul className="mt-3 flex flex-col gap-2">
-          {kitchen.map((order) => {
-            const total =
-              typeof order.pricing_snapshot?.total_paise === "number"
-                ? order.pricing_snapshot.total_paise
-                : null;
-            return (
-              <li key={order.id}>
-                <Link
-                  href={`/orders/${order.id}`}
-                  className="flex items-center justify-between rounded-2xl border border-amber-200/10 bg-amber-950/25 px-4 py-3 transition hover:border-amber-300/25"
-                >
-                  <div>
-                    <p className="font-medium text-amber-50">{order.status}</p>
-                    <p className="text-xs text-amber-100/50">
-                      {order.state_machine_profile} · {order.items.length} items
-                    </p>
-                  </div>
-                  <span className="text-sm text-amber-100/70">
-                    {total != null ? formatPaise(total) : "—"}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
         {!loading && kitchen.length === 0 ? (
-          <p className="mt-4 text-sm text-amber-100/55">No active kitchen orders.</p>
-        ) : null}
+          <EmptyState
+            className="mt-4 border-amber-200/15"
+            title="No active kitchen orders"
+            description="New paid orders will appear here automatically."
+          />
+        ) : (
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+            {kitchen.map((order) => {
+              const total =
+                typeof order.pricing_snapshot?.total_paise === "number"
+                  ? order.pricing_snapshot.total_paise
+                  : null;
+              const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+              return (
+                <li key={order.id}>
+                  <Link
+                    href={`/orders/${order.id}`}
+                    className="flex h-full flex-col rounded-2xl border border-amber-200/10 bg-amber-950/25 px-4 py-4 transition hover:border-amber-300/25"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <StatusBadge status={order.status} />
+                      <span className="text-sm font-medium text-amber-100/80">
+                        {total != null ? formatPaise(total) : "—"}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-sm text-amber-50">
+                      {itemCount} item{itemCount === 1 ? "" : "s"}
+                    </p>
+                    <p className="mt-1 text-xs text-amber-100/45">
+                      {order.state_machine_profile} ·{" "}
+                      {new Date(order.created_at).toLocaleTimeString("en-IN", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </section>
 
       <section className="mt-10">
@@ -134,9 +170,12 @@ export default function OrdersPage() {
             <li key={order.id}>
               <Link
                 href={`/orders/${order.id}`}
-                className="block rounded-xl px-2 py-1.5 text-sm text-amber-100/70 hover:text-amber-50"
+                className="flex items-center justify-between rounded-xl px-2 py-1.5 text-sm hover:bg-amber-950/20"
               >
-                {order.status} · {new Date(order.created_at).toLocaleString("en-IN")}
+                <span className="flex items-center gap-2 text-amber-100/70 hover:text-amber-50">
+                  <StatusBadge status={order.status} className="!text-[10px]" />
+                  {new Date(order.created_at).toLocaleString("en-IN")}
+                </span>
               </Link>
             </li>
           ))}

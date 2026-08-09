@@ -1,6 +1,7 @@
 /** Thin fetch wrapper against the Commerce Engine API. */
 
 import type {
+  Addon,
   Business,
   Cart,
   CourierQuote,
@@ -11,6 +12,7 @@ import type {
   OrderDebugger,
   Partner,
   Product,
+  ProductAddonLink,
   TokenResponse,
   Tenant,
   Variant,
@@ -161,12 +163,35 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     addCartItem: (
       cartId: string,
-      body: { variant_id: string; quantity?: number; addons?: unknown[] },
+      body: {
+        variant_id: string;
+        quantity?: number;
+        addons?: Array<{ addon_id: string; quantity?: number }>;
+      },
     ) =>
       request<Cart>(`/api/v1/carts/${cartId}/items`, {
         method: "POST",
         body: JSON.stringify(body),
       }),
+
+    updateCartItem: (cartId: string, itemId: string, body: { quantity: number }) =>
+      request<Cart>(`/api/v1/carts/${cartId}/items/${itemId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    removeCartItem: (cartId: string, itemId: string) =>
+      request<Cart>(`/api/v1/carts/${cartId}/items/${itemId}`, {
+        method: "DELETE",
+      }),
+
+    listAddons: (businessId: string) =>
+      request<Addon[]>(`/api/v1/businesses/${businessId}/addons`),
+
+    listProductAddons: (businessId: string, productId: string) =>
+      request<ProductAddonLink[]>(
+        `/api/v1/businesses/${businessId}/products/${productId}/addons`,
+      ),
 
     checkout: (body: {
       cart_id: string;

@@ -58,6 +58,23 @@ export interface Variant {
   is_available: boolean;
 }
 
+export interface Addon {
+  id: string;
+  business_id: BusinessId;
+  name: string;
+  price_paise: MoneyPaise;
+  max_qty: number;
+  is_active: boolean;
+}
+
+export interface ProductAddonLink {
+  id: string;
+  product_id: ProductId;
+  addon_id: string;
+  group_name: string | null;
+  is_required: boolean;
+}
+
 export interface Cart {
   id: CartId;
   business_id: BusinessId | null;

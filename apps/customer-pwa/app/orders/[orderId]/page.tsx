@@ -2,17 +2,32 @@
 
 import { ApiError } from "@commerce/api-client";
 import type { Order } from "@commerce/types";
-import { formatPaise } from "@commerce/ui";
+import {
+  OrderStatusStepper,
+  PriceBreakdown,
+  Spinner,
+  StatusBadge,
+  formatPaise,
+} from "@commerce/ui";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { api, getToken } from "../../../lib/session";
+
+const TERMINAL = new Set(["DELIVERED", "CANCELLED", "FAILED", "REFUNDED"]);
 
 export default function OrderDetailPage() {
   const router = useRouter();
   const params = useParams<{ orderId: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    const data = await api().getOrder(params.orderId);
+    setOrder(data);
+    return data;
+  }, [params.orderId]);
 
   useEffect(() => {
     if (!getToken()) {
@@ -22,37 +37,53 @@ export default function OrderDetailPage() {
     let cancelled = false;
     (async () => {
       try {
-        const data = await api().getOrder(params.orderId);
-        if (!cancelled) setOrder(data);
+        await load();
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof ApiError ? err.message : "Order not found");
         }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [params.orderId, router]);
+  }, [load, router]);
 
-  const total =
-    typeof order?.pricing_snapshot?.total_paise === "number"
-      ? order.pricing_snapshot.total_paise
-      : null;
+  useEffect(() => {
+    if (!order || TERMINAL.has(order.status)) return;
+    const timer = window.setInterval(() => {
+      load().catch(() => undefined);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [load, order?.status]);
+
+  if (loading) {
+    return (
+      <main className="mx-auto flex max-w-xl justify-center px-5 py-20">
+        <Spinner size="lg" className="text-emerald-300" />
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-xl px-5 py-10">
       <p className="font-display text-4xl text-emerald-50">Order</p>
       {error ? <p className="mt-4 text-rose-300">{error}</p> : null}
       {order ? (
-        <div className="mt-8 space-y-4">
-          <p className="text-2xl text-emerald-50">{order.status}</p>
-          <p className="text-sm text-emerald-100/55">
-            {order.state_machine_profile} · {order.fulfillment_type} · {order.payment_method}
-          </p>
-          <p className="font-display text-3xl text-emerald-50">
-            {total != null ? formatPaise(total) : "—"}
-          </p>
+        <div className="mt-8 space-y-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <StatusBadge status={order.status} />
+            <p className="text-sm text-emerald-100/55">
+              {order.state_machine_profile} · {order.fulfillment_type} · {order.payment_method}
+            </p>
+          </div>
+
+          <OrderStatusStepper profile={order.state_machine_profile} status={order.status} />
+
+          <PriceBreakdown snapshot={order.pricing_snapshot} />
+
           <ul className="divide-y divide-emerald-200/10 rounded-2xl border border-emerald-200/10">
             {order.items.map((item) => (
               <li key={item.id} className="flex justify-between px-4 py-3 text-sm">
@@ -65,6 +96,10 @@ export default function OrderDetailPage() {
               </li>
             ))}
           </ul>
+
+          {!TERMINAL.has(order.status) ? (
+            <p className="text-xs text-emerald-100/40">Status refreshes every 5 seconds.</p>
+          ) : null}
         </div>
       ) : null}
     </main>

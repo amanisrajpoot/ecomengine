@@ -153,6 +153,16 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `seed_demo` + demo guide.
 
+## Phase 23 — Experience polish
+
+- Shared `@commerce/ui`: `Spinner`, `EmptyState`, `StatusBadge`, `PriceBreakdown`, `OrderStatusStepper`
+- Customer PWA: env tenant ID, phone on checkout, cart qty/remove, addon picker, order polling + stepper, cart badge
+- Merchant PWA: kitchen board cards, auto-refresh queue, status stepper on order detail
+- Rider PWA: availability panel, job cards, step-by-step POD flow
+- Admin web: dashboard counts, collapsible debugger sections, tenant ID copy/remember
+
+**Status:** implemented — `docs/experience.md`.
+
 ---
 
 ## MVP status
