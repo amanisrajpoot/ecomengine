@@ -15,6 +15,7 @@ export { OrderNotificationsPanel } from "./order-notifications-panel";
 export { LedgerEntryCard } from "./ledger-entry-card";
 export { LedgerBalancesPanel } from "./ledger-balances-panel";
 export { OrderLedgerPanel } from "./order-ledger-panel";
+export { OndcSessionCard } from "./ondc-session-card";
 export { flowStepsFor, statusLabel, ORDER_FLOW_STEPS } from "./order-flow";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

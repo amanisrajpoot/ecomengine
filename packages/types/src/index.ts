@@ -334,6 +334,34 @@ export interface ManualAdjustmentBody {
   metadata?: Record<string, unknown>;
 }
 
+export interface OndcMeta {
+  adapter: string;
+  mock_mode: boolean;
+  supported_domains: string[];
+  supported_actions: string[];
+  version: string;
+}
+
+export interface OndcSession {
+  id: string;
+  tenant_id: string;
+  transaction_id: string;
+  bap_id: string;
+  bap_uri: string;
+  bpp_id: string;
+  stage: string;
+  business_id: string | null;
+  location_id: string | null;
+  cart_id: string | null;
+  order_id: string | null;
+  selected_items: Record<string, unknown>[];
+  customer_phone: string | null;
+  context_json: Record<string, unknown>;
+  callback_log: Record<string, unknown>[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface OrderDebugger {
   order: Order;
   payments: Record<string, unknown>[];

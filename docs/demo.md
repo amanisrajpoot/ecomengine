@@ -147,6 +147,12 @@ If no rider was online at Ready, use **Request rider** on merchant order detail 
 3. **Admin** (:3003) → Settlements → New → RIDER + partner id → Calculate
 4. **Rider** → **Earnings** → view payout period (read-only)
 
+## ONDC ops (admin)
+
+1. Run `pytest tests/test_phase20_ondc.py` or Beckn `search` → `confirm` with `X-Tenant-ID`
+2. **Admin** (:3003) → **ONDC** → session list filtered by stage
+3. Open session → callback log + link to order debugger
+
 ## End-to-end courier flow
 
 1. **Rider** — Go online

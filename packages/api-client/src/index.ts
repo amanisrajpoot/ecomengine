@@ -14,6 +14,8 @@ import type {
   LedgerEvent,
   ManualAdjustmentBody,
   NearbyStore,
+  OndcMeta,
+  OndcSession,
   Order,
   OrderDebugger,
   Partner,
@@ -407,6 +409,14 @@ export function createApiClient(options: ApiClientOptions = {}) {
         method: "POST",
         body: JSON.stringify(body),
       }),
+
+    getOndcMeta: () => request<OndcMeta>("/api/v1/integrations/ondc/meta"),
+
+    listOndcSessions: (params?: { stage?: string; limit?: number }) =>
+      request<OndcSession[]>(`/api/v1/integrations/ondc/sessions${toQuery(params ?? {})}`),
+
+    getOndcSession: (sessionId: string) =>
+      request<OndcSession>(`/api/v1/integrations/ondc/sessions/${sessionId}`),
 
     getOrderFulfillment: (orderId: string) =>
       request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),
