@@ -133,7 +133,28 @@ export interface Business {
   type: BusinessType | string;
   status: string;
   capabilities: Record<string, unknown>;
+  description?: string | null;
+  logo_url?: string | null;
+  contact?: {
+    phone?: string | null;
+    email?: string | null;
+    whatsapp?: string | null;
+  };
+  settings?: {
+    preparation_time_minutes?: number | null;
+    accepts_scheduled_orders?: boolean;
+    currency?: string;
+    timezone?: string;
+    extra?: Record<string, unknown>;
+  };
 }
+
+export type DayHours = {
+  day: string;
+  open?: string | null;
+  close?: string | null;
+  closed?: boolean;
+};
 
 export type StockReason =
   | "RECEIVE"
@@ -179,6 +200,9 @@ export interface BusinessLocation {
   lat: number;
   lng: number;
   is_active: boolean;
+  hours?: DayHours[];
+  timezone?: string;
+  service_area?: Record<string, unknown> | null;
 }
 
 export interface Fulfillment {

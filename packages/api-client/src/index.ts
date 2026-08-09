@@ -8,6 +8,7 @@ import type {
   Cart,
   Category,
   CourierQuote,
+  DayHours,
   Delivery,
   Fulfillment,
   InventoryItem,
@@ -146,12 +147,32 @@ export function createApiClient(options: ApiClientOptions = {}) {
       ),
 
     getBusiness: (businessId: string) =>
-      request<{
-        id: string;
-        name: string;
-        type: string;
-        capabilities: Record<string, unknown>;
-      }>(`/api/v1/businesses/${businessId}`),
+      request<Business>(`/api/v1/businesses/${businessId}`),
+
+    updateBusiness: (
+      businessId: string,
+      body: {
+        name?: string;
+        description?: string | null;
+        logo_url?: string | null;
+        contact?: {
+          phone?: string | null;
+          email?: string | null;
+          whatsapp?: string | null;
+        };
+        settings?: {
+          preparation_time_minutes?: number | null;
+          accepts_scheduled_orders?: boolean;
+          currency?: string;
+          timezone?: string;
+        };
+        status?: string;
+      },
+    ) =>
+      request<Business>(`/api/v1/businesses/${businessId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
 
     listProducts: (
       businessId: string,
@@ -382,6 +403,67 @@ export function createApiClient(options: ApiClientOptions = {}) {
     listLocations: (businessId: string, activeOnly = true) =>
       request<BusinessLocation[]>(
         `/api/v1/businesses/${businessId}/locations${toQuery({ active_only: activeOnly })}`,
+      ),
+
+    getLocation: (businessId: string, locationId: string) =>
+      request<BusinessLocation>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}`,
+      ),
+
+    createLocation: (
+      businessId: string,
+      body: {
+        name: string;
+        address: {
+          line1: string;
+          line2?: string | null;
+          landmark?: string | null;
+          city: string;
+          state: string;
+          pincode: string;
+          country?: string;
+        };
+        lat: number;
+        lng: number;
+        hours?: DayHours[];
+        timezone?: string;
+        is_active?: boolean;
+        service_area?: Record<string, unknown> | null;
+      },
+    ) =>
+      request<BusinessLocation>(`/api/v1/businesses/${businessId}/locations`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateLocation: (
+      businessId: string,
+      locationId: string,
+      body: {
+        name?: string;
+        address?: {
+          line1: string;
+          line2?: string | null;
+          landmark?: string | null;
+          city: string;
+          state: string;
+          pincode: string;
+          country?: string;
+        };
+        lat?: number;
+        lng?: number;
+        hours?: DayHours[];
+        timezone?: string;
+        is_active?: boolean;
+        service_area?: Record<string, unknown> | null;
+      },
+    ) =>
+      request<BusinessLocation>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(body),
+        },
       ),
 
     upsertInventoryItem: (
