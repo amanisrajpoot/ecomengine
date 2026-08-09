@@ -96,12 +96,25 @@ Single tenant **`commerce-demo`** includes:
 
 Default browse coordinates: **Bengaluru Indiranagar** (`12.9784, 77.6408`).
 
-## End-to-end food flow (manual)
+## End-to-end food flow
 
-1. **Customer** (:3000) — login → Browse → Spice Kitchen → add Butter Chicken → Cart → checkout COD (`9876543210`)
-2. **Merchant** (:3001) — login → Orders → Accept → Preparing → Ready
-3. **Rider** (:3002) — login → Go online → complete pickup/drop POD on assigned job
-4. **Admin** (:3003) — login (paste tenant ID) → Orders → open debugger chain
+1. **Rider** (:3002) — login → **Go online** (do this before or while kitchen prepares)
+2. **Customer** (:3000) — login → Browse → Spice Kitchen → add item → Cart → checkout COD
+3. **Merchant** (:3001) — login → Orders → Accept → Preparing → **Ready** (auto-assigns rider)
+4. **Rider** (:3002) — job appears → complete pickup/drop POD
+5. **Admin** (:3003) — login (tenant from `demo.env`) → Dispatch or Orders → debugger
+
+If no rider was online at Ready, use **Request rider** on merchant order detail or **Admin → Dispatch**.
+
+## End-to-end courier flow
+
+1. **Rider** — Go online
+2. **Customer** — Courier tab → quote → book COD (courier business ID from `demo.env`)
+3. **Rider** — assigned job after payment → POD
+
+## End-to-end food flow (legacy manual API — no longer required)
+
+Removed — dispatch is automatic + in-app retry.
 
 ## API-only checks
 
@@ -127,5 +140,5 @@ pnpm demo:seed
 | `pnpm demo:seed` / `No module named 'asyncpg'` | Start Docker (`docker compose up -d`) and run `pnpm demo:seed` again — it seeds via the container. Or install backend venv deps (see above). |
 | Empty browse | Confirm `NEXT_PUBLIC_TENANT_ID` matches `demo.env` |
 | Rider login fails | Re-run `seed_demo` (creates partner profile + vehicle) |
-| Merchant sees no orders | Place an order as customer first; select Spice Kitchen business |
+| Rider sees no jobs | Go **online** on Rider PWA **before** merchant marks Ready; or use Merchant **Request rider** / Admin **Dispatch** |
 | CORS / API errors / **405 on OPTIONS** | Pull latest and **rebuild Docker**: `docker compose up --build -d`. PWAs on :3000–3003 need CORS from API :8000. |

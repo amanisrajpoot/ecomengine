@@ -1,9 +1,10 @@
 "use client";
 
 import { ApiError } from "@commerce/api-client";
-import type { Fulfillment, Order } from "@commerce/types";
+import type { Delivery, Fulfillment, Order } from "@commerce/types";
 import {
   Button,
+  DispatchPanel,
   formatPaise,
   OrderStatusStepper,
   Spinner,
@@ -69,12 +70,7 @@ export default function OrderDetailPage() {
         reason: "merchant_pwa",
       });
       setOrder(updated);
-      try {
-        const ful = await api().getOrderFulfillment(order.id);
-        setFulfillment(ful);
-      } catch {
-        /* optional */
-      }
+      await load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Transition failed");
     } finally {
@@ -95,6 +91,7 @@ export default function OrderDetailPage() {
       ? order.pricing_snapshot.total_paise
       : null;
   const actions = order ? merchantActionsFor(order) : [];
+  const client = api();
 
   return (
     <main className="mx-auto max-w-xl px-5 py-10">
@@ -133,6 +130,13 @@ export default function OrderDetailPage() {
               Fulfillment: <StatusBadge status={fulfillment.status} /> ({fulfillment.type})
             </p>
           ) : null}
+
+          <DispatchPanel
+            order={order}
+            api={client}
+            className="border-amber-200/15"
+            onUpdate={() => void load()}
+          />
 
           <div className="flex flex-col gap-2">
             {actions.map((action) => (

@@ -110,7 +110,7 @@ async def test_fulfillment_syncs_along_order_happy_path(client: AsyncClient) -> 
 
     await move("READY", "merchant")
     ful = (await client.get(f"/api/v1/orders/{order_id}/fulfillment", headers=headers)).json()
-    assert ful["status"] == "READY"
+    assert ful["status"] == "AWAITING_PICKUP"
 
     await move("PICKED_UP", "rider")
     ful = (await client.get(f"/api/v1/orders/{order_id}/fulfillment", headers=headers)).json()

@@ -117,7 +117,7 @@ async def _ready_order_with_location(client: AsyncClient, slug: str):
 
     ful = await client.get(f"/api/v1/orders/{order_id}/fulfillment", headers=headers)
     assert ful.status_code == 200
-    assert ful.json()["status"] == "READY"
+    assert ful.json()["status"] == "AWAITING_PICKUP"
     return headers, user_id, order_id, ful.json()["id"]
 
 
@@ -159,6 +159,11 @@ async def test_assign_track_and_complete_delivery(client: AsyncClient) -> None:
         headers=headers,
         json={"metadata": {"dropoff": {"lat": 12.9452, "lng": 77.6245}}},
     )
+    if delivery.status_code == 409 or delivery.status_code == 400:
+        delivery = await client.get(
+            f"/api/v1/fulfillments/{fulfillment_id}/delivery",
+            headers=headers,
+        )
     assert delivery.status_code == 200, delivery.text
     body = delivery.json()
     assert body["status"] == "CREATED"
@@ -221,6 +226,11 @@ async def test_no_partners_available(client: AsyncClient) -> None:
         headers=headers,
         json={},
     )
+    if delivery.status_code != 200:
+        delivery = await client.get(
+            f"/api/v1/fulfillments/{fulfillment_id}/delivery",
+            headers=headers,
+        )
     assert delivery.status_code == 200
     assigned = await client.post(
         f"/api/v1/deliveries/{delivery.json()['id']}/assign",
