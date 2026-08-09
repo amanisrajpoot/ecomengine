@@ -20,6 +20,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 4** — inventory (optional; receive/reserve/release/consume + movements)
 - **Phase 5** — cart + pricing pipeline (breakdown snapshots; tax stub)
 - **Phase 6** — tax engine (`TaxRule`; customer vs platform vs settlement kinds)
+- **Phase 7** — orders (checkout + configurable state machines)
 
 ## Prerequisites
 
