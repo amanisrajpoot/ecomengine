@@ -1,0 +1,9 @@
+{
+  "name": "@commerce/config",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "node -e \"process.exit(0)\"",
+    "build": "node -e \"process.exit(0)\""
+  }
+}

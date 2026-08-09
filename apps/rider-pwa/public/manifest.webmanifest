@@ -1,0 +1,9 @@
+{
+  "name": "Commerce Engine — Rider PWA",
+  "short_name": "Rider PWA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1c14",
+  "theme_color": "#0f1c14",
+  "icons": []
+}

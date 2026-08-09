@@ -1,0 +1,16 @@
+{
+  "name": "commerce-engine",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev:customer": "pnpm --filter @commerce/customer-pwa dev",
+    "dev:merchant": "pnpm --filter @commerce/merchant-pwa dev",
+    "dev:rider": "pnpm --filter @commerce/rider-pwa dev",
+    "dev:admin": "pnpm --filter @commerce/admin-web dev",
+    "build": "pnpm -r run build",
+    "typecheck": "pnpm -r run typecheck"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
