@@ -28,17 +28,13 @@ def _require_tenant(tenant_id: uuid.UUID | None) -> uuid.UUID:
 
 
 def _to_read(fulfillment, events) -> FulfillmentRead:
-    return FulfillmentRead(
-        id=fulfillment.id,
-        tenant_id=fulfillment.tenant_id,
-        order_id=fulfillment.order_id,
-        type=fulfillment.type,
-        status=fulfillment.status,
-        scheduled_for=fulfillment.scheduled_for,
-        metadata=fulfillment.metadata_json or {},
-        created_at=fulfillment.created_at,
-        updated_at=fulfillment.updated_at,
-        status_events=[FulfillmentStatusEventRead.model_validate(e) for e in events],
+    base = FulfillmentRead.model_validate(fulfillment)
+    return base.model_copy(
+        update={
+            "status_events": [
+                FulfillmentStatusEventRead.model_validate(e) for e in events
+            ]
+        }
     )
 
 
