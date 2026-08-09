@@ -329,6 +329,19 @@ export function createApiClient(options: ApiClientOptions = {}) {
         `/api/v1/businesses/${businessId}/products/${productId}/addons`,
       ),
 
+    linkProductAddon: (
+      businessId: string,
+      productId: string,
+      body: { addon_id: string; group_name?: string | null; is_required?: boolean },
+    ) =>
+      request<ProductAddonLink>(
+        `/api/v1/businesses/${businessId}/products/${productId}/addons`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
     checkout: (body: {
       cart_id: string;
       payment_provider?: string;
