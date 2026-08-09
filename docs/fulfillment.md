@@ -126,4 +126,22 @@ Stored on stop / delivery completion event; triggers `OrderDelivered` when polic
 - `GET /api/v1/fulfillments` / `GET /api/v1/fulfillments/{id}`
 - `POST /api/v1/fulfillments/{id}/transitions`
 
-Created automatically when an order reaches `PAYMENT_CONFIRMED`. Order transitions sync the fulfillment projection (`PENDING` → … → `COMPLETED`) without storing rider/vehicle on `Order`. Delivery partners, stops, and assignment arrive in Phase 12.
+Created automatically when an order reaches `PAYMENT_CONFIRMED`. Order transitions sync the fulfillment projection (`PENDING` → … → `COMPLETED`) without storing rider/vehicle on `Order`.
+
+---
+
+## Phase 12 APIs (delivery)
+
+### Partners / vehicles
+- `POST/GET /api/v1/delivery-partners`, `PATCH`, `POST .../location`
+- `POST/GET /api/v1/vehicles`
+
+### Deliveries
+- `POST /api/v1/fulfillments/{id}/deliveries` — create with pickup/drop stops (not for `SELF_PICKUP`)
+- `GET /api/v1/deliveries/{id}` / `GET /api/v1/fulfillments/{id}/delivery`
+- `POST /api/v1/deliveries/{id}/assign` — V1 nearest online partner (or explicit `partner_id`)
+- `POST /api/v1/deliveries/{id}/transitions`
+- `POST /api/v1/deliveries/{id}/tracking` — REST location ping (WebSockets later)
+- `POST /api/v1/deliveries/{id}/stops/{stop_id}/complete` — OTP/photo/signature proof
+
+Assignment V1: online `ACTIVE` partners with location → filter service area radius → rank by haversine to pickup → assign nearest.

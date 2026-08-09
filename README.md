@@ -25,6 +25,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 9** — ledger (immutable balanced postings from payment events)
 - **Phase 10** — settlements (ledger → merchant/rider/platform payout lifecycle)
 - **Phase 11** — fulfillment (1:1 with order; delivery/partners in Phase 12)
+- **Phase 12** — delivery (partners, vehicles, nearest assignment, tracking, POD)
 
 ## Prerequisites
 

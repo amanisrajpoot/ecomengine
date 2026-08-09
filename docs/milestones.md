@@ -84,7 +84,9 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phase 12 — Delivery
 
-- Partners, vehicles, assignment V1, tracking hooks
+- Partners, vehicles, assignment V1, tracking hooks, stop proof of delivery
+
+**Status:** implemented — delivery_partner_profiles, vehicles, deliveries, delivery_stops; nearest-online assignment; REST tracking.
 
 ## Phase 13 — Vertical 1: Food
 

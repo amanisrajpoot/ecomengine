@@ -10,6 +10,7 @@ from app.cart.router import router as cart_router
 from app.catalog.router import router as catalog_router
 from app.core.config import get_settings
 from app.core.errors import AppError, app_error_handler, http_error_handler
+from app.delivery.router import router as delivery_router
 from app.fulfillment.router import router as fulfillment_router
 from app.identity.router import router as auth_router
 from app.identity.router import users_router
@@ -17,6 +18,7 @@ from app.inventory.router import router as inventory_router
 from app.ledger.router import router as ledger_router
 from app.locations.router import router as locations_router
 from app.orders.router import router as orders_router
+from app.partners.router import router as partners_router
 from app.payments.router import router as payments_router
 from app.pricing.router import router as pricing_router
 from app.settlements.router import router as settlements_router
@@ -27,12 +29,14 @@ from app.tenants.router import router as tenants_router
 import app.businesses.models  # noqa: F401
 import app.cart.models  # noqa: F401
 import app.catalog.models  # noqa: F401
+import app.delivery.models  # noqa: F401
 import app.fulfillment.models  # noqa: F401
 import app.identity.models  # noqa: F401
 import app.inventory.models  # noqa: F401
 import app.ledger.models  # noqa: F401
 import app.locations.models  # noqa: F401
 import app.orders.models  # noqa: F401
+import app.partners.models  # noqa: F401
 import app.payments.models  # noqa: F401
 import app.settlements.models  # noqa: F401
 import app.taxation.models  # noqa: F401
@@ -70,6 +74,8 @@ app.include_router(payments_router, prefix="/api/v1")
 app.include_router(ledger_router, prefix="/api/v1")
 app.include_router(settlements_router, prefix="/api/v1")
 app.include_router(fulfillment_router, prefix="/api/v1")
+app.include_router(partners_router, prefix="/api/v1")
+app.include_router(delivery_router, prefix="/api/v1")
 
 
 @app.get("/health")

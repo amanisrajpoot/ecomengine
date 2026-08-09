@@ -142,6 +142,49 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.STAFF,
         Role.DELIVERY_PARTNER,
     },
+    "partners.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.DELIVERY_PARTNER,
+    },
+    "partners.manage": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+    },
+    "partners.location": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.DELIVERY_PARTNER,
+    },
+    "delivery.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.STAFF,
+        Role.CUSTOMER,
+        Role.DELIVERY_PARTNER,
+    },
+    "delivery.manage": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.DELIVERY_PARTNER,
+    },
+    "delivery.assign": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_MANAGER,
+    },
+    "delivery.track": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.DELIVERY_PARTNER,
+        Role.BUSINESS_MANAGER,
+    },
 }
 
 
