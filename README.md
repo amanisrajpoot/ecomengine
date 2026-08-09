@@ -26,6 +26,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 10** — settlements (ledger → merchant/rider/platform payout lifecycle)
 - **Phase 11** — fulfillment (1:1 with order; delivery/partners in Phase 12)
 - **Phase 12** — delivery (partners, vehicles, nearest assignment, tracking, POD)
+- **Phase 13** — Food vertical golden path + order debugger (shared engines)
 
 ## Prerequisites
 
@@ -54,6 +55,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 PYTHONPATH=. alembic upgrade head
 PYTHONPATH=. python -m app.scripts.bootstrap_super_admin
+PYTHONPATH=. python -m app.scripts.seed_tax_rules
+# Optional Food demo catalog:
+PYTHONPATH=. python -m app.scripts.seed_food_demo
 PYTHONPATH=. uvicorn app.main:app --reload --port 8000
 PYTHONPATH=. pytest
 ```

@@ -1,0 +1,5 @@
+"""Vertical thin configs — capability presets only; shared engines do the work."""
+
+from app.verticals import food
+
+__all__ = ["food"]

@@ -14,7 +14,9 @@ from app.core.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 class DeliveryPartnerProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "delivery_partner_profiles"
-    __table_args__ = (UniqueConstraint("user_id", name="uq_delivery_partner_user"),)
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "user_id", name="uq_delivery_partner_tenant_user"),
+    )
 
     tenant_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False, index=True

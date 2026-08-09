@@ -91,6 +91,10 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.DELIVERY_PARTNER,
         Role.CUSTOMER,
     },
+    "orders.debug": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+    },
     "payments.manage": {
         Role.SUPER_ADMIN,
         Role.TENANT_ADMIN,
