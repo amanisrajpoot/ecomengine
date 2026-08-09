@@ -10,6 +10,7 @@ import asyncio
 import os
 
 from app.core.db import SessionLocal
+from app.core import models as _orm  # noqa: F401 — register all tables
 from app.identity.service import create_bootstrap_super_admin
 
 

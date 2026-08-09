@@ -15,4 +15,4 @@ COPY pyproject.toml ./pyproject.toml
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "alembic upgrade head && python -m app.scripts.bootstrap_super_admin && python -m app.scripts.seed_tax_rules && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "alembic upgrade head && python -m app.scripts.bootstrap_super_admin && python -m app.scripts.seed_tax_rules && python -m app.scripts.seed_demo && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
