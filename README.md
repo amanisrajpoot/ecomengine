@@ -32,6 +32,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 16** — Customer PWA (browse, cart checkout, courier book, orders)
 - **Phase 17** — Merchant PWA (order queue + kitchen transitions)
 - **Phase 18** — Rider PWA (assignments, POD, go-online)
+- **Phase 19** — Admin web (tenant list, order debugger, ops dashboard on port 3003)
 
 ## Prerequisites
 

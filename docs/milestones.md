@@ -119,13 +119,15 @@ Dependency order matters more than calendar duration. Implement sequentially.
 - **Phase 16** — Customer PWA: browse nearby Food/Grocery, cart COD checkout, courier quote/book, orders
 - **Phase 17** — Merchant PWA: business order queue, accept → prepare/pick → ready transitions
 - **Phase 18** — Rider PWA: go online, assigned jobs, stop POD, tracking pings
-- Admin (incl. order debugger)
+- **Phase 19** — Admin web: tenant list, order list, full-chain order debugger UI
 
 **Phase 16 status:** implemented — Customer PWA screens + `catalog.read` / food discovery for customers.
 
 **Phase 17 status:** implemented — Merchant PWA kitchen queue + order transitions.
 
 **Phase 18 status:** implemented — Rider PWA + `GET /deliveries?mine=true` + partner `/me` endpoints.
+
+**Phase 19 status:** implemented — Admin web (violet ops shell) + `listTenants` / `getOrderDebugger` in api-client.
 
 ## Phase 20 — ONDC adapter
 

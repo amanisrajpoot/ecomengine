@@ -8,9 +8,11 @@ import type {
   Fulfillment,
   NearbyStore,
   Order,
+  OrderDebugger,
   Partner,
   Product,
   TokenResponse,
+  Tenant,
   Variant,
 } from "@commerce/types";
 
@@ -86,6 +88,11 @@ export function createApiClient(options: ApiClientOptions = {}) {
     getHealth: () => request<{ status: string }>("/health"),
     getMeta: () =>
       request<{ name: string; version: string; environment: string }>("/api/v1/meta"),
+
+    listTenants: () => request<Tenant[]>("/api/v1/tenants"),
+
+    getOrderDebugger: (orderId: string) =>
+      request<OrderDebugger>(`/api/v1/orders/${orderId}/debugger`),
 
     login: (body: { email: string; password: string }) =>
       request<TokenResponse>("/api/v1/auth/login", {

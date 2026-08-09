@@ -147,6 +147,26 @@ export interface Partner {
   current_lng: number | null;
 }
 
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  config: Record<string, unknown>;
+}
+
+export interface OrderDebugger {
+  order: Order;
+  payments: Record<string, unknown>[];
+  ledger_entries: Record<string, unknown>[];
+  ledger_balances: Record<string, unknown>[];
+  fulfillment: Record<string, unknown> | null;
+  delivery: Record<string, unknown> | null;
+  settlements: Record<string, unknown>[];
+  vertical: string;
+  chain: string[];
+}
+
 export interface PriceBreakdown {
   currency: string;
   subtotal_paise: MoneyPaise;

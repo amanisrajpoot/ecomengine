@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0f1c14;
-  --fg: #f3f7f2;
-  --accent: #3d8b5f;
+  --bg: #120f18;
+  --fg: #f5f0ff;
+  --accent: #8b5cf6;
 }
 
 body {
@@ -13,8 +13,31 @@ body {
   min-height: 100vh;
   color: var(--fg);
   background:
-    radial-gradient(1200px 600px at 10% -10%, #1d3a28 0%, transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, #243528 0%, transparent 50%),
-    var(--bg);
-  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    radial-gradient(1100px 640px at 5% -8%, #2a1a45 0%, transparent 55%),
+    radial-gradient(800px 480px at 100% 0%, #1a1530 0%, transparent 48%),
+    linear-gradient(180deg, #16121f 0%, var(--bg) 42%, #0a0810 100%);
+  font-family: var(--font-sans), "Segoe UI", sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.65s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise 0.75s ease-out 0.1s both;
 }
