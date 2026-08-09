@@ -59,12 +59,15 @@ class UserRoleBinding(UUIDPrimaryKeyMixin, Base):
 
 class CustomerProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "customer_profiles"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "user_id", name="uq_customer_profiles_tenant_user"),
+    )
 
     tenant_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False, index=True
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), unique=True, nullable=False
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
     display_name: Mapped[str | None] = mapped_column(Text, nullable=True)
 

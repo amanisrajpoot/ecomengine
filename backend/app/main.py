@@ -14,6 +14,7 @@ from app.identity.router import router as auth_router
 from app.identity.router import users_router
 from app.inventory.router import router as inventory_router
 from app.locations.router import router as locations_router
+from app.orders.router import router as orders_router
 from app.pricing.router import router as pricing_router
 from app.taxation.router import router as tax_router
 from app.tenants.router import router as tenants_router
@@ -25,6 +26,7 @@ import app.catalog.models  # noqa: F401
 import app.identity.models  # noqa: F401
 import app.inventory.models  # noqa: F401
 import app.locations.models  # noqa: F401
+import app.orders.models  # noqa: F401
 import app.taxation.models  # noqa: F401
 import app.tenants.models  # noqa: F401
 
@@ -55,6 +57,7 @@ app.include_router(inventory_router, prefix="/api/v1")
 app.include_router(cart_router, prefix="/api/v1")
 app.include_router(pricing_router, prefix="/api/v1")
 app.include_router(tax_router, prefix="/api/v1")
+app.include_router(orders_router, prefix="/api/v1")
 
 
 @app.get("/health")

@@ -52,6 +52,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Universal order + configurable state machines
 
+**Status:** implemented — checkout from cart, `FOOD_DELIVERY` / `HYPERLOCAL_DELIVERY` / `COURIER` profiles, status history + domain events; single `Order` model.
+
 ## Phase 8 — Payments
 
 - Gateway interface; Razorpay + COD
