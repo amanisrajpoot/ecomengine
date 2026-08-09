@@ -2,10 +2,17 @@
 
 import { ApiError } from "@commerce/api-client";
 import type { Business, Order } from "@commerce/types";
-import { EmptyState, formatPaise, Spinner, StatusBadge } from "@commerce/ui";
+import {
+  EmptyState,
+  formatPaise,
+  LiveIndicator,
+  Spinner,
+  StatusBadge,
+  useToast,
+} from "@commerce/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { KITCHEN_STATUSES } from "../../lib/order-actions";
 import { api, getBusinessId, getToken, setBusinessId } from "../../lib/session";
@@ -14,16 +21,53 @@ const POLL_MS = 8000;
 
 export default function OrdersPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [selected, setSelected] = useState<string | null>(getBusinessId());
   const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const knownKitchenIdsRef = useRef<Set<string>>(new Set());
+  const kitchenInitializedRef = useRef(false);
 
-  const loadOrders = useCallback(async (businessId: string) => {
-    const rows = await api().listOrders({ business_id: businessId });
-    setOrders(rows);
-  }, []);
+  const notifyNewKitchenOrders = useCallback(
+    (rows: Order[]) => {
+      const kitchen = rows.filter((order) =>
+        KITCHEN_STATUSES.includes(order.status as (typeof KITCHEN_STATUSES)[number]),
+      );
+      if (!kitchenInitializedRef.current) {
+        kitchen.forEach((order) => knownKitchenIdsRef.current.add(order.id));
+        kitchenInitializedRef.current = true;
+        return;
+      }
+      for (const order of kitchen) {
+        if (knownKitchenIdsRef.current.has(order.id)) continue;
+        knownKitchenIdsRef.current.add(order.id);
+        if (order.status !== "PAYMENT_CONFIRMED") continue;
+        const total =
+          typeof order.pricing_snapshot?.total_paise === "number"
+            ? order.pricing_snapshot.total_paise
+            : null;
+        const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+        toast({
+          title: "New order",
+          description: `${itemCount} item${itemCount === 1 ? "" : "s"}${total != null ? ` · ${formatPaise(total)}` : ""}`,
+          variant: "success",
+          durationMs: 8000,
+        });
+      }
+    },
+    [toast],
+  );
+
+  const loadOrders = useCallback(
+    async (businessId: string) => {
+      const rows = await api().listOrders({ business_id: businessId });
+      setOrders(rows);
+      notifyNewKitchenOrders(rows);
+    },
+    [notifyNewKitchenOrders],
+  );
 
   useEffect(() => {
     if (!getToken()) {
@@ -72,6 +116,8 @@ export default function OrdersPage() {
   );
 
   async function onBusinessChange(id: string) {
+    knownKitchenIdsRef.current = new Set();
+    kitchenInitializedRef.current = false;
     setSelected(id);
     setBusinessId(id);
     setLoading(true);
@@ -89,9 +135,7 @@ export default function OrdersPage() {
     <main className="mx-auto max-w-3xl px-5 py-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <p className="font-display text-4xl text-amber-50">Kitchen board</p>
-        {!loading && selected ? (
-          <p className="text-xs text-amber-100/45">Auto-refresh every {POLL_MS / 1000}s</p>
-        ) : null}
+        {!loading && selected ? <LiveIndicator label={`${POLL_MS / 1000}s`} /> : null}
       </div>
       <label className="mt-6 flex flex-col gap-1.5 text-sm text-amber-50/80">
         <span>Business</span>

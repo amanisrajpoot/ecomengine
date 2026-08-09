@@ -1,74 +1,35 @@
 "use client";
 
-import { ApiError } from "@commerce/api-client";
-import type { Notification } from "@commerce/types";
-import { EmptyState, NotificationCard, Spinner } from "@commerce/ui";
+import { NotificationFeed } from "@commerce/ui";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { api, getToken } from "../../lib/session";
 
+const NOTIFICATIONS_SEEN_KEY = "ce.customer.notifications.lastSeen";
+
 export default function NotificationsPage() {
   const router = useRouter();
-  const [rows, setRows] = useState<Notification[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!getToken()) {
-      router.replace("/login");
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const data = await api().listNotifications({ limit: 100 });
-        if (!cancelled) setRows(data);
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : "Failed to load notifications");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    if (!getToken()) router.replace("/login");
   }, [router]);
 
+  if (!getToken()) return null;
+
   return (
-    <main className="mx-auto max-w-xl px-5 py-10">
-      <p className="font-display text-4xl text-emerald-50">Notifications</p>
-      <p className="mt-2 text-sm text-emerald-100/55">
-        SMS updates for your orders — scoped to your account.
-      </p>
-
-      {loading ? (
-        <div className="mt-12 flex justify-center">
-          <Spinner size="lg" className="text-emerald-300" />
-        </div>
-      ) : null}
-      {error ? <p className="mt-4 text-rose-300">{error}</p> : null}
-
-      <ul className="mt-8 flex flex-col gap-3">
-        {rows.map((notification) => (
-          <li key={notification.id}>
-            <NotificationCard
-              notification={notification}
-              className="!border-emerald-200/10 !bg-emerald-950/25"
-            />
-          </li>
-        ))}
-      </ul>
-
-      {!loading && !error && rows.length === 0 ? (
-        <EmptyState
-          className="mt-8 border-emerald-200/15"
-          title="No notifications yet"
-          description="Place an order with your phone number to receive SMS status updates."
-        />
-      ) : null}
-    </main>
+    <NotificationFeed
+      className="text-emerald-50"
+      title="Notifications"
+      description="SMS updates for your orders — scoped to your account."
+      storageKey={NOTIFICATIONS_SEEN_KEY}
+      loadNotifications={() => api().listNotifications({ limit: 100 })}
+      cardClassName="!border-emerald-200/10 !bg-emerald-950/25"
+      emptyTitle="No notifications yet"
+      emptyDescription="Place an order with your phone number to receive SMS status updates."
+      orderHref={(notification) =>
+        notification.order_id ? `/orders/${notification.order_id}` : undefined
+      }
+    />
   );
 }

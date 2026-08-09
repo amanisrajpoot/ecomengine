@@ -1,15 +1,20 @@
 "use client";
 
-import { ApiError } from "@commerce/api-client";
 import type { Notification } from "@commerce/types";
-import { NotificationCard, Spinner } from "@commerce/ui";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
+
+import { ErrorState } from "./error-state";
+import { usePolling } from "./hooks/use-polling";
+import { LiveIndicator } from "./live-indicator";
+import { NotificationCard } from "./notification-card";
+import { Spinner } from "./spinner";
 
 type OrderNotificationsPanelProps = {
   orderId: string;
   loadNotifications: (orderId: string) => Promise<Notification[]>;
   className?: string;
   emptyMessage?: string;
+  pollIntervalMs?: number;
 };
 
 export function OrderNotificationsPanel({
@@ -17,42 +22,32 @@ export function OrderNotificationsPanel({
   loadNotifications,
   className = "",
   emptyMessage = "No SMS notifications for this order yet.",
+  pollIntervalMs = 5000,
 }: OrderNotificationsPanelProps) {
-  const [rows, setRows] = useState<Notification[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const fetcher = useCallback(
+    () => loadNotifications(orderId),
+    [loadNotifications, orderId],
+  );
 
-  const load = useCallback(async () => {
-    const data = await loadNotifications(orderId);
-    setRows(data);
-    return data;
-  }, [loadNotifications, orderId]);
+  const { data, error, loading, refresh } = usePolling(fetcher, {
+    intervalMs: pollIntervalMs,
+    immediate: true,
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        await load();
-        if (!cancelled) setError(null);
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : "Could not load notifications");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [load]);
+  const rows = data ?? [];
+  const message = error
+    ? error
+    : null;
 
   return (
     <section
       className={`rounded-2xl border border-white/10 bg-black/20 px-4 py-4 ${className}`}
     >
-      <p className="text-sm font-medium text-white/80">Notifications</p>
-      {loading ? (
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-medium text-white/80">Notifications</p>
+        <LiveIndicator label={`${pollIntervalMs / 1000}s`} />
+      </div>
+      {loading && rows.length === 0 ? (
         <div className="mt-4 flex justify-center">
           <Spinner size="sm" />
         </div>
@@ -70,7 +65,16 @@ export function OrderNotificationsPanel({
           ))}
         </ul>
       )}
-      {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
+      {message ? (
+        <ErrorState
+          className="mt-3 !border-rose-400/15 !bg-rose-950/10 !py-4"
+          title="Could not load"
+          message={message}
+          onRetry={() => {
+            refresh().catch(() => undefined);
+          }}
+        />
+      ) : null}
     </section>
   );
 }

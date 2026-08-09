@@ -1,14 +1,29 @@
 "use client";
 
 import type { Notification } from "@commerce/types";
-import { StatusBadge } from "@commerce/ui";
+import { StatusBadge } from "./status-badge";
 
 type NotificationCardProps = {
   notification: Notification;
   className?: string;
+  orderHref?: string;
 };
 
-export function NotificationCard({ notification, className = "" }: NotificationCardProps) {
+export function NotificationCard({
+  notification,
+  className = "",
+  orderHref,
+}: NotificationCardProps) {
+  const orderLabel = notification.order_id ? (
+    orderHref ? (
+      <a href={orderHref} className="text-emerald-300/80 hover:text-emerald-200">
+        order {notification.order_id.slice(0, 8)}…
+      </a>
+    ) : (
+      `order ${notification.order_id.slice(0, 8)}…`
+    )
+  ) : null;
+
   return (
     <article
       className={`rounded-2xl border border-white/10 bg-black/20 px-4 py-4 ${className}`}
@@ -27,7 +42,7 @@ export function NotificationCard({ notification, className = "" }: NotificationC
       <p className="mt-3 text-sm text-white/80">{notification.body}</p>
       <p className="mt-2 text-xs text-white/40">
         {notification.channel} → {notification.recipient}
-        {notification.order_id ? ` · order ${notification.order_id.slice(0, 8)}…` : ""}
+        {orderLabel ? <> · {orderLabel}</> : null}
       </p>
     </article>
   );
