@@ -218,6 +218,22 @@ export interface Tenant {
   config: Record<string, unknown>;
 }
 
+export interface Settlement {
+  id: string;
+  tenant_id: string;
+  party_type: "MERCHANT" | "RIDER" | "PLATFORM" | string;
+  party_id: string;
+  status: string;
+  period_start: string;
+  period_end: string;
+  total_paise: number;
+  currency: string;
+  report: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  ledger_entry_ids: string[];
+}
+
 export interface OrderDebugger {
   order: Order;
   payments: Record<string, unknown>[];

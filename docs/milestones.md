@@ -194,6 +194,16 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/inventory-merchant.md`.
 
+## Phase 27 — Settlements UI
+
+- Admin web: settlements list, create period, lifecycle actions (calculate → reconcile → approve → mark paid)
+- Merchant PWA: read-only settlements for owned businesses
+- `SettlementCard` in `@commerce/ui`
+- api-client settlement methods; merchant-scoped `GET /settlements`
+- Backend: merchant settlement access scoping
+
+**Status:** implemented — `docs/settlements-ui.md`.
+
 ---
 
 ## MVP status

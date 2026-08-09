@@ -113,6 +113,12 @@ If no rider was online at Ready, use **Request rider** on merchant order detail 
 3. View Milk 1L stock (seeded at 50 available) → tap → receive or adjust → check movements
 4. **Add stock item** links a new catalog variant to the store location
 
+## Settlements (admin + merchant)
+
+1. Deliver a COD order so ledger entries exist
+2. **Admin** (:3003) → Settlements → New → MERCHANT + business → Create → Calculate → Reconcile → Approve → Mark paid
+3. **Merchant** (:3001) → Settlements → view payout period for selected business (read-only)
+
 ## End-to-end courier flow
 
 1. **Rider** — Go online

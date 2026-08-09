@@ -116,6 +116,7 @@ async def list_settlements(
     tenant_id: uuid.UUID,
     party_type: str | None = None,
     party_id: uuid.UUID | None = None,
+    party_ids: list[uuid.UUID] | None = None,
     status: str | None = None,
 ) -> list[Settlement]:
     stmt = select(Settlement).where(Settlement.tenant_id == tenant_id)
@@ -123,6 +124,8 @@ async def list_settlements(
         stmt = stmt.where(Settlement.party_type == party_type)
     if party_id:
         stmt = stmt.where(Settlement.party_id == party_id)
+    if party_ids:
+        stmt = stmt.where(Settlement.party_id.in_(party_ids))
     if status:
         stmt = stmt.where(Settlement.status == status)
     stmt = stmt.order_by(Settlement.created_at.desc())

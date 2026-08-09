@@ -8,6 +8,7 @@ export { PriceBreakdown, type PricingSnapshot } from "./price-breakdown";
 export { OrderStatusStepper } from "./order-status-stepper";
 export { DispatchPanel } from "./dispatch-panel";
 export { OrderTrackingPanel } from "./order-tracking-panel";
+export { SettlementCard } from "./settlement-card";
 export { flowStepsFor, statusLabel, ORDER_FLOW_STEPS } from "./order-flow";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

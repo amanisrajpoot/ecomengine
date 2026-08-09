@@ -11,6 +11,11 @@ from app.core.db import get_db
 from app.core.deps import AuthContext, require_permission, resolve_tenant_id
 from app.core.errors import AppError
 from app.settlements import service
+from app.settlements.access import (
+    assert_settlement_read_readable,
+    is_merchant_settlement_viewer,
+    merchant_business_ids,
+)
 from app.settlements.schemas import SettlementCreate, SettlementRead, SettlementTransitionBody
 
 router = APIRouter(tags=["settlements"])
@@ -44,10 +49,27 @@ async def list_settlements(
     ctx: AuthContext = Depends(require_permission("settlements.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[SettlementRead]:
-    _ = ctx
     tid = _require_tenant(tenant_id)
+    scoped_party_type = party_type
+    scoped_party_id = party_id
+    scoped_party_ids: list[uuid.UUID] | None = None
+    if is_merchant_settlement_viewer(ctx):
+        scoped_party_type = "MERCHANT"
+        scoped_party_ids = merchant_business_ids(ctx)
+        if not scoped_party_ids:
+            return []
+        if party_id and party_id not in scoped_party_ids:
+            return []
+        if party_id:
+            scoped_party_id = party_id
+            scoped_party_ids = None
     rows = await service.list_settlements(
-        db, tenant_id=tid, party_type=party_type, party_id=party_id, status=status
+        db,
+        tenant_id=tid,
+        party_type=scoped_party_type,
+        party_id=scoped_party_id,
+        party_ids=scoped_party_ids,
+        status=status,
     )
     return [await service.to_read(db, r) for r in rows]
 
@@ -59,9 +81,10 @@ async def get_settlement(
     ctx: AuthContext = Depends(require_permission("settlements.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> SettlementRead:
-    _ = ctx
     tid = _require_tenant(tenant_id)
-    return await service.get_settlement(db, tenant_id=tid, settlement_id=settlement_id)
+    read = await service.get_settlement(db, tenant_id=tid, settlement_id=settlement_id)
+    assert_settlement_read_readable(ctx, party_type=read.party_type, party_id=read.party_id)
+    return read
 
 
 @router.post("/settlements/{settlement_id}/calculate", response_model=SettlementRead)
@@ -137,4 +160,8 @@ async def list_order_settlements(
 ) -> list[SettlementRead]:
     _ = ctx
     tid = _require_tenant(tenant_id)
-    return await service.list_settlements_for_order(db, tenant_id=tid, order_id=order_id)
+    rows = await service.list_settlements_for_order(db, tenant_id=tid, order_id=order_id)
+    if is_merchant_settlement_viewer(ctx):
+        allowed = set(merchant_business_ids(ctx))
+        rows = [r for r in rows if r.party_type == "MERCHANT" and r.party_id in allowed]
+    return rows
