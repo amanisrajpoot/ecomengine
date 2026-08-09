@@ -4,9 +4,11 @@ import type {
   Business,
   Cart,
   CourierQuote,
+  Delivery,
   Fulfillment,
   NearbyStore,
   Order,
+  Partner,
   Product,
   TokenResponse,
   Variant,
@@ -198,6 +200,46 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     createShipment: (body: Record<string, unknown>) =>
       request<Order>("/api/v1/courier/shipments", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    getMyPartner: () => request<Partner>("/api/v1/delivery-partners/me"),
+
+    updateMyLocation: (body: { lat: number; lng: number; is_online?: boolean }) =>
+      request<Partner>("/api/v1/delivery-partners/me/location", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    listDeliveries: (params?: {
+      mine?: boolean;
+      partner_id?: string;
+      status?: string;
+      active_only?: boolean;
+    }) => request<Delivery[]>(`/api/v1/deliveries${toQuery(params ?? {})}`),
+
+    getDelivery: (deliveryId: string) =>
+      request<Delivery>(`/api/v1/deliveries/${deliveryId}`),
+
+    completeDeliveryStop: (
+      deliveryId: string,
+      stopId: string,
+      proof?: Record<string, unknown>,
+    ) =>
+      request<Delivery>(
+        `/api/v1/deliveries/${deliveryId}/stops/${stopId}/complete`,
+        {
+          method: "POST",
+          body: JSON.stringify({ proof: proof ?? {} }),
+        },
+      ),
+
+    updateDeliveryTracking: (
+      deliveryId: string,
+      body: { lat: number; lng: number; heading?: number; speed_kmh?: number },
+    ) =>
+      request<Delivery>(`/api/v1/deliveries/${deliveryId}/tracking`, {
         method: "POST",
         body: JSON.stringify(body),
       }),

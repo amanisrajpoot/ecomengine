@@ -73,6 +73,30 @@ async def get_partner(
     return partner
 
 
+async def get_partner_for_user(
+    db: AsyncSession, *, tenant_id: uuid.UUID, user_id: uuid.UUID
+) -> DeliveryPartnerProfile | None:
+    return await db.scalar(
+        select(DeliveryPartnerProfile).where(
+            DeliveryPartnerProfile.tenant_id == tenant_id,
+            DeliveryPartnerProfile.user_id == user_id,
+        )
+    )
+
+
+async def require_partner_for_user(
+    db: AsyncSession, *, tenant_id: uuid.UUID, user_id: uuid.UUID
+) -> DeliveryPartnerProfile:
+    partner = await get_partner_for_user(db, tenant_id=tenant_id, user_id=user_id)
+    if not partner:
+        raise AppError(
+            "PARTNER_NOT_FOUND",
+            "No delivery partner profile for this user",
+            404,
+        )
+    return partner
+
+
 async def update_partner(
     db: AsyncSession,
     *,

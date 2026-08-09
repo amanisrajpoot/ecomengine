@@ -58,6 +58,36 @@ async def list_partners(
     return [PartnerRead.model_validate(r) for r in rows]
 
 
+@router.get("/delivery-partners/me", response_model=PartnerRead)
+async def get_my_partner(
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("partners.read")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> PartnerRead:
+    tid = _require_tenant(tenant_id)
+    partner = await service.require_partner_for_user(
+        db, tenant_id=tid, user_id=ctx.user.id
+    )
+    return PartnerRead.model_validate(partner)
+
+
+@router.post("/delivery-partners/me/location", response_model=PartnerRead)
+async def update_my_partner_location(
+    payload: PartnerLocationUpdate,
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("partners.location")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> PartnerRead:
+    tid = _require_tenant(tenant_id)
+    partner = await service.require_partner_for_user(
+        db, tenant_id=tid, user_id=ctx.user.id
+    )
+    updated = await service.update_partner_location(
+        db, tenant_id=tid, partner_id=partner.id, payload=payload
+    )
+    return PartnerRead.model_validate(updated)
+
+
 @router.get("/delivery-partners/{partner_id}", response_model=PartnerRead)
 async def get_partner(
     partner_id: uuid.UUID,

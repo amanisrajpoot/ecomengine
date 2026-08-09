@@ -94,6 +94,32 @@ async def get_by_fulfillment(
     return await _load_delivery(db, tenant_id=tenant_id, delivery_id=delivery.id)
 
 
+TERMINAL_DELIVERY_STATUSES = frozenset({"COMPLETED", "CANCELLED", "FAILED"})
+
+
+async def list_deliveries(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    partner_id: uuid.UUID | None = None,
+    status: str | None = None,
+    active_only: bool = False,
+) -> list[tuple[Delivery, list[DeliveryStop]]]:
+    stmt = select(Delivery).where(Delivery.tenant_id == tenant_id)
+    if partner_id:
+        stmt = stmt.where(Delivery.partner_id == partner_id)
+    if status:
+        stmt = stmt.where(Delivery.status == status)
+    if active_only:
+        stmt = stmt.where(Delivery.status.notin_(TERMINAL_DELIVERY_STATUSES))
+    stmt = stmt.order_by(Delivery.created_at.desc())
+    deliveries = list(await db.scalars(stmt))
+    results: list[tuple[Delivery, list[DeliveryStop]]] = []
+    for delivery in deliveries:
+        results.append(await _load_delivery(db, tenant_id=tenant_id, delivery_id=delivery.id))
+    return results
+
+
 async def _default_stops(
     db: AsyncSession, *, order: Order, fulfillment: Fulfillment
 ) -> list[StopCreate]:

@@ -116,6 +116,37 @@ export interface Fulfillment {
   status: string;
 }
 
+export interface DeliveryStop {
+  id: string;
+  delivery_id: string;
+  sequence: number;
+  stop_type: "PICKUP" | "DROP" | string;
+  address: Record<string, unknown>;
+  lat: number | null;
+  lng: number | null;
+  status: string;
+  proof: Record<string, unknown> | null;
+}
+
+export interface Delivery {
+  id: string;
+  fulfillment_id: string;
+  partner_id: string | null;
+  status: string;
+  metadata: Record<string, unknown>;
+  stops: DeliveryStop[];
+}
+
+export interface Partner {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  status: string;
+  is_online: boolean;
+  current_lat: number | null;
+  current_lng: number | null;
+}
+
 export interface PriceBreakdown {
   currency: string;
   subtotal_paise: MoneyPaise;

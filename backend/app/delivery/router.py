@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_db
@@ -54,6 +54,35 @@ async def create_delivery(
         payload=payload or DeliveryCreateBody(),
     )
     return _to_read(delivery, stops)
+
+
+@router.get("/deliveries", response_model=list[DeliveryRead])
+async def list_deliveries(
+    partner_id: uuid.UUID | None = Query(default=None),
+    status: str | None = Query(default=None),
+    active_only: bool = Query(default=False),
+    mine: bool = Query(default=False),
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("delivery.read")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> list[DeliveryRead]:
+    tid = _require_tenant(tenant_id)
+    resolved_partner_id = partner_id
+    if mine:
+        from app.partners.service import require_partner_for_user
+
+        partner = await require_partner_for_user(
+            db, tenant_id=tid, user_id=ctx.user.id
+        )
+        resolved_partner_id = partner.id
+    rows = await service.list_deliveries(
+        db,
+        tenant_id=tid,
+        partner_id=resolved_partner_id,
+        status=status,
+        active_only=active_only,
+    )
+    return [_to_read(d, stops) for d, stops in rows]
 
 
 @router.get("/deliveries/{delivery_id}", response_model=DeliveryRead)
