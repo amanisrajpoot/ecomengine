@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "commerce-engine"
-    app_version: str = "0.20.0"
+    app_version: str = "0.21.0"
     environment: str = "development"
 
     database_url: str = "postgresql+asyncpg://commerce:commerce@localhost:5432/commerce"
@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     # ONDC adapter — mock mode skips subscriber auth and records callbacks locally.
     ondc_mock: bool = True
     ondc_send_callbacks: bool = False
+
+    # Notifications — default SMS channel (mock in dev).
+    notifications_default_channel: str = "sms_mock"
 
 
 @lru_cache

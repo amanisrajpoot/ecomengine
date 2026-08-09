@@ -34,6 +34,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 18** — Rider PWA (assignments, POD, go-online)
 - **Phase 19** — Admin web (tenant list, order debugger, ops dashboard on port 3003)
 - **Phase 20** — ONDC adapter (Beckn BPP: search → confirm on shared engines)
+- **Phase 21** — Notifications (order lifecycle SMS fan-out, mock channel)
 
 ## Prerequisites
 

@@ -88,7 +88,10 @@ async def initiate_payment(
         currency=order.currency,
         idempotency_key=payload.idempotency_key or str(order.id),
         raw=result.raw,
-        checkout_payload=result.checkout,
+        checkout_payload={
+            **(result.checkout or {}),
+            **({"customer_phone": payload.customer_phone} if payload.customer_phone else {}),
+        },
     )
     db.add(payment)
 

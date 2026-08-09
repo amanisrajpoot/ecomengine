@@ -46,6 +46,9 @@ Bindings are always evaluated with **tenant** (and business/location when releva
 | Manage / assign delivery | Y | Y | Y | Y | — | manage | — |
 | Track own orders | — | — | — | — | — | assigned | own |
 | Order debugger | Y | Y | — | — | — | — | — |
+| Notifications list | Y | Y | Y | Y | — | — | Y* |
+
+\* Customers see only their own notification rows.
 
 \* Owner create may be self-serve onboarding under tenant policy.
 
