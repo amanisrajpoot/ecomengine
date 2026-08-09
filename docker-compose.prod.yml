@@ -1,0 +1,137 @@
+# Full production stack — API + all four PWAs + data stores.
+# Usage: cp .env.production.example .env && docker compose -f docker-compose.prod.yml up -d --build
+
+name: commerce-engine
+
+x-frontend-build: &frontend-build
+  context: .
+  dockerfile: Dockerfile.frontend
+  args:
+    NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-commerce}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-commerce}
+      POSTGRES_DB: ${POSTGRES_DB:-commerce}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-commerce} -d ${POSTGRES_DB:-commerce}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio_data:/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-commerce}:${POSTGRES_PASSWORD:-commerce}@postgres:5432/${POSTGRES_DB:-commerce}
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT_URL: http://minio:9000
+      DEMO_ENV_PATH: /app/demo.env
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+  customer:
+    build:
+      <<: *frontend-build
+      args:
+        APP_FILTER: "@commerce/customer-pwa"
+        APP_DIR: customer-pwa
+        PORT: 3000
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    ports:
+      - "${CUSTOMER_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  merchant:
+    build:
+      <<: *frontend-build
+      args:
+        APP_FILTER: "@commerce/merchant-pwa"
+        APP_DIR: merchant-pwa
+        PORT: 3001
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    ports:
+      - "${MERCHANT_PORT:-3001}:3001"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  rider:
+    build:
+      <<: *frontend-build
+      args:
+        APP_FILTER: "@commerce/rider-pwa"
+        APP_DIR: rider-pwa
+        PORT: 3002
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    ports:
+      - "${RIDER_PORT:-3002}:3002"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  admin:
+    build:
+      <<: *frontend-build
+      args:
+        APP_FILTER: "@commerce/admin-web"
+        APP_DIR: admin-web
+        PORT: 3003
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-3003}:3003"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  minio_data:

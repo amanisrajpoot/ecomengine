@@ -260,6 +260,12 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/ui-foundation.md`.
 
+## Docker full-stack deploy
+
+- `docker-compose.prod.yml` — API + Postgres + Redis + MinIO + all four PWAs
+- `Dockerfile.frontend` — shared multi-stage build for Next.js apps
+- `docs/deploy.md` — one-command deploy (Oracle Free Tier, any VPS)
+
 ---
 
 ## MVP status

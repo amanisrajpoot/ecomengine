@@ -69,6 +69,17 @@ docker compose up --build
 - API docs: http://localhost:8000/docs
 - MinIO console: http://localhost:9001 (minioadmin / minioadmin)
 
+## Deploy full stack (Docker)
+
+Run API + all four PWAs on any VPS (Oracle, DigitalOcean, etc.):
+
+```bash
+cp .env.production.example .env   # edit PUBLIC_HOST, secrets, CORS
+pnpm deploy:up                    # or: docker compose -f docker-compose.prod.yml up -d --build
+```
+
+See **[docs/deploy.md](docs/deploy.md)** for Oracle Free Tier steps and demo credentials.
+
 ### Backend (local without Docker for the API)
 
 ```bash
