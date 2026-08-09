@@ -121,6 +121,7 @@ async def list_notifications(
     tenant_id: uuid.UUID,
     order_id: uuid.UUID | None = None,
     user_id: uuid.UUID | None = None,
+    order_ids: list[uuid.UUID] | None = None,
     limit: int = 50,
 ) -> list[Notification]:
     stmt = select(Notification).where(Notification.tenant_id == tenant_id)
@@ -128,5 +129,9 @@ async def list_notifications(
         stmt = stmt.where(Notification.order_id == order_id)
     if user_id:
         stmt = stmt.where(Notification.user_id == user_id)
+    if order_ids is not None:
+        if not order_ids:
+            return []
+        stmt = stmt.where(Notification.order_id.in_(order_ids))
     stmt = stmt.order_by(Notification.created_at.desc()).limit(max(1, min(limit, 200)))
     return list(await db.scalars(stmt))

@@ -157,6 +157,7 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.TENANT_ADMIN,
         Role.BUSINESS_OWNER,
         Role.BUSINESS_MANAGER,
+        Role.DELIVERY_PARTNER,
     },
     "settlements.manage": {
         Role.SUPER_ADMIN,
@@ -233,6 +234,7 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.BUSINESS_OWNER,
         Role.BUSINESS_MANAGER,
         Role.CUSTOMER,
+        Role.DELIVERY_PARTNER,
     },
 }
 

@@ -140,6 +140,13 @@ If no rider was online at Ready, use **Request rider** on merchant order detail 
 3. **Merchant** (:3001) → Ledger → select business → view scoped entries
 4. Order debugger shows structured ledger panel (replaces raw JSON)
 
+## Rider ops (alerts + earnings)
+
+1. **Rider** (:3002) — complete a delivery job
+2. **Alerts** nav — order SMS updates for assigned jobs
+3. **Admin** (:3003) → Settlements → New → RIDER + partner id → Calculate
+4. **Rider** → **Earnings** → view payout period (read-only)
+
 ## End-to-end courier flow
 
 1. **Rider** — Go online

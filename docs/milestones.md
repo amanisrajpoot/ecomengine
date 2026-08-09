@@ -233,6 +233,14 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/ledger-ui.md`.
 
+## Phase 31 — Rider ops UI
+
+- Rider PWA: `/notifications` (Alerts) + `/settlements` (Earnings) read-only
+- Backend: rider scoping on notifications (assigned order ids) and settlements (RIDER party)
+- RBAC: `DELIVERY_PARTNER` on `notifications.read` and `settlements.read`
+
+**Status:** implemented — `docs/rider-ops-ui.md`.
+
 ---
 
 ## MVP status

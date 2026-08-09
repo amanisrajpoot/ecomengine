@@ -9,6 +9,8 @@ import { clearSession, getToken } from "../lib/session";
 const links = [
   { href: "/", label: "Home" },
   { href: "/deliveries", label: "Jobs" },
+  { href: "/notifications", label: "Alerts" },
+  { href: "/settlements", label: "Earnings" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
