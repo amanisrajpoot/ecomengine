@@ -17,10 +17,13 @@ import { useCallback, useEffect, useState } from "react";
 import {
   api,
   getCustomerPhone,
+  getDeliveryAddress,
   getSessionCart,
   getToken,
   setCustomerPhone,
+  setDeliveryAddress,
   setSessionCart,
+  type DeliveryAddress,
 } from "../../lib/session";
 
 export default function CartPage() {
@@ -30,6 +33,7 @@ export default function CartPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [phone, setPhone] = useState(getCustomerPhone());
+  const [address, setAddress] = useState<DeliveryAddress>(getDeliveryAddress());
   const [itemBusy, setItemBusy] = useState<string | null>(null);
 
   const loadCart = useCallback(async () => {
@@ -97,12 +101,14 @@ export default function CartPage() {
     setBusy(true);
     setError(null);
     setCustomerPhone(phone);
+    setDeliveryAddress(address);
     try {
       const order = await api().checkout({
         cart_id: cart.id,
         payment_provider: "cod",
         fulfillment_type: "DELIVERY",
         customer_phone: phone,
+        delivery_address: address,
       });
       setSessionCart(null);
       router.push(`/orders/${order.id}`);
@@ -193,7 +199,29 @@ export default function CartPage() {
             <PriceBreakdown snapshot={cart.pricing_snapshot} />
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 space-y-4">
+            <p className="text-sm font-medium text-emerald-50/90">Delivery address</p>
+            <TextField
+              label="Street / building"
+              value={address.line1}
+              onChange={(e) => setAddress((prev) => ({ ...prev, line1: e.target.value }))}
+              required
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <TextField
+                label="City"
+                value={address.city}
+                onChange={(e) => setAddress((prev) => ({ ...prev, city: e.target.value }))}
+                required
+              />
+              <TextField
+                label="Pincode"
+                value={address.pincode}
+                onChange={(e) => setAddress((prev) => ({ ...prev, pincode: e.target.value }))}
+                pattern="[0-9]{6}"
+                required
+              />
+            </div>
             <TextField
               label="Phone for delivery updates"
               type="tel"

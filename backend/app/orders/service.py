@@ -18,6 +18,30 @@ from app.orders.schemas import CheckoutRequest, OrderTransitionRequest
 from app.orders.states import registry
 
 
+def _checkout_metadata(*, user_id: uuid.UUID, payload: CheckoutRequest) -> dict:
+    meta: dict = {"created_by": str(user_id)}
+    if payload.customer_phone:
+        meta["customer_phone"] = payload.customer_phone
+    if payload.delivery_address:
+        addr = payload.delivery_address
+        drop: dict = {
+            "address": {
+                "line1": addr.line1,
+                "city": addr.city,
+                "state": addr.state,
+                "pincode": addr.pincode,
+            },
+        }
+        if addr.lat is not None:
+            drop["lat"] = addr.lat
+        if addr.lng is not None:
+            drop["lng"] = addr.lng
+        if payload.customer_phone:
+            drop["contact"] = {"phone": payload.customer_phone}
+        meta["drop"] = drop
+    return meta
+
+
 async def _load_order_graph(
     db: AsyncSession, *, tenant_id: uuid.UUID, order_id: uuid.UUID
 ) -> tuple[Order, list[OrderItem], list[OrderStatusEvent]]:
@@ -77,10 +101,7 @@ async def checkout_from_cart(
             payload.payment_provider == "cod" or payload.payment_method == "COD"
         ) else "ONLINE",
         placed_at=datetime.now(UTC),
-        metadata_json={
-            "created_by": str(user_id),
-            **({"customer_phone": payload.customer_phone} if payload.customer_phone else {}),
-        },
+        metadata_json=_checkout_metadata(user_id=user_id, payload=payload),
     )
     db.add(order)
     await db.flush()

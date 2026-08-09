@@ -3,7 +3,9 @@
 import { ApiError } from "@commerce/api-client";
 import type { Order } from "@commerce/types";
 import {
+  Button,
   OrderStatusStepper,
+  OrderTrackingPanel,
   PriceBreakdown,
   Spinner,
   StatusBadge,
@@ -15,6 +17,7 @@ import { useCallback, useEffect, useState } from "react";
 import { api, getToken } from "../../../lib/session";
 
 const TERMINAL = new Set(["DELIVERED", "CANCELLED", "FAILED", "REFUNDED"]);
+const CUSTOMER_CANCELLABLE = new Set(["PAYMENT_PENDING", "PAYMENT_CONFIRMED", "ACCEPTED"]);
 
 export default function OrderDetailPage() {
   const router = useRouter();
@@ -22,6 +25,7 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
     const data = await api().getOrder(params.orderId);
@@ -59,6 +63,24 @@ export default function OrderDetailPage() {
     return () => window.clearInterval(timer);
   }, [load, order?.status]);
 
+  async function cancelOrder() {
+    if (!order) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const updated = await api().transitionOrder(order.id, {
+        to_status: "CANCELLED",
+        actor: "customer",
+        reason: "Cancelled by customer",
+      });
+      setOrder(updated);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not cancel order");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (loading) {
     return (
       <main className="mx-auto flex max-w-xl justify-center px-5 py-20">
@@ -66,6 +88,8 @@ export default function OrderDetailPage() {
       </main>
     );
   }
+
+  const canCancel = order && CUSTOMER_CANCELLABLE.has(order.status);
 
   return (
     <main className="mx-auto max-w-xl px-5 py-10">
@@ -82,6 +106,8 @@ export default function OrderDetailPage() {
 
           <OrderStatusStepper profile={order.state_machine_profile} status={order.status} />
 
+          <OrderTrackingPanel order={order} api={api()} />
+
           <PriceBreakdown snapshot={order.pricing_snapshot} />
 
           <ul className="divide-y divide-emerald-200/10 rounded-2xl border border-emerald-200/10">
@@ -96,6 +122,18 @@ export default function OrderDetailPage() {
               </li>
             ))}
           </ul>
+
+          {canCancel ? (
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full text-rose-300 hover:bg-rose-500/10"
+              disabled={busy}
+              onClick={() => void cancelOrder()}
+            >
+              {busy ? "Cancelling…" : "Cancel order"}
+            </Button>
+          ) : null}
 
           {!TERMINAL.has(order.status) ? (
             <p className="text-xs text-emerald-100/40">Status refreshes every 5 seconds.</p>

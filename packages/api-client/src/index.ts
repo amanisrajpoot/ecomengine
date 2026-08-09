@@ -198,13 +198,21 @@ export function createApiClient(options: ApiClientOptions = {}) {
       payment_provider?: string;
       fulfillment_type?: string;
       customer_phone?: string;
+      delivery_address?: {
+        line1: string;
+        city: string;
+        state?: string;
+        pincode: string;
+        lat?: number;
+        lng?: number;
+      };
     }) =>
       request<Order>("/api/v1/orders/checkout", {
         method: "POST",
         body: JSON.stringify(body),
       }),
 
-    listOrders: (params?: { business_id?: string; status?: string }) =>
+    listOrders: (params?: { business_id?: string; status?: string; mine?: boolean }) =>
       request<Order[]>(`/api/v1/orders${toQuery(params ?? {})}`),
 
     getOrder: (orderId: string) => request<Order>(`/api/v1/orders/${orderId}`),
@@ -215,7 +223,7 @@ export function createApiClient(options: ApiClientOptions = {}) {
     ) =>
       request<Order>(`/api/v1/orders/${orderId}/transitions`, {
         method: "POST",
-        body: JSON.stringify({ actor: "merchant", ...body }),
+        body: JSON.stringify({ actor: body.actor ?? "system", ...body }),
       }),
 
     listBusinesses: (params?: { status?: string; type?: string }) =>

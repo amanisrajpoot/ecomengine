@@ -173,6 +173,17 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/dispatch.md`.
 
+## Phase 25 — Customer journey
+
+- Delivery address at checkout → `metadata.drop` for fulfillment/delivery stops
+- Customer-scoped order list + 404 on cross-customer reads
+- `OrderTrackingPanel` on customer order detail (fulfillment + delivery polling)
+- Customer cancel for early order statuses
+- Courier PWA: editable pickup/drop address fields
+- api-client: `listOrders({ mine })`, `transitionOrder` respects `actor`
+
+**Status:** implemented — `docs/customer-journey.md`.
+
 ---
 
 ## MVP status

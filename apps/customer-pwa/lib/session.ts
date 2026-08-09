@@ -6,6 +6,25 @@ const TOKEN_KEY = "ce_customer_token";
 const TENANT_KEY = "ce_customer_tenant";
 const CART_KEY = "ce_customer_cart";
 const PHONE_KEY = "ce_customer_phone";
+const ADDRESS_KEY = "ce_customer_address";
+
+export type DeliveryAddress = {
+  line1: string;
+  city: string;
+  state: string;
+  pincode: string;
+  lat?: number;
+  lng?: number;
+};
+
+export const DEFAULT_DELIVERY_ADDRESS: DeliveryAddress = {
+  line1: "Koramangala 5th Block",
+  city: "Bengaluru",
+  state: "Karnataka",
+  pincode: "560038",
+  lat: 12.9352,
+  lng: 77.6245,
+};
 
 export type SessionCart = {
   cartId: string;
@@ -35,6 +54,21 @@ export function getCustomerPhone(): string {
 
 export function setCustomerPhone(phone: string) {
   localStorage.setItem(PHONE_KEY, phone);
+}
+
+export function getDeliveryAddress(): DeliveryAddress {
+  if (typeof window === "undefined") return DEFAULT_DELIVERY_ADDRESS;
+  const raw = localStorage.getItem(ADDRESS_KEY);
+  if (!raw) return DEFAULT_DELIVERY_ADDRESS;
+  try {
+    return { ...DEFAULT_DELIVERY_ADDRESS, ...(JSON.parse(raw) as DeliveryAddress) };
+  } catch {
+    return DEFAULT_DELIVERY_ADDRESS;
+  }
+}
+
+export function setDeliveryAddress(address: DeliveryAddress) {
+  localStorage.setItem(ADDRESS_KEY, JSON.stringify(address));
 }
 
 export function setSession(token: string, tenantId: string) {
