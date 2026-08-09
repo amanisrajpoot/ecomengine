@@ -100,6 +100,7 @@ pnpm demo:seed
 
 | Issue | Fix |
 |-------|-----|
+| `backend-1 exited with code 1` / `NoReferencedTableError: tenants` | Pull latest `main` (or phase-22+); scripts now load all ORM models. Then `docker compose down -v && docker compose up --build` |
 | Empty browse | Confirm `NEXT_PUBLIC_TENANT_ID` matches `demo.env` |
 | Rider login fails | Re-run `seed_demo` (creates partner profile + vehicle) |
 | Merchant sees no orders | Place an order as customer first; select Spice Kitchen business |

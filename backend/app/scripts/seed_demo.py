@@ -21,6 +21,7 @@ from sqlalchemy import select
 from app.businesses.models import Business
 from app.catalog.models import Addon, Category, Product, ProductAddonLink, Variant
 from app.core.db import SessionLocal
+from app.core import models as _orm  # noqa: F401 — register all tables
 from app.identity.models import User, UserRoleBinding
 from app.identity.rbac import Role
 from app.identity.schemas import PasswordRegister

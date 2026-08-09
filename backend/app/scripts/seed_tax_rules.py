@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 
 from app.core.db import SessionLocal
+from app.core import models as _orm  # noqa: F401 — register all tables
 from app.taxation.service import seed_india_default_rules
 
 
