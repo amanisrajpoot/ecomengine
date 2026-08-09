@@ -180,7 +180,7 @@ They enable capabilities, e.g.:
 - Loyalty ecosystem
 - Advanced WMS
 - Subscriptions
-- Multiple payment gateways (start: one online + COD)
+- Multiple payment gateways (V1: Cashfree + COD; registry for more)
 - Multiple map providers
 - Full accounting suite
 - Analytics warehouse

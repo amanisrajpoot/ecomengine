@@ -56,7 +56,10 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phase 8 — Payments
 
-- Gateway interface; Razorpay + COD
+- Multi-gateway interface (`PaymentGateway` + registry); Cashfree first + COD
+- Mock mode when credentials missing / `PAYMENTS_MOCK=true`
+
+**Status:** implemented — initiate / verify / refund / Cashfree webhook; order payment confirmation via payments actor.
 
 ## Phase 9 — Ledger
 

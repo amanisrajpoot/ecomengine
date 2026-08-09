@@ -64,7 +64,8 @@ DELIVERED
 
 | From | To | Actor |
 |------|----|-------|
-| `CREATED` | `PAYMENT_PENDING` | system |
+| `CREATED` | `PAYMENT_PENDING` | system / customer / payments |
+| `CREATED` | `PAYMENT_CONFIRMED` | payments (COD shortcut) |
 | `PAYMENT_PENDING` | `PAYMENT_CONFIRMED` | payments |
 | `PAYMENT_PENDING` | `CANCELLED` | customer/system |
 | `PAYMENT_CONFIRMED` | `ACCEPTED` | merchant |

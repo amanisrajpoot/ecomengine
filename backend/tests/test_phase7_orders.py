@@ -118,7 +118,7 @@ async def test_food_cod_checkout_and_happy_path(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_online_checkout_starts_created_then_payment_pending(client: AsyncClient) -> None:
+async def test_online_checkout_starts_payment_pending(client: AsyncClient) -> None:
     headers, cart_id = await _food_cart(client, "order-online")
     checkout = await client.post(
         "/api/v1/orders/checkout",
@@ -126,22 +126,20 @@ async def test_online_checkout_starts_created_then_payment_pending(client: Async
         json={"cart_id": cart_id, "payment_method": "ONLINE"},
     )
     assert checkout.status_code == 200, checkout.text
-    assert checkout.json()["status"] == "CREATED"
+    assert checkout.json()["status"] == "PAYMENT_PENDING"
     order_id = checkout.json()["id"]
 
-    pending = await client.post(
-        f"/api/v1/orders/{order_id}/transitions",
-        headers=headers,
-        json={"to_status": "PAYMENT_PENDING", "actor": "system"},
-    )
-    assert pending.status_code == 200
+    payments = await client.get(f"/api/v1/orders/{order_id}/payments", headers=headers)
+    assert payments.status_code == 200, payments.text
+    assert payments.json()[0]["provider"] == "cashfree"
+
     confirmed = await client.post(
-        f"/api/v1/orders/{order_id}/transitions",
+        f"/api/v1/orders/{order_id}/payments/verify",
         headers=headers,
-        json={"to_status": "PAYMENT_CONFIRMED", "actor": "payments"},
+        json={},
     )
-    assert confirmed.status_code == 200
-    assert confirmed.json()["status"] == "PAYMENT_CONFIRMED"
+    assert confirmed.status_code == 200, confirmed.text
+    assert confirmed.json()["order_status"] == "PAYMENT_CONFIRMED"
 
 
 @pytest.mark.asyncio

@@ -31,6 +31,8 @@ Bindings are always evaluated with **tenant** (and business/location when releva
 | Approve settlements | Y | Y | — | — | — | — | — |
 | Go online / accept jobs | — | — | — | — | — | Y | — |
 | Place orders | — | — | — | — | — | — | Y |
+| Initiate / verify payments | Y | Y | Y | — | — | — | Y |
+| Refund payments | Y | Y | — | — | — | — | — |
 | Track own orders | — | — | — | — | — | assigned | own |
 | Order debugger | Y | Y | — | — | — | — | — |
 

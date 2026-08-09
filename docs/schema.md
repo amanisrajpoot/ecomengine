@@ -349,6 +349,7 @@ Indexes: `(tenant_id, status)`, `(tenant_id, customer_id)`, `(tenant_id, busines
 | currency | TEXT |
 | idempotency_key | TEXT NULL |
 | raw | JSONB |
+| checkout_payload | JSONB |
 | created_at, updated_at | timestamptz |
 
 Unique: `(tenant_id, idempotency_key)` where key not null.
@@ -361,9 +362,11 @@ Unique: `(tenant_id, idempotency_key)` where key not null.
 | tenant_id | UUID |
 | payment_id | UUID |
 | order_id | UUID |
+| provider_ref | TEXT NULL |
 | amount_paise | BIGINT |
 | status | TEXT |
 | reason | TEXT NULL |
+| raw | JSONB |
 | created_at, updated_at | timestamptz |
 
 ---
