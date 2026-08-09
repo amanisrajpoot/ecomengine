@@ -266,6 +266,14 @@ Dependency order matters more than calendar duration. Implement sequentially.
 - `Dockerfile.frontend` — shared multi-stage build for Next.js apps
 - `docs/deploy.md` — one-command deploy (Oracle Free Tier, any VPS)
 
+## Phase 34 — Merchant catalog UI
+
+- Merchant PWA: `/catalog`, `/catalog/new`, `/catalog/[productId]`
+- `ProductCard`, `VariantRow` in `@commerce/ui`
+- api-client: catalog write methods + `Category` type
+
+**Status:** implemented — `docs/catalog-merchant.md`.
+
 ---
 
 ## MVP status

@@ -6,6 +6,7 @@ import type {
   Business,
   BusinessLocation,
   Cart,
+  Category,
   CourierQuote,
   Delivery,
   Fulfillment,
@@ -152,14 +153,116 @@ export function createApiClient(options: ApiClientOptions = {}) {
         capabilities: Record<string, unknown>;
       }>(`/api/v1/businesses/${businessId}`),
 
-    listProducts: (businessId: string, activeOnly = true) =>
+    listProducts: (
+      businessId: string,
+      options?: { active_only?: boolean; category_id?: string },
+    ) =>
       request<Product[]>(
-        `/api/v1/businesses/${businessId}/products${toQuery({ active_only: activeOnly })}`,
+        `/api/v1/businesses/${businessId}/products${toQuery({
+          active_only: options?.active_only ?? true,
+          category_id: options?.category_id,
+        })}`,
       ),
+
+    getProduct: (businessId: string, productId: string) =>
+      request<Product>(`/api/v1/businesses/${businessId}/products/${productId}`),
+
+    createProduct: (
+      businessId: string,
+      body: {
+        name: string;
+        category_id?: string | null;
+        description?: string | null;
+        is_active?: boolean;
+      },
+    ) =>
+      request<Product>(`/api/v1/businesses/${businessId}/products`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateProduct: (
+      businessId: string,
+      productId: string,
+      body: {
+        name?: string;
+        category_id?: string | null;
+        description?: string | null;
+        is_active?: boolean;
+      },
+    ) =>
+      request<Product>(`/api/v1/businesses/${businessId}/products/${productId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    listCategories: (businessId: string) =>
+      request<Category[]>(`/api/v1/businesses/${businessId}/categories`),
+
+    createCategory: (
+      businessId: string,
+      body: { name: string; parent_id?: string | null; sort_order?: number; is_active?: boolean },
+    ) =>
+      request<Category>(`/api/v1/businesses/${businessId}/categories`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateCategory: (
+      businessId: string,
+      categoryId: string,
+      body: {
+        name?: string;
+        parent_id?: string | null;
+        sort_order?: number;
+        is_active?: boolean;
+      },
+    ) =>
+      request<Category>(`/api/v1/businesses/${businessId}/categories/${categoryId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
 
     listVariants: (businessId: string, productId: string) =>
       request<Variant[]>(
         `/api/v1/businesses/${businessId}/products/${productId}/variants`,
+      ),
+
+    createVariant: (
+      businessId: string,
+      productId: string,
+      body: {
+        name: string;
+        sku?: string | null;
+        base_price_paise: number;
+        is_available?: boolean;
+      },
+    ) =>
+      request<Variant>(
+        `/api/v1/businesses/${businessId}/products/${productId}/variants`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    updateVariant: (
+      businessId: string,
+      productId: string,
+      variantId: string,
+      body: {
+        name?: string;
+        sku?: string | null;
+        base_price_paise?: number;
+        is_available?: boolean;
+      },
+    ) =>
+      request<Variant>(
+        `/api/v1/businesses/${businessId}/products/${productId}/variants/${variantId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(body),
+        },
       ),
 
     createCart: (body: {
@@ -201,6 +304,25 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     listAddons: (businessId: string) =>
       request<Addon[]>(`/api/v1/businesses/${businessId}/addons`),
+
+    createAddon: (
+      businessId: string,
+      body: { name: string; price_paise?: number; max_qty?: number; is_active?: boolean },
+    ) =>
+      request<Addon>(`/api/v1/businesses/${businessId}/addons`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateAddon: (
+      businessId: string,
+      addonId: string,
+      body: { name?: string; price_paise?: number; max_qty?: number; is_active?: boolean },
+    ) =>
+      request<Addon>(`/api/v1/businesses/${businessId}/addons/${addonId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
 
     listProductAddons: (businessId: string, productId: string) =>
       request<ProductAddonLink[]>(
