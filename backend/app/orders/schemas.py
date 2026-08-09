@@ -85,3 +85,26 @@ class OrderRead(BaseModel):
     updated_at: datetime
     items: list[OrderItemRead] = []
     status_events: list[OrderStatusEventRead] = []
+
+
+class OrderDebuggerRead(BaseModel):
+    """Admin projection: Order → Payment → Ledger → Fulfillment → Delivery → Settlement."""
+
+    order: OrderRead
+    payments: list[dict[str, Any]] = Field(default_factory=list)
+    ledger_entries: list[dict[str, Any]] = Field(default_factory=list)
+    ledger_balances: list[dict[str, Any]] = Field(default_factory=list)
+    fulfillment: dict[str, Any] | None = None
+    delivery: dict[str, Any] | None = None
+    settlements: list[dict[str, Any]] = Field(default_factory=list)
+    vertical: str = "FOOD"
+    chain: list[str] = Field(
+        default_factory=lambda: [
+            "order",
+            "payments",
+            "ledger",
+            "fulfillment",
+            "delivery",
+            "settlements",
+        ]
+    )

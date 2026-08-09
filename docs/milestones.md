@@ -90,7 +90,11 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phase 13 — Vertical 1: Food
 
-- End-to-end restaurant → rider → customer → settlement
+- End-to-end restaurant → rider → customer → settlement on shared engines
+- Order debugger (Order → Payment → Ledger → Fulfillment → Delivery → Settlement)
+- Thin `verticals/food` capability preset (no FoodOrder model)
+
+**Status:** implemented — golden-path test + `GET /orders/{id}/debugger` + `seed_food_demo`.
 
 ## Phase 14 — Vertical 2: Hyperlocal
 

@@ -13,6 +13,7 @@ from app.core.errors import AppError
 from app.orders import service
 from app.orders.schemas import (
     CheckoutRequest,
+    OrderDebuggerRead,
     OrderItemRead,
     OrderRead,
     OrderStatusEventRead,
@@ -82,6 +83,18 @@ async def get_order(
         db, tenant_id=tid, order_id=order_id
     )
     return _to_order_read(order, items, events)
+
+
+@router.get("/{order_id}/debugger", response_model=OrderDebuggerRead)
+async def get_order_debugger(
+    order_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("orders.debug")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> OrderDebuggerRead:
+    _ = ctx
+    tid = _require_tenant(tenant_id)
+    return await service.get_order_debugger(db, tenant_id=tid, order_id=order_id)
 
 
 @router.post("/{order_id}/transitions", response_model=OrderRead)

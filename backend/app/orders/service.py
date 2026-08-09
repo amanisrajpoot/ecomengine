@@ -225,3 +225,83 @@ async def list_orders(
         stmt = stmt.where(Order.status == status)
     stmt = stmt.order_by(Order.created_at.desc())
     return list(await db.scalars(stmt))
+
+
+async def get_order_debugger(
+    db: AsyncSession, *, tenant_id: uuid.UUID, order_id: uuid.UUID
+):
+    """Assemble Order → Payments → Ledger → Fulfillment → Delivery → Settlements."""
+    from app.delivery.schemas import DeliveryRead, DeliveryStopRead
+    from app.delivery.service import get_by_fulfillment
+    from app.fulfillment.schemas import FulfillmentRead, FulfillmentStatusEventRead
+    from app.fulfillment.service import get_by_order as get_fulfillment_by_order
+    from app.ledger.schemas import LedgerEntryRead
+    from app.ledger.service import account_balances, list_entries
+    from app.orders.schemas import (
+        OrderDebuggerRead,
+        OrderItemRead,
+        OrderRead,
+        OrderStatusEventRead,
+    )
+    from app.payments.schemas import PaymentRead
+    from app.payments.service import list_payments_for_order
+    from app.settlements.service import list_settlements_for_order
+
+    order, items, events = await _load_order_graph(
+        db, tenant_id=tenant_id, order_id=order_id
+    )
+    order_read = OrderRead.model_validate(order)
+    order_read.items = [OrderItemRead.model_validate(i) for i in items]
+    order_read.status_events = [OrderStatusEventRead.model_validate(e) for e in events]
+
+    payments = await list_payments_for_order(db, tenant_id=tenant_id, order_id=order_id)
+    ledger = await list_entries(db, tenant_id=tenant_id, order_id=order_id)
+    balances = await account_balances(db, tenant_id=tenant_id, order_id=order_id)
+
+    fulfillment_payload = None
+    delivery_payload = None
+    ful_graph = await get_fulfillment_by_order(db, tenant_id=tenant_id, order_id=order_id)
+    if ful_graph:
+        ful, ful_events = ful_graph
+        ful_read = FulfillmentRead.model_validate(ful)
+        ful_read = ful_read.model_copy(
+            update={
+                "status_events": [
+                    FulfillmentStatusEventRead.model_validate(e) for e in ful_events
+                ]
+            }
+        )
+        fulfillment_payload = ful_read.model_dump(mode="json")
+        del_graph = await get_by_fulfillment(
+            db, tenant_id=tenant_id, fulfillment_id=ful.id
+        )
+        if del_graph:
+            delivery, stops = del_graph
+            del_read = DeliveryRead.model_validate(delivery)
+            del_read = del_read.model_copy(
+                update={"stops": [DeliveryStopRead.model_validate(s) for s in stops]}
+            )
+            delivery_payload = del_read.model_dump(mode="json")
+
+    settlements = await list_settlements_for_order(
+        db, tenant_id=tenant_id, order_id=order_id
+    )
+
+    vertical = "FOOD"
+    if order.state_machine_profile == "HYPERLOCAL_DELIVERY":
+        vertical = "HYPERLOCAL"
+    elif order.state_machine_profile == "COURIER":
+        vertical = "COURIER"
+
+    return OrderDebuggerRead(
+        order=order_read,
+        payments=[PaymentRead.model_validate(p).model_dump(mode="json") for p in payments],
+        ledger_entries=[
+            LedgerEntryRead.model_validate(e).model_dump(mode="json") for e in ledger
+        ],
+        ledger_balances=[b.model_dump(mode="json") for b in balances],
+        fulfillment=fulfillment_payload,
+        delivery=delivery_payload,
+        settlements=[s.model_dump(mode="json") for s in settlements],
+        vertical=vertical,
+    )

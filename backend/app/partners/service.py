@@ -20,7 +20,10 @@ async def create_partner(
     if not user:
         raise AppError("USER_NOT_FOUND", "User not found", 404)
     existing = await db.scalar(
-        select(DeliveryPartnerProfile).where(DeliveryPartnerProfile.user_id == payload.user_id)
+        select(DeliveryPartnerProfile).where(
+            DeliveryPartnerProfile.tenant_id == tenant_id,
+            DeliveryPartnerProfile.user_id == payload.user_id,
+        )
     )
     if existing:
         raise AppError("PARTNER_EXISTS", "Delivery partner profile already exists for user", 409)
