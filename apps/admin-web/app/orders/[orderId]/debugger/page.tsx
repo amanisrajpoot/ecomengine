@@ -2,7 +2,7 @@
 
 import { ApiError } from "@commerce/api-client";
 import type { OrderDebugger } from "@commerce/types";
-import { OrderNotificationsPanel, formatPaise } from "@commerce/ui";
+import { OrderLedgerPanel, OrderNotificationsPanel, formatPaise } from "@commerce/ui";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -112,9 +112,13 @@ export default function OrderDebuggerPage() {
             orderId={params.orderId}
             loadNotifications={(orderId) => api().listNotifications({ order_id: orderId })}
           />
+          <OrderLedgerPanel
+            orderId={params.orderId}
+            eventHrefBase="/ledger/events"
+            loadLedger={(orderId) => api().getOrderLedger(orderId)}
+            loadBalances={(orderId) => api().listLedgerBalances({ order_id: orderId })}
+          />
           <JsonBlock title="Payments" data={debug.payments} />
-          <JsonBlock title="Ledger entries" data={debug.ledger_entries} />
-          <JsonBlock title="Ledger balances" data={debug.ledger_balances} />
           <JsonBlock title="Fulfillment" data={debug.fulfillment} />
           <JsonBlock title="Delivery" data={debug.delivery} />
           <JsonBlock title="Settlements" data={debug.settlements} />

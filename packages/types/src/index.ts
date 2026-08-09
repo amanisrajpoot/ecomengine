@@ -286,6 +286,54 @@ export interface Settlement {
   ledger_entry_ids: string[];
 }
 
+export interface LedgerEntry {
+  id: string;
+  tenant_id: string;
+  order_id: string | null;
+  event_group_id: string;
+  event_type: string;
+  account: string;
+  direction: "DEBIT" | "CREDIT" | string;
+  amount_paise: number;
+  currency: string;
+  reference_key: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LedgerEvent {
+  event_group_id: string;
+  event_type: string;
+  reference_key: string;
+  order_id: string | null;
+  currency: string;
+  debit_total_paise: number;
+  credit_total_paise: number;
+  entries: LedgerEntry[];
+}
+
+export interface AccountBalance {
+  account: string;
+  debit_paise: number;
+  credit_paise: number;
+  net_paise: number;
+}
+
+export interface ManualAdjustmentBody {
+  order_id?: string;
+  reference_key: string;
+  currency?: string;
+  lines: Array<{
+    account: string;
+    direction: "DEBIT" | "CREDIT";
+    amount_paise: number;
+    metadata?: Record<string, unknown>;
+  }>;
+  reason?: string;
+  metadata?: Record<string, unknown>;
+}
+
 export interface OrderDebugger {
   order: Order;
   payments: Record<string, unknown>[];

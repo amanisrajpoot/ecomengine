@@ -6,6 +6,7 @@ import {
   Button,
   DispatchPanel,
   formatPaise,
+  OrderLedgerPanel,
   OrderStatusStepper,
   Spinner,
   StatusBadge,
@@ -136,6 +137,13 @@ export default function OrderDetailPage() {
             api={client}
             className="border-amber-200/15"
             onUpdate={() => void load()}
+          />
+
+          <OrderLedgerPanel
+            orderId={order.id}
+            loadLedger={(orderId) => client.getOrderLedger(orderId)}
+            loadBalances={(orderId) => client.listLedgerBalances({ order_id: orderId })}
+            className="!border-amber-200/10 !bg-amber-950/25"
           />
 
           <div className="flex flex-col gap-2">

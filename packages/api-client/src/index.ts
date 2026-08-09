@@ -1,6 +1,7 @@
 /** Thin fetch wrapper against the Commerce Engine API. */
 
 import type {
+  AccountBalance,
   Addon,
   Business,
   BusinessLocation,
@@ -9,6 +10,9 @@ import type {
   Delivery,
   Fulfillment,
   InventoryItem,
+  LedgerEntry,
+  LedgerEvent,
+  ManualAdjustmentBody,
   NearbyStore,
   Order,
   OrderDebugger,
@@ -381,6 +385,28 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     listNotifications: (params?: { order_id?: string; limit?: number }) =>
       request<Notification[]>(`/api/v1/notifications${toQuery(params ?? {})}`),
+
+    listLedgerEntries: (params?: {
+      order_id?: string;
+      business_id?: string;
+      account?: string;
+      event_type?: string;
+    }) => request<LedgerEntry[]>(`/api/v1/ledger/entries${toQuery(params ?? {})}`),
+
+    getOrderLedger: (orderId: string) =>
+      request<LedgerEntry[]>(`/api/v1/orders/${orderId}/ledger`),
+
+    getLedgerEvent: (eventGroupId: string) =>
+      request<LedgerEvent>(`/api/v1/ledger/events/${eventGroupId}`),
+
+    listLedgerBalances: (params?: { order_id?: string; business_id?: string }) =>
+      request<AccountBalance[]>(`/api/v1/ledger/balances${toQuery(params ?? {})}`),
+
+    createLedgerAdjustment: (body: ManualAdjustmentBody) =>
+      request<LedgerEvent>("/api/v1/ledger/adjustments", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
 
     getOrderFulfillment: (orderId: string) =>
       request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),

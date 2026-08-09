@@ -133,6 +133,13 @@ If no rider was online at Ready, use **Request rider** on merchant order detail 
 3. **Merchant** (:3001) → **Alerts** → tenant-wide delivery log
 4. **Admin** (:3003) → **Notifications** or order debugger feed
 
+## Ledger (admin + merchant)
+
+1. Deliver a COD order so `ORDER_PAYMENT_CAPTURED` postings exist
+2. **Admin** (:3003) → Ledger → filter `MERCHANT_PAYABLE` → open event group
+3. **Merchant** (:3001) → Ledger → select business → view scoped entries
+4. Order debugger shows structured ledger panel (replaces raw JSON)
+
 ## End-to-end courier flow
 
 1. **Rider** — Go online
