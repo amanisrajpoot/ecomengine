@@ -63,7 +63,10 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phase 9 — Ledger
 
-- Financial events → immutable ledger entries
+- Financial events → immutable ledger entries (balanced postings)
+- Hooks on payment capture / COD authorize / refund; manual adjustments
+
+**Status:** implemented — `ledger_entries`, posting builders, order/account queries, balances API.
 
 ## Phase 10 — Settlements
 

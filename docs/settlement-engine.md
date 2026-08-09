@@ -57,6 +57,27 @@ Immutable.
 
 Prefer balanced postings per financial event (sum debits = sum credits) within an event group id.
 
+### V1 accounts
+
+| Account | Role |
+|---------|------|
+| `PLATFORM_CASH` | Online payment inflow / refund outflow |
+| `CUSTOMER_RECEIVABLE` | COD authorized amount |
+| `TAX_LIABILITY` | Customer GST + commission GST |
+| `PLATFORM_FEE_REVENUE` | Platform convenience fee |
+| `PLATFORM_COMMISSION` | Merchant commission |
+| `MERCHANT_PAYABLE` | Net merchant entitlement |
+| `RIDER_PAYABLE` | Delivery fee accrual |
+| `PLATFORM_CLEARING` | Manual adjustments |
+
+### V1 event types
+
+- `ORDER_PAYMENT_CAPTURED` — posted on Cashfree capture or COD authorize
+- `PAYMENT_REFUND` — posted on refund
+- `MANUAL_ADJUSTMENT` — admin balanced adjustment
+
+Commission rate defaults to `LEDGER_DEFAULT_COMMISSION_BPS` (1000 = 10%), overridable via tenant `config.commission_bps` / `config.extra.commission_bps`. Commission GST uses `PLATFORM_SERVICE` / `COMMISSION` tax rules when present.
+
 ---
 
 ## Settlement parties

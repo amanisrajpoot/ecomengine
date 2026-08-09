@@ -101,6 +101,16 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.SUPER_ADMIN,
         Role.TENANT_ADMIN,
     },
+    "ledger.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+    },
+    "ledger.adjust": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+    },
 }
 
 

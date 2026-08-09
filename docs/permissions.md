@@ -33,6 +33,8 @@ Bindings are always evaluated with **tenant** (and business/location when releva
 | Place orders | — | — | — | — | — | — | Y |
 | Initiate / verify payments | Y | Y | Y | — | — | — | Y |
 | Refund payments | Y | Y | — | — | — | — | — |
+| Read ledger | Y | Y | Y | Y | — | — | — |
+| Ledger adjustments | Y | Y | — | — | — | — | — |
 | Track own orders | — | — | — | — | — | assigned | own |
 | Order debugger | Y | Y | — | — | — | — | — |
 

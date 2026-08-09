@@ -114,6 +114,12 @@ async def initiate_payment(
         payment.status = "AUTHORIZED"
         await db.commit()
         await db.refresh(payment)
+
+        from app.ledger.service import post_payment_captured
+
+        await post_payment_captured(
+            db, tenant_id=tenant_id, order=order_graph[0], payment=payment
+        )
         return payment, order_graph[0]
 
     if order.status == "CREATED":
@@ -166,32 +172,24 @@ async def verify_and_confirm(
     await db.refresh(payment)
 
     if result.status == "CAPTURED" and order.status in {"CREATED", "PAYMENT_PENDING"}:
-        # CREATED can jump to PAYMENT_CONFIRMED on some profiles.
-        if order.status == "CREATED":
-            await transition_order(
-                db,
-                tenant_id=tenant_id,
-                order_id=order.id,
-                payload=OrderTransitionRequest(
-                    to_status="PAYMENT_CONFIRMED",
-                    actor="payments",
-                    reason=f"{provider}_captured",
-                ),
-                actor_user_id=actor_user_id,
-            )
-        else:
-            await transition_order(
-                db,
-                tenant_id=tenant_id,
-                order_id=order.id,
-                payload=OrderTransitionRequest(
-                    to_status="PAYMENT_CONFIRMED",
-                    actor="payments",
-                    reason=f"{provider}_captured",
-                ),
-                actor_user_id=actor_user_id,
-            )
+        await transition_order(
+            db,
+            tenant_id=tenant_id,
+            order_id=order.id,
+            payload=OrderTransitionRequest(
+                to_status="PAYMENT_CONFIRMED",
+                actor="payments",
+                reason=f"{provider}_captured",
+            ),
+            actor_user_id=actor_user_id,
+        )
         order = (await get_order(db, tenant_id=tenant_id, order_id=order.id))[0]
+
+        from app.ledger.service import post_payment_captured
+
+        await post_payment_captured(
+            db, tenant_id=tenant_id, order=order, payment=payment
+        )
 
     return payment, order
 
@@ -237,6 +235,12 @@ async def refund_payment(
     db.add(refund)
     await db.commit()
     await db.refresh(refund)
+
+    from app.ledger.service import post_payment_refund
+
+    await post_payment_refund(
+        db, tenant_id=tenant_id, payment=payment, refund=refund
+    )
     return refund
 
 
