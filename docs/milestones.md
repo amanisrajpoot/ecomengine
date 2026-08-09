@@ -108,6 +108,11 @@ Dependency order matters more than calendar duration. Implement sequentially.
 ## Phase 15 — Vertical 3: Courier
 
 - Pickup/drop package flow; proves generic engine
+- `POST /courier/quote` — fare from distance + weight + vehicle (+ express)
+- `POST /courier/shipments` — shared `Order` (`MULTI_STOP` / `COURIER` profile; no catalog)
+- Delivery sync walks courier states: assign → pickup → in-transit → delivered
+
+**Status:** implemented — golden-path test + `seed_courier_demo`.
 
 ## Phases 16–19 — Experience apps
 

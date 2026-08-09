@@ -100,14 +100,24 @@ async def _default_stops(
     pickup_address: dict[str, Any] = {}
     pickup_lat = None
     pickup_lng = None
-    if order.location_id:
+    order_meta = order.metadata_json if isinstance(order.metadata_json, dict) else {}
+    pickup_meta = order_meta.get("pickup") if isinstance(order_meta.get("pickup"), dict) else {}
+    drop_meta_order = order_meta.get("drop") if isinstance(order_meta.get("drop"), dict) else {}
+
+    if pickup_meta:
+        pickup_address = pickup_meta.get("address") or {}
+        if not isinstance(pickup_address, dict):
+            pickup_address = {"line1": "Pickup"}
+        pickup_lat = pickup_meta.get("lat")
+        pickup_lng = pickup_meta.get("lng")
+    elif order.location_id:
         loc = await db.get(BusinessLocation, order.location_id)
         if loc:
             pickup_address = loc.address or {}
             pickup_lat = loc.lat
             pickup_lng = loc.lng
 
-    drop_meta = (fulfillment.metadata_json or {}).get("dropoff") or {}
+    drop_meta = (fulfillment.metadata_json or {}).get("dropoff") or drop_meta_order or {}
     drop_address = drop_meta.get("address") if isinstance(drop_meta, dict) else {}
     if not isinstance(drop_address, dict):
         drop_address = {"line1": "Customer address"}
@@ -125,8 +135,9 @@ async def _default_stops(
                 sequence=0,
                 stop_type="PICKUP",
                 address=pickup_address or {"line1": "Pickup"},
-                lat=pickup_lat,
-                lng=pickup_lng,
+                lat=float(pickup_lat) if pickup_lat is not None else None,
+                lng=float(pickup_lng) if pickup_lng is not None else None,
+                contact=pickup_meta.get("contact") if isinstance(pickup_meta, dict) else {},
             ),
             StopCreate(
                 sequence=1,
@@ -134,6 +145,7 @@ async def _default_stops(
                 address=drop_address or {"line1": "Drop"},
                 lat=float(drop_lat) if drop_lat is not None else None,
                 lng=float(drop_lng) if drop_lng is not None else None,
+                contact=drop_meta.get("contact") if isinstance(drop_meta, dict) else {},
             ),
         ]
 
@@ -142,8 +154,8 @@ async def _default_stops(
             sequence=0,
             stop_type="PICKUP",
             address=pickup_address or {"line1": "Store"},
-            lat=pickup_lat,
-            lng=pickup_lng,
+            lat=float(pickup_lat) if pickup_lat is not None else None,
+            lng=float(pickup_lng) if pickup_lng is not None else None,
         ),
         StopCreate(
             sequence=1,
@@ -181,6 +193,27 @@ async def create_delivery_for_fulfillment(
     )
     if not order:
         raise AppError("ORDER_NOT_FOUND", "Order not found", 404)
+
+    # Courier packages are ready for pickup at payment confirm — hop PENDING→READY.
+    if fulfillment.type == "MULTI_STOP" and fulfillment.status == "PENDING":
+        for hop in ("ACCEPTED", "READY"):
+            fulfillment = await _get_fulfillment(
+                db, tenant_id=tenant_id, fulfillment_id=fulfillment.id
+            )
+            if fulfillment.status == hop:
+                continue
+            await transition_fulfillment(
+                db,
+                tenant_id=tenant_id,
+                fulfillment_id=fulfillment.id,
+                payload=FulfillmentTransitionRequest(
+                    to_status=hop, actor="system", reason="courier_ready_for_pickup"
+                ),
+                actor_user_id=None,
+            )
+        fulfillment = await _get_fulfillment(
+            db, tenant_id=tenant_id, fulfillment_id=fulfillment.id
+        )
 
     stops_payload = list(payload.stops)
     if payload.auto_stops and not stops_payload:
@@ -354,6 +387,34 @@ async def assign_delivery(
     await db.commit()
     await db.refresh(delivery)
 
+    # Courier: assignment moves order PAYMENT_CONFIRMED → PICKUP_ASSIGNED.
+    fulfillment = await _get_fulfillment(
+        db, tenant_id=tenant_id, fulfillment_id=delivery.fulfillment_id
+    )
+    order = await db.scalar(
+        select(Order).where(Order.id == fulfillment.order_id, Order.tenant_id == tenant_id)
+    )
+    if (
+        order
+        and order.state_machine_profile == "COURIER"
+        and order.status == "PAYMENT_CONFIRMED"
+        and delivery.status == "ASSIGNED"
+    ):
+        try:
+            await transition_order(
+                db,
+                tenant_id=tenant_id,
+                order_id=order.id,
+                payload=OrderTransitionRequest(
+                    to_status="PICKUP_ASSIGNED",
+                    actor="system",
+                    reason="delivery_assigned",
+                ),
+                actor_user_id=None,
+            )
+        except AppError:
+            pass
+
     await event_bus.publish(
         "DeliveryAssigned",
         {
@@ -444,7 +505,7 @@ async def transition_delivery(
             "PICKUP_ASSIGNED",
             "IN_TRANSIT",
         }:
-            # Best-effort: walk food path to DELIVERED when possible.
+            # Best-effort: walk profile-specific path to DELIVERED.
             try:
                 if order.status == "READY":
                     await transition_order(
@@ -459,13 +520,31 @@ async def transition_delivery(
                     order = (
                         await db.scalar(select(Order).where(Order.id == order.id))
                     ) or order
-                if order.status == "PICKED_UP":
+                if order.status == "PICKUP_ASSIGNED":
                     await transition_order(
                         db,
                         tenant_id=tenant_id,
                         order_id=order.id,
                         payload=OrderTransitionRequest(
-                            to_status="OUT_FOR_DELIVERY",
+                            to_status="PICKED_UP", actor="rider", reason="delivery_complete"
+                        ),
+                        actor_user_id=actor_user_id,
+                    )
+                    order = (
+                        await db.scalar(select(Order).where(Order.id == order.id))
+                    ) or order
+                if order.status == "PICKED_UP":
+                    next_status = (
+                        "IN_TRANSIT"
+                        if order.state_machine_profile == "COURIER"
+                        else "OUT_FOR_DELIVERY"
+                    )
+                    await transition_order(
+                        db,
+                        tenant_id=tenant_id,
+                        order_id=order.id,
+                        payload=OrderTransitionRequest(
+                            to_status=next_status,
                             actor="rider",
                             reason="delivery_complete",
                         ),
@@ -474,7 +553,7 @@ async def transition_delivery(
                     order = (
                         await db.scalar(select(Order).where(Order.id == order.id))
                     ) or order
-                if order.status == "OUT_FOR_DELIVERY":
+                if order.status in {"OUT_FOR_DELIVERY", "IN_TRANSIT"}:
                     await transition_order(
                         db,
                         tenant_id=tenant_id,

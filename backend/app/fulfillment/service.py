@@ -106,6 +106,14 @@ async def ensure_fulfillment_for_order(
         "state_machine_profile": order.state_machine_profile,
         **(payload.metadata if payload else {}),
     }
+    order_meta = order.metadata_json if isinstance(order.metadata_json, dict) else {}
+    if "pickup" in order_meta and "pickup" not in meta:
+        meta["pickup"] = order_meta["pickup"]
+    if "drop" in order_meta:
+        meta.setdefault("dropoff", order_meta["drop"])
+        meta.setdefault("drop", order_meta["drop"])
+    if "package" in order_meta and "package" not in meta:
+        meta["package"] = order_meta["package"]
     fulfillment = Fulfillment(
         tenant_id=tenant_id,
         order_id=order.id,

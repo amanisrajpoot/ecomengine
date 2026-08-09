@@ -10,6 +10,7 @@ from app.cart.router import router as cart_router
 from app.catalog.router import router as catalog_router
 from app.core.config import get_settings
 from app.core.errors import AppError, app_error_handler, http_error_handler
+from app.courier.router import router as courier_router
 from app.delivery.router import router as delivery_router
 from app.fulfillment.router import router as fulfillment_router
 from app.identity.router import router as auth_router
@@ -76,6 +77,7 @@ app.include_router(settlements_router, prefix="/api/v1")
 app.include_router(fulfillment_router, prefix="/api/v1")
 app.include_router(partners_router, prefix="/api/v1")
 app.include_router(delivery_router, prefix="/api/v1")
+app.include_router(courier_router, prefix="/api/v1")
 
 
 @app.get("/health")
