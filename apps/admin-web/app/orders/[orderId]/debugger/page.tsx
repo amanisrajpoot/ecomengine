@@ -2,7 +2,7 @@
 
 import { ApiError } from "@commerce/api-client";
 import type { OrderDebugger } from "@commerce/types";
-import { formatPaise } from "@commerce/ui";
+import { OrderNotificationsPanel, formatPaise } from "@commerce/ui";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -107,6 +107,10 @@ export default function OrderDebuggerPage() {
             onRefresh={() => {
               loadDebugger().catch(() => undefined);
             }}
+          />
+          <OrderNotificationsPanel
+            orderId={params.orderId}
+            loadNotifications={(orderId) => api().listNotifications({ order_id: orderId })}
           />
           <JsonBlock title="Payments" data={debug.payments} />
           <JsonBlock title="Ledger entries" data={debug.ledger_entries} />

@@ -12,6 +12,7 @@ const links = [
   { href: "/courier", label: "Courier" },
   { href: "/cart", label: "Cart" },
   { href: "/orders", label: "Orders" },
+  { href: "/notifications", label: "Alerts" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {

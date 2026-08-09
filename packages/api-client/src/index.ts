@@ -18,6 +18,7 @@ import type {
   Settlement,
   StockMovement,
   Refund,
+  Notification,
   Payment,
   PaymentInitiateResponse,
   TokenResponse,
@@ -377,6 +378,9 @@ export function createApiClient(options: ApiClientOptions = {}) {
         method: "POST",
         body: JSON.stringify(body),
       }),
+
+    listNotifications: (params?: { order_id?: string; limit?: number }) =>
+      request<Notification[]>(`/api/v1/notifications${toQuery(params ?? {})}`),
 
     getOrderFulfillment: (orderId: string) =>
       request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),

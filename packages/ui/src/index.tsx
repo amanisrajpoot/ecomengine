@@ -10,6 +10,8 @@ export { DispatchPanel } from "./dispatch-panel";
 export { OrderTrackingPanel } from "./order-tracking-panel";
 export { SettlementCard } from "./settlement-card";
 export { PaymentPanel } from "./payment-panel";
+export { NotificationCard } from "./notification-card";
+export { OrderNotificationsPanel } from "./order-notifications-panel";
 export { flowStepsFor, statusLabel, ORDER_FLOW_STEPS } from "./order-flow";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

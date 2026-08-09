@@ -239,6 +239,23 @@ export interface PaymentInitiateResponse {
   order_status: string;
 }
 
+export interface Notification {
+  id: string;
+  tenant_id: string;
+  user_id: string | null;
+  order_id: string | null;
+  event_name: string;
+  channel: string;
+  recipient: string;
+  subject: string | null;
+  body: string;
+  status: string;
+  provider: string | null;
+  provider_ref: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
 export interface Refund {
   id: string;
   tenant_id: string;
