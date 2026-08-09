@@ -32,6 +32,7 @@ import type {
   TokenResponse,
   Tenant,
   Variant,
+  Vehicle,
 } from "@commerce/types";
 
 export type ApiClientOptions = {
@@ -655,6 +656,45 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     listDeliveryPartners: (params?: { online_only?: boolean; status?: string }) =>
       request<Partner[]>(`/api/v1/delivery-partners${toQuery(params ?? {})}`),
+
+    getDeliveryPartner: (partnerId: string) =>
+      request<Partner>(`/api/v1/delivery-partners/${partnerId}`),
+
+    createDeliveryPartner: (body: {
+      user_id: string;
+      display_name?: string | null;
+      status?: string;
+    }) =>
+      request<Partner>("/api/v1/delivery-partners", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateDeliveryPartner: (
+      partnerId: string,
+      body: {
+        display_name?: string | null;
+        status?: string;
+        is_online?: boolean;
+      },
+    ) =>
+      request<Partner>(`/api/v1/delivery-partners/${partnerId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    listVehicles: (params?: { partner_id?: string }) =>
+      request<Vehicle[]>(`/api/v1/vehicles${toQuery(params ?? {})}`),
+
+    createVehicle: (body: {
+      partner_id: string;
+      vehicle_type?: string;
+      registration?: string | null;
+    }) =>
+      request<Vehicle>("/api/v1/vehicles", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
 
     courierQuote: (body: Record<string, unknown>) =>
       request<CourierQuote>("/api/v1/courier/quote", {

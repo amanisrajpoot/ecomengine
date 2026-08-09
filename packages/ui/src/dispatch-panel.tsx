@@ -1,7 +1,7 @@
 "use client";
 
 import { ApiError } from "@commerce/api-client";
-import type { Delivery, Fulfillment, Order } from "@commerce/types";
+import type { Delivery, Fulfillment, Order, Partner } from "@commerce/types";
 import { Button, StatusBadge } from "@commerce/ui";
 import { useCallback, useEffect, useState } from "react";
 
@@ -9,7 +9,14 @@ type DispatchApi = {
   getOrderFulfillment: (orderId: string) => Promise<Fulfillment>;
   getFulfillmentDelivery: (fulfillmentId: string) => Promise<Delivery>;
   createDelivery: (fulfillmentId: string) => Promise<Delivery>;
-  assignDelivery: (deliveryId: string) => Promise<Delivery>;
+  listDeliveryPartners?: (params?: {
+    online_only?: boolean;
+    status?: string;
+  }) => Promise<Partner[]>;
+  assignDelivery: (
+    deliveryId: string,
+    body?: { partner_id?: string },
+  ) => Promise<Delivery>;
 };
 
 type DispatchPanelProps = {
@@ -30,6 +37,8 @@ const DISPATCHABLE = new Set([
 export function DispatchPanel({ order, api, onUpdate, className = "" }: DispatchPanelProps) {
   const [fulfillment, setFulfillment] = useState<Fulfillment | null>(null);
   const [delivery, setDelivery] = useState<Delivery | null>(null);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [selectedPartnerId, setSelectedPartnerId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -63,6 +72,19 @@ export function DispatchPanel({ order, api, onUpdate, className = "" }: Dispatch
     }
   }, [api, order.fulfillment_type, order.id, order.state_machine_profile, order.status]);
 
+  const loadPartners = useCallback(async () => {
+    if (!api.listDeliveryPartners) return;
+    try {
+      const rows = await api.listDeliveryPartners({ online_only: true, status: "ACTIVE" });
+      setPartners(rows);
+      if (!selectedPartnerId && rows[0]?.id) {
+        setSelectedPartnerId(rows[0].id);
+      }
+    } catch {
+      setPartners([]);
+    }
+  }, [api, selectedPartnerId]);
+
   useEffect(() => {
     void load();
   }, [load]);
@@ -75,7 +97,17 @@ export function DispatchPanel({ order, api, onUpdate, className = "" }: Dispatch
     return () => window.clearInterval(timer);
   }, [load, order.status]);
 
-  async function requestRider() {
+  const needsRider =
+    fulfillment &&
+    (!delivery || (delivery.status === "CREATED" && !delivery.partner_id));
+
+  useEffect(() => {
+    if (needsRider && api.listDeliveryPartners) {
+      void loadPartners();
+    }
+  }, [api.listDeliveryPartners, loadPartners, needsRider]);
+
+  async function assign(partnerId?: string) {
     if (!fulfillment) return;
     setBusy(true);
     setError(null);
@@ -87,7 +119,10 @@ export function DispatchPanel({ order, api, onUpdate, className = "" }: Dispatch
         setNotFound(false);
       }
       if (!del.partner_id && del.status === "CREATED") {
-        del = await api.assignDelivery(del.id);
+        del = await api.assignDelivery(
+          del.id,
+          partnerId ? { partner_id: partnerId } : undefined,
+        );
         setDelivery(del);
       }
       onUpdate?.();
@@ -121,10 +156,6 @@ export function DispatchPanel({ order, api, onUpdate, className = "" }: Dispatch
     return null;
   }
 
-  const needsRider =
-    fulfillment &&
-    (!delivery || (delivery.status === "CREATED" && !delivery.partner_id));
-
   return (
     <section
       className={`rounded-2xl border border-white/10 bg-black/20 px-4 py-4 ${className}`}
@@ -155,15 +186,46 @@ export function DispatchPanel({ order, api, onUpdate, className = "" }: Dispatch
       )}
 
       {needsRider ? (
-        <Button
-          type="button"
-          className="mt-4 w-full"
-          variant="soft"
-          disabled={busy}
-          onClick={() => void requestRider()}
-        >
-          {busy ? "Requesting…" : delivery ? "Retry rider assignment" : "Request rider"}
-        </Button>
+        <div className="mt-4 flex flex-col gap-2">
+          {api.listDeliveryPartners && partners.length > 0 ? (
+            <label className="flex flex-col gap-1 text-xs text-white/55">
+              <span>Assign rider</span>
+              <select
+                className="rounded-lg border border-white/10 bg-black/30 px-2 py-2 text-sm text-white/85"
+                value={selectedPartnerId}
+                onChange={(e) => setSelectedPartnerId(e.target.value)}
+              >
+                {partners.map((partner) => (
+                  <option key={partner.id} value={partner.id}>
+                    {partner.display_name ?? partner.id.slice(0, 8)}…
+                    {partner.is_online ? " · online" : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {api.listDeliveryPartners && partners.length > 0 && selectedPartnerId ? (
+              <Button
+                type="button"
+                variant="soft"
+                disabled={busy}
+                onClick={() => void assign(selectedPartnerId)}
+              >
+                {busy ? "Assigning…" : "Assign selected"}
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="ghost"
+              className="!text-xs"
+              disabled={busy}
+              onClick={() => void assign()}
+            >
+              Auto-assign nearest
+            </Button>
+          </div>
+        </div>
       ) : null}
 
       {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
