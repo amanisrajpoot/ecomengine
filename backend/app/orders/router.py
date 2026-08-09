@@ -11,6 +11,7 @@ from app.core.db import get_db
 from app.core.deps import AuthContext, require_permission, resolve_tenant_id
 from app.core.errors import AppError
 from app.orders import service
+from app.orders.access import assert_order_readable, is_customer_only, resolve_customer_profile_id
 from app.orders.schemas import (
     CheckoutRequest,
     OrderDebuggerRead,
@@ -54,14 +55,21 @@ async def checkout(
 async def list_orders(
     business_id: uuid.UUID | None = Query(default=None),
     status: str | None = Query(default=None),
+    mine: bool = Query(default=False),
     db: AsyncSession = Depends(get_db),
     ctx: AuthContext = Depends(require_permission("orders.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[OrderRead]:
-    _ = ctx
     tid = _require_tenant(tenant_id)
+    customer_id: uuid.UUID | None = None
+    if mine or is_customer_only(ctx):
+        customer_id = await resolve_customer_profile_id(db, tenant_id=tid, ctx=ctx)
     orders = await service.list_orders(
-        db, tenant_id=tid, business_id=business_id, status=status
+        db,
+        tenant_id=tid,
+        business_id=business_id,
+        customer_id=customer_id,
+        status=status,
     )
     result: list[OrderRead] = []
     for order in orders:
@@ -77,11 +85,11 @@ async def get_order(
     ctx: AuthContext = Depends(require_permission("orders.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> OrderRead:
-    _ = ctx
     tid = _require_tenant(tenant_id)
     order, items, events = await service.get_order(
         db, tenant_id=tid, order_id=order_id
     )
+    await assert_order_readable(db, tenant_id=tid, ctx=ctx, order=order)
     return _to_order_read(order, items, events)
 
 

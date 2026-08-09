@@ -6,13 +6,62 @@ import { Button, TextField, formatPaise } from "@commerce/ui";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
-import { api, getToken } from "../../lib/session";
+import {
+  api,
+  DEFAULT_DELIVERY_ADDRESS,
+  getCustomerPhone,
+  getDeliveryAddress,
+  getToken,
+} from "../../lib/session";
+
+type StopAddress = {
+  lat: number;
+  lng: number;
+  address: { line1: string; city: string; state: string; pincode: string };
+};
+
+const DEFAULT_PICKUP: StopAddress = {
+  lat: 12.9716,
+  lng: 77.5946,
+  address: {
+    line1: "MG Road Hub",
+    city: "Bengaluru",
+    state: "Karnataka",
+    pincode: "560001",
+  },
+};
+
+function toStopAddress(
+  line1: string,
+  city: string,
+  pincode: string,
+  lat?: number,
+  lng?: number,
+): StopAddress {
+  return {
+    lat: lat ?? DEFAULT_DELIVERY_ADDRESS.lat ?? 12.9352,
+    lng: lng ?? DEFAULT_DELIVERY_ADDRESS.lng ?? 77.6245,
+    address: {
+      line1,
+      city,
+      state: "Karnataka",
+      pincode,
+    },
+  };
+}
 
 export default function CourierPage() {
   const router = useRouter();
+  const savedDrop = getDeliveryAddress();
   const [businessId, setBusinessId] = useState(
     process.env.NEXT_PUBLIC_COURIER_BUSINESS_ID ?? "",
   );
+  const [pickupLine1, setPickupLine1] = useState(DEFAULT_PICKUP.address.line1);
+  const [pickupCity, setPickupCity] = useState(DEFAULT_PICKUP.address.city);
+  const [pickupPincode, setPickupPincode] = useState(DEFAULT_PICKUP.address.pincode);
+  const [dropLine1, setDropLine1] = useState(savedDrop.line1);
+  const [dropCity, setDropCity] = useState(savedDrop.city);
+  const [dropPincode, setDropPincode] = useState(savedDrop.pincode);
   const [weightKg, setWeightKg] = useState("2");
   const [vehicle, setVehicle] = useState("BIKE");
   const [express, setExpress] = useState(false);
@@ -20,8 +69,8 @@ export default function CourierPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const pickup = { lat: 12.9716, lng: 77.5946, address: { line1: "MG Road Hub", city: "Bengaluru", state: "Karnataka", pincode: "560001" } };
-  const drop = { lat: 12.9352, lng: 77.6245, address: { line1: "Koramangala 5th Block", city: "Bengaluru", state: "Karnataka", pincode: "560095" } };
+  const pickup = toStopAddress(pickupLine1, pickupCity, pickupPincode, DEFAULT_PICKUP.lat, DEFAULT_PICKUP.lng);
+  const drop = toStopAddress(dropLine1, dropCity, dropPincode, savedDrop.lat, savedDrop.lng);
 
   useEffect(() => {
     if (!getToken()) router.replace("/login");
@@ -64,7 +113,7 @@ export default function CourierPage() {
         vehicle_type: vehicle,
         express,
         payment_provider: "cod",
-        customer_phone: "9876543210",
+        customer_phone: getCustomerPhone(),
         package_notes: "Customer PWA shipment",
       });
       router.push(`/orders/${order.id}`);
@@ -79,7 +128,7 @@ export default function CourierPage() {
     <main className="mx-auto max-w-xl px-5 py-10">
       <p className="font-display text-4xl text-emerald-50">Courier</p>
       <p className="mt-2 text-sm text-emerald-100/55">
-        Demo route: MG Road → Koramangala. Quote by distance, weight, and vehicle.
+        Quote by distance, weight, and vehicle. Edit pickup and drop addresses below.
         {process.env.NEXT_PUBLIC_COURIER_BUSINESS_ID
           ? " Courier business loaded from environment."
           : ""}
@@ -93,6 +142,52 @@ export default function CourierPage() {
             placeholder="COURIER business UUID"
           />
         ) : null}
+        <fieldset className="space-y-3 rounded-xl border border-emerald-200/10 p-4">
+          <legend className="px-1 text-sm font-medium text-emerald-50/90">Pickup</legend>
+          <TextField
+            label="Street / building"
+            value={pickupLine1}
+            onChange={(e) => setPickupLine1(e.target.value)}
+            required
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <TextField
+              label="City"
+              value={pickupCity}
+              onChange={(e) => setPickupCity(e.target.value)}
+              required
+            />
+            <TextField
+              label="Pincode"
+              value={pickupPincode}
+              onChange={(e) => setPickupPincode(e.target.value)}
+              required
+            />
+          </div>
+        </fieldset>
+        <fieldset className="space-y-3 rounded-xl border border-emerald-200/10 p-4">
+          <legend className="px-1 text-sm font-medium text-emerald-50/90">Drop</legend>
+          <TextField
+            label="Street / building"
+            value={dropLine1}
+            onChange={(e) => setDropLine1(e.target.value)}
+            required
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <TextField
+              label="City"
+              value={dropCity}
+              onChange={(e) => setDropCity(e.target.value)}
+              required
+            />
+            <TextField
+              label="Pincode"
+              value={dropPincode}
+              onChange={(e) => setDropPincode(e.target.value)}
+              required
+            />
+          </div>
+        </fieldset>
         <TextField
           label="Weight (kg)"
           type="number"

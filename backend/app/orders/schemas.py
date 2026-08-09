@@ -9,6 +9,15 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class CheckoutAddress(BaseModel):
+    line1: str = Field(min_length=1, max_length=256)
+    city: str = Field(min_length=1, max_length=128)
+    state: str = Field(default="Karnataka", min_length=1, max_length=64)
+    pincode: str = Field(min_length=5, max_length=10)
+    lat: float | None = None
+    lng: float | None = None
+
+
 class CheckoutRequest(BaseModel):
     cart_id: uuid.UUID
     # Multi-gateway provider key (registry-backed). Defaults to Cashfree.
@@ -25,6 +34,7 @@ class CheckoutRequest(BaseModel):
     notify_url: str | None = None
     customer_phone: str | None = None
     customer_email: str | None = None
+    delivery_address: CheckoutAddress | None = None
 
 
 class OrderTransitionRequest(BaseModel):
