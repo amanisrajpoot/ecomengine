@@ -27,6 +27,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 11** — fulfillment (1:1 with order; delivery/partners in Phase 12)
 - **Phase 12** — delivery (partners, vehicles, nearest assignment, tracking, POD)
 - **Phase 13** — Food vertical golden path + order debugger (shared engines)
+- **Phase 14** — Hyperlocal (store discovery + inventory reserve/consume on order lifecycle)
 
 ## Prerequisites
 

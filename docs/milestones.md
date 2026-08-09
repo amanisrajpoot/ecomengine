@@ -99,6 +99,11 @@ Dependency order matters more than calendar duration. Implement sequentially.
 ## Phase 14 — Vertical 2: Hyperlocal
 
 - Inventory + store discovery; minimal new core code
+- `GET /stores/nearby` (haversine + service_area)
+- Reserve on `PAYMENT_CONFIRMED`, consume on `DELIVERED`, release on cancel
+- Thin `verticals/hyperlocal` preset (GROCERY/RETAIL; no GroceryOrder model)
+
+**Status:** implemented — golden-path + cancel-release tests + `seed_hyperlocal_demo`.
 
 ## Phase 15 — Vertical 3: Courier
 

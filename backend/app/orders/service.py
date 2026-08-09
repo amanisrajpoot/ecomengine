@@ -159,6 +159,44 @@ async def transition_order(
     machine.assert_can_transition(order.status, payload.to_status, payload.actor)
 
     previous = order.status
+
+    # Hyperlocal inventory side-effects (same transaction as status change).
+    from app.inventory.service import consume_for_order, release_for_order, reserve_for_order
+
+    if payload.to_status == "PAYMENT_CONFIRMED":
+        await reserve_for_order(
+            db,
+            tenant_id=tenant_id,
+            order=order,
+            items=items,
+            actor_user_id=actor_user_id,
+            commit=False,
+        )
+    elif payload.to_status == "DELIVERED":
+        await consume_for_order(
+            db,
+            tenant_id=tenant_id,
+            order=order,
+            items=items,
+            actor_user_id=actor_user_id,
+            commit=False,
+        )
+    elif payload.to_status == "CANCELLED" and previous in {
+        "PAYMENT_CONFIRMED",
+        "ACCEPTED",
+        "PICKING",
+        "READY",
+        "PREPARING",
+    }:
+        await release_for_order(
+            db,
+            tenant_id=tenant_id,
+            order=order,
+            items=items,
+            actor_user_id=actor_user_id,
+            commit=False,
+        )
+
     order.status = payload.to_status
     db.add(
         OrderStatusEvent(

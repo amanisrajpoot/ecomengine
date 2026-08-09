@@ -64,6 +64,7 @@ async def _apply_movement(
     reference_type: str | None = None,
     reference_id: uuid.UUID | None = None,
     note: str | None = None,
+    commit: bool = True,
 ) -> tuple[InventoryItem, StockMovement]:
     new_on_hand = item.on_hand + delta_on_hand
     new_reserved = item.reserved + delta_reserved
@@ -94,9 +95,12 @@ async def _apply_movement(
     item.on_hand = new_on_hand
     item.reserved = new_reserved
     db.add(movement)
-    await db.commit()
-    await db.refresh(item)
-    await db.refresh(movement)
+    if commit:
+        await db.commit()
+        await db.refresh(item)
+        await db.refresh(movement)
+    else:
+        await db.flush()
     return item, movement
 
 
@@ -311,3 +315,171 @@ async def list_movements(
         .order_by(StockMovement.created_at.desc())
     )
     return list(await db.scalars(stmt))
+
+
+async def _item_for_variant_location(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    business_id: uuid.UUID,
+    location_id: uuid.UUID,
+    variant_id: uuid.UUID,
+) -> InventoryItem | None:
+    return await db.scalar(
+        select(InventoryItem).where(
+            InventoryItem.tenant_id == tenant_id,
+            InventoryItem.business_id == business_id,
+            InventoryItem.location_id == location_id,
+            InventoryItem.variant_id == variant_id,
+        )
+    )
+
+
+async def reserve_for_order(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    order,
+    items: list,
+    actor_user_id: uuid.UUID | None,
+    commit: bool = False,
+) -> list[StockMovement]:
+    """Reserve stock for each order line at payment confirmation (hyperlocal)."""
+    from app.businesses.models import Business
+
+    if not order.business_id or not order.location_id:
+        return []
+    business = await db.get(Business, order.business_id)
+    if not business or not business.capabilities.get("inventory", False):
+        return []
+
+    movements: list[StockMovement] = []
+    for line in items:
+        if not line.variant_id or line.quantity <= 0:
+            continue
+        item = await _item_for_variant_location(
+            db,
+            tenant_id=tenant_id,
+            business_id=order.business_id,
+            location_id=order.location_id,
+            variant_id=line.variant_id,
+        )
+        if not item:
+            raise AppError(
+                "INVENTORY_NOT_FOUND",
+                f"No inventory for variant {line.variant_id} at order location",
+                409,
+                details={"variant_id": str(line.variant_id), "location_id": str(order.location_id)},
+            )
+        _item, movement = await _apply_movement(
+            db,
+            item=item,
+            reason=StockReason.RESERVE.value,
+            delta_on_hand=0,
+            delta_reserved=line.quantity,
+            created_by=actor_user_id,
+            reference_type="order",
+            reference_id=order.id,
+            note="reserve_on_payment_confirmed",
+            commit=commit,
+        )
+        movements.append(movement)
+    return movements
+
+
+async def consume_for_order(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    order,
+    items: list,
+    actor_user_id: uuid.UUID | None,
+    commit: bool = False,
+) -> list[StockMovement]:
+    """Consume reserved stock when order is delivered."""
+    from app.businesses.models import Business
+
+    if not order.business_id or not order.location_id:
+        return []
+    business = await db.get(Business, order.business_id)
+    if not business or not business.capabilities.get("inventory", False):
+        return []
+
+    movements: list[StockMovement] = []
+    for line in items:
+        if not line.variant_id or line.quantity <= 0:
+            continue
+        item = await _item_for_variant_location(
+            db,
+            tenant_id=tenant_id,
+            business_id=order.business_id,
+            location_id=order.location_id,
+            variant_id=line.variant_id,
+        )
+        if not item:
+            continue
+        _item, movement = await _apply_movement(
+            db,
+            item=item,
+            reason=StockReason.CONSUME.value,
+            delta_on_hand=-line.quantity,
+            delta_reserved=-line.quantity,
+            created_by=actor_user_id,
+            reference_type="order",
+            reference_id=order.id,
+            note="consume_on_delivered",
+            commit=commit,
+        )
+        movements.append(movement)
+    return movements
+
+
+async def release_for_order(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    order,
+    items: list,
+    actor_user_id: uuid.UUID | None,
+    commit: bool = False,
+) -> list[StockMovement]:
+    """Release reserved stock when a paid order is cancelled."""
+    from app.businesses.models import Business
+
+    if not order.business_id or not order.location_id:
+        return []
+    business = await db.get(Business, order.business_id)
+    if not business or not business.capabilities.get("inventory", False):
+        return []
+
+    movements: list[StockMovement] = []
+    for line in items:
+        if not line.variant_id or line.quantity <= 0:
+            continue
+        item = await _item_for_variant_location(
+            db,
+            tenant_id=tenant_id,
+            business_id=order.business_id,
+            location_id=order.location_id,
+            variant_id=line.variant_id,
+        )
+        if not item:
+            continue
+        # Only release what is still reserved for this line.
+        qty = min(line.quantity, item.reserved)
+        if qty <= 0:
+            continue
+        _item, movement = await _apply_movement(
+            db,
+            item=item,
+            reason=StockReason.RELEASE.value,
+            delta_on_hand=0,
+            delta_reserved=-qty,
+            created_by=actor_user_id,
+            reference_type="order",
+            reference_id=order.id,
+            note="release_on_cancel",
+            commit=commit,
+        )
+        movements.append(movement)
+    return movements

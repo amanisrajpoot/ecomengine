@@ -84,3 +84,17 @@ class BusinessLocationRead(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+
+class NearbyStoreRead(BaseModel):
+    business_id: uuid.UUID
+    business_name: str
+    business_type: str
+    location_id: uuid.UUID
+    location_name: str
+    address: dict[str, Any]
+    lat: float
+    lng: float
+    distance_km: float
+    service_area: dict[str, Any] | None = None
+    capabilities: dict[str, Any] = Field(default_factory=dict)
