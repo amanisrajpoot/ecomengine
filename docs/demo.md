@@ -119,6 +119,13 @@ If no rider was online at Ready, use **Request rider** on merchant order detail 
 2. **Admin** (:3003) → Settlements → New → MERCHANT + business → Create → Calculate → Reconcile → Approve → Mark paid
 3. **Merchant** (:3001) → Settlements → view payout period for selected business (read-only)
 
+## Online payments (Cashfree mock)
+
+1. **Customer** (:3000) → cart → **Pay online (Cashfree)** → place order
+2. Order detail → **Simulate successful payment** (mock mode)
+3. Status moves to `PAYMENT_CONFIRMED` → continue food flow with merchant/rider
+4. **Admin** debugger → Payment actions for verify/refund if needed
+
 ## End-to-end courier flow
 
 1. **Rider** — Go online
