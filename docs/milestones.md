@@ -28,9 +28,13 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Categories, products, variants, addons, bundles, images, availability
 
+**Status:** implemented — generic catalog APIs gated by business capabilities (`catalog`, `addons`).
+
 ## Phase 4 — Inventory
 
 - Optional; stock, reserved, movements, low/out of stock
+
+**Status:** implemented — movement-backed stock mutations; `available = on_hand - reserved`; gated by `capabilities.inventory`.
 
 ## Phase 5 — Cart + pricing
 

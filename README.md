@@ -16,6 +16,8 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 0** — specs + scaffold
 - **Phase 1** — auth (OTP + password), identity/RBAC, multi-tenancy, platform/tenant/business config
 - **Phase 2** — business onboarding, capability presets, locations (address/geo/hours)
+- **Phase 3** — catalog (categories, products, variants, addons, bundles)
+- **Phase 4** — inventory (optional; receive/reserve/release/consume + movements)
 
 ## Prerequisites
 

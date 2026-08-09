@@ -18,6 +18,7 @@ from app.main import app as fastapi_app
 import app.businesses.models  # noqa: F401
 import app.catalog.models  # noqa: F401
 import app.identity.models  # noqa: F401
+import app.inventory.models  # noqa: F401
 import app.locations.models  # noqa: F401
 import app.tenants.models  # noqa: F401
 
