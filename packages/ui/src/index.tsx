@@ -19,6 +19,7 @@ export { NotificationFeed } from "./notification-feed";
 export { StatusBadge } from "./status-badge";
 export { PriceBreakdown, type PricingSnapshot } from "./price-breakdown";
 export { OrderStatusStepper } from "./order-status-stepper";
+export { OrderStatusTimeline } from "./order-status-timeline";
 export { DispatchPanel } from "./dispatch-panel";
 export { OrderTrackingPanel } from "./order-tracking-panel";
 export { SettlementCard } from "./settlement-card";

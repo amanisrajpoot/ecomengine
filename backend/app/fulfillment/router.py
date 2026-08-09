@@ -17,6 +17,8 @@ from app.fulfillment.schemas import (
     FulfillmentStatusEventRead,
     FulfillmentTransitionRequest,
 )
+from app.orders.access import assert_order_readable
+from app.orders.service import get_order
 
 router = APIRouter(tags=["fulfillment"])
 
@@ -82,8 +84,9 @@ async def get_order_fulfillment(
     ctx: AuthContext = Depends(require_permission("fulfillment.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> FulfillmentRead:
-    _ = ctx
     tid = _require_tenant(tenant_id)
+    order, _items, _events = await get_order(db, tenant_id=tid, order_id=order_id)
+    await assert_order_readable(db, tenant_id=tid, ctx=ctx, order=order)
     graph = await service.get_by_order(db, tenant_id=tid, order_id=order_id)
     if not graph:
         raise AppError("FULFILLMENT_NOT_FOUND", "Fulfillment not found for order", 404)

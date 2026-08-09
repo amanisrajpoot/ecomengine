@@ -1,18 +1,24 @@
 "use client";
 
 import { ApiError } from "@commerce/api-client";
-import type { Order } from "@commerce/types";
+import type { Business, Order } from "@commerce/types";
 import {
   Button,
+  ErrorState,
+  LiveIndicator,
   OrderNotificationsPanel,
   OrderStatusStepper,
+  OrderStatusTimeline,
   OrderTrackingPanel,
   PaymentPanel,
   PriceBreakdown,
+  SkeletonCard,
   Spinner,
   StatusBadge,
   formatPaise,
+  usePolling,
 } from "@commerce/ui";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -24,79 +30,109 @@ const CUSTOMER_CANCELLABLE = new Set(["PAYMENT_PENDING", "PAYMENT_CONFIRMED", "A
 export default function OrderDetailPage() {
   const router = useRouter();
   const params = useParams<{ orderId: string }>();
-  const [order, setOrder] = useState<Order | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [business, setBusiness] = useState<Business | null>(null);
   const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [stopPoll, setStopPoll] = useState(false);
 
-  const load = useCallback(async () => {
-    const data = await api().getOrder(params.orderId);
-    setOrder(data);
-    return data;
-  }, [params.orderId]);
+  const fetchOrder = useCallback(
+    () => api().getOrder(params.orderId),
+    [params.orderId],
+  );
+
+  const { data: order, error, loading, refresh } = usePolling(fetchOrder, {
+    intervalMs: 5000,
+    enabled: Boolean(getToken()) && !stopPoll,
+    immediate: true,
+  });
 
   useEffect(() => {
     if (!getToken()) {
       router.replace("/login");
-      return;
     }
+  }, [router]);
+
+  useEffect(() => {
+    if (order && TERMINAL.has(order.status)) {
+      setStopPoll(true);
+    }
+  }, [order?.status]);
+
+  useEffect(() => {
+    if (!order?.business_id) return;
     let cancelled = false;
     (async () => {
       try {
-        await load();
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : "Order not found");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+        const biz = await api().getBusiness(order.business_id!);
+        if (!cancelled) setBusiness(biz);
+      } catch {
+        if (!cancelled) setBusiness(null);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [load, router]);
-
-  useEffect(() => {
-    if (!order || TERMINAL.has(order.status)) return;
-    const timer = window.setInterval(() => {
-      load().catch(() => undefined);
-    }, 5000);
-    return () => window.clearInterval(timer);
-  }, [load, order?.status]);
+  }, [order?.business_id]);
 
   async function cancelOrder() {
     if (!order) return;
     setBusy(true);
-    setError(null);
+    setActionError(null);
     try {
-      const updated = await api().transitionOrder(order.id, {
+      await api().transitionOrder(order.id, {
         to_status: "CANCELLED",
         actor: "customer",
         reason: "Cancelled by customer",
       });
-      setOrder(updated);
+      await refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Could not cancel order");
+      setActionError(err instanceof ApiError ? err.message : "Could not cancel order");
     } finally {
       setBusy(false);
     }
   }
 
-  if (loading) {
+  if (loading && !order) {
     return (
-      <main className="mx-auto flex max-w-xl justify-center px-5 py-20">
-        <Spinner size="lg" className="text-emerald-300" />
+      <main className="mx-auto max-w-xl px-5 py-10">
+        <Spinner size="lg" className="mx-auto mt-12 text-emerald-300" />
+      </main>
+    );
+  }
+
+  if (error && !order) {
+    return (
+      <main className="mx-auto max-w-xl px-5 py-10">
+        <Link href="/orders" className="text-sm text-emerald-100/50 hover:text-emerald-50">
+          ← My orders
+        </Link>
+        <ErrorState
+          className="mt-8 border-emerald-200/15"
+          message={error}
+          onRetry={() => void refresh()}
+        />
       </main>
     );
   }
 
   const canCancel = order && CUSTOMER_CANCELLABLE.has(order.status);
+  const isLive = order && !TERMINAL.has(order.status);
 
   return (
     <main className="mx-auto max-w-xl px-5 py-10">
-      <p className="font-display text-4xl text-emerald-50">Order</p>
-      {error ? <p className="mt-4 text-rose-300">{error}</p> : null}
+      <Link href="/orders" className="text-sm text-emerald-100/50 hover:text-emerald-50">
+        ← My orders
+      </Link>
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <p className="font-display text-4xl text-emerald-50">Order</p>
+        {isLive ? <LiveIndicator /> : null}
+      </div>
+      {business ? (
+        <p className="mt-2 text-sm text-emerald-100/55">{business.name}</p>
+      ) : order?.business_id ? (
+        <SkeletonCard className="mt-2 !border-emerald-200/10 !bg-emerald-950/20 !p-3" />
+      ) : null}
+      {actionError ? <p className="mt-4 text-rose-300">{actionError}</p> : null}
       {order ? (
         <div className="mt-8 space-y-5">
           <div className="flex flex-wrap items-center gap-3">
@@ -112,7 +148,7 @@ export default function OrderDetailPage() {
             order={order}
             api={api()}
             onUpdate={() => {
-              load().catch(() => undefined);
+              refresh().catch(() => undefined);
             }}
           />
 
@@ -122,6 +158,13 @@ export default function OrderDetailPage() {
             orderId={order.id}
             loadNotifications={(orderId) => api().listNotifications({ order_id: orderId })}
           />
+
+          {order.status_events?.length ? (
+            <OrderStatusTimeline
+              events={order.status_events}
+              className="!border-emerald-200/10 !bg-emerald-950/25"
+            />
+          ) : null}
 
           <PriceBreakdown snapshot={order.pricing_snapshot} />
 
@@ -148,10 +191,6 @@ export default function OrderDetailPage() {
             >
               {busy ? "Cancelling…" : "Cancel order"}
             </Button>
-          ) : null}
-
-          {!TERMINAL.has(order.status) ? (
-            <p className="text-xs text-emerald-100/40">Status refreshes every 5 seconds.</p>
           ) : null}
         </div>
       ) : null}

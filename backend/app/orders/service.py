@@ -157,7 +157,11 @@ async def checkout_from_cart(
         order_id=order.id,
         payload=InitiatePaymentBody(
             provider=provider,
-            return_url=payload.return_url,
+            return_url=(
+                payload.return_url.replace("{order_id}", str(order.id))
+                if payload.return_url
+                else None
+            ),
             notify_url=payload.notify_url,
             customer_phone=payload.customer_phone,
             customer_email=payload.customer_email,

@@ -16,6 +16,7 @@ from app.delivery.models import Delivery, DeliveryStop
 from app.delivery.schemas import (
     AssignDeliveryBody,
     CompleteStopBody,
+    CustomerDeliveryTrackingRead,
     DeliveryCreateBody,
     DeliveryTransitionBody,
     StopCreate,
@@ -702,3 +703,63 @@ async def complete_stop(
             await _move("COMPLETED", "drop_stop_completed")
 
     return await _load_delivery(db, tenant_id=tenant_id, delivery_id=delivery.id)
+
+
+async def get_order_delivery_tracking(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    order_id: uuid.UUID,
+) -> CustomerDeliveryTrackingRead:
+    from app.delivery.schemas import (
+        DeliveryStopRead,
+        LastLocationRead,
+        RiderSummary,
+    )
+    from app.fulfillment.service import get_by_order
+
+    graph = await get_by_order(db, tenant_id=tenant_id, order_id=order_id)
+    if not graph:
+        raise AppError("DELIVERY_NOT_FOUND", "Delivery not found for order", 404)
+    fulfillment, _events = graph
+    delivery_graph = await get_by_fulfillment(
+        db, tenant_id=tenant_id, fulfillment_id=fulfillment.id
+    )
+    if not delivery_graph:
+        raise AppError("DELIVERY_NOT_FOUND", "Delivery not found for order", 404)
+    delivery, stops = delivery_graph
+
+    partner_summary: RiderSummary | None = None
+    if delivery.partner_id:
+        partner = await db.get(DeliveryPartnerProfile, delivery.partner_id)
+        if partner:
+            partner_summary = RiderSummary(display_name=partner.display_name)
+
+    last_location: LastLocationRead | None = None
+    meta = delivery.metadata_json or {}
+    raw_loc = meta.get("last_location")
+    if isinstance(raw_loc, dict) and raw_loc.get("lat") is not None and raw_loc.get("lng") is not None:
+        at_raw = raw_loc.get("at")
+        at_dt: datetime | None = None
+        if isinstance(at_raw, str):
+            try:
+                at_dt = datetime.fromisoformat(at_raw.replace("Z", "+00:00"))
+            except ValueError:
+                at_dt = None
+        last_location = LastLocationRead(
+            lat=float(raw_loc["lat"]),
+            lng=float(raw_loc["lng"]),
+            heading=raw_loc.get("heading"),
+            speed_kmh=raw_loc.get("speed_kmh"),
+            at=at_dt,
+        )
+
+    return CustomerDeliveryTrackingRead(
+        delivery_id=delivery.id,
+        status=delivery.status,
+        eta=delivery.eta,
+        stops=[DeliveryStopRead.model_validate(s) for s in stops],
+        partner=partner_summary,
+        last_location=last_location,
+        fulfillment_status=fulfillment.status,
+    )

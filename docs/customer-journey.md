@@ -34,7 +34,9 @@ The Customer PWA persists the last address in `localStorage` and pre-fills cart 
 
 ## Order tracking
 
-`OrderTrackingPanel` in `@commerce/ui` polls fulfillment + delivery status every 5 seconds on the customer order detail page. Shows rider assignment when available.
+`OrderTrackingPanel` polls `GET /orders/{id}/delivery` every 5 seconds on the customer order detail page. Shows fulfillment status, rider name, stop progress, ETA, and last known location.
+
+See `docs/customer-tracking-ui.md` for Phase 39 details.
 
 ## Customer cancel
 

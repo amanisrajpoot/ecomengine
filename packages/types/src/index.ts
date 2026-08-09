@@ -241,6 +241,29 @@ export interface Delivery {
   status: string;
   metadata: Record<string, unknown>;
   stops: DeliveryStop[];
+  eta?: string | null;
+}
+
+export interface DeliveryRiderSummary {
+  display_name: string | null;
+}
+
+export interface LastKnownLocation {
+  lat: number;
+  lng: number;
+  heading?: number | null;
+  speed_kmh?: number | null;
+  at?: string | null;
+}
+
+export interface OrderDeliveryTracking {
+  delivery_id: string;
+  status: string;
+  eta: string | null;
+  stops: DeliveryStop[];
+  partner: DeliveryRiderSummary | null;
+  last_location: LastKnownLocation | null;
+  fulfillment_status: string | null;
 }
 
 export interface Partner {

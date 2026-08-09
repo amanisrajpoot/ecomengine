@@ -309,6 +309,17 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/staff-ui.md`.
 
+## Phase 39 — Customer order tracking polish
+
+- Customer: `/orders` active/past split with live refresh; richer order detail
+- `GET /api/v1/orders/{id}/delivery` — scoped tracking with rider, stops, ETA, location
+- Fulfillment read scoped to order owner
+- `OrderTrackingPanel` v2, `OrderStatusTimeline`
+- api-client: `getOrderDelivery`
+- Cashfree return URL → order detail
+
+**Status:** implemented — `docs/customer-tracking-ui.md`.
+
 ---
 
 ## MVP status

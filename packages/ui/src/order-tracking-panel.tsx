@@ -1,14 +1,19 @@
 "use client";
 
 import { ApiError } from "@commerce/api-client";
-import type { Delivery, Fulfillment, Order } from "@commerce/types";
-import { StatusBadge } from "@commerce/ui";
-import { useCallback, useEffect, useState } from "react";
+import type { Order, OrderDeliveryTracking } from "@commerce/types";
+import { useCallback } from "react";
+
+import { ErrorState } from "./error-state";
+import { LiveIndicator } from "./live-indicator";
+import { StatusBadge } from "./status-badge";
+import { usePolling } from "./hooks/use-polling";
 
 type TrackingApi = {
-  getOrderFulfillment: (orderId: string) => Promise<Fulfillment>;
-  getFulfillmentDelivery: (fulfillmentId: string) => Promise<Delivery>;
+  getOrderDelivery: (orderId: string) => Promise<OrderDeliveryTracking>;
 };
+
+type TrackingData = OrderDeliveryTracking | null;
 
 type OrderTrackingPanelProps = {
   order: Order;
@@ -16,6 +21,7 @@ type OrderTrackingPanelProps = {
   className?: string;
 };
 
+const TERMINAL_ORDER = new Set(["DELIVERED", "CANCELLED", "FAILED", "REFUNDED"]);
 const TRACKABLE = new Set([
   "ACCEPTED",
   "PREPARING",
@@ -30,65 +36,47 @@ const TRACKABLE = new Set([
   "DELIVERED",
 ]);
 
-export function OrderTrackingPanel({ order, api, className = "" }: OrderTrackingPanelProps) {
-  const [fulfillment, setFulfillment] = useState<Fulfillment | null>(null);
-  const [delivery, setDelivery] = useState<Delivery | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+function stopLabel(stopType: string): string {
+  if (stopType === "PICKUP") return "Pickup";
+  if (stopType === "DROP") return "Drop-off";
+  return stopType;
+}
 
-  const load = useCallback(async () => {
-    if (order.fulfillment_type === "SELF_PICKUP") {
-      setLoading(false);
-      return;
-    }
-    if (!TRACKABLE.has(order.status) && order.state_machine_profile !== "COURIER") {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const ful = await api.getOrderFulfillment(order.id);
-      setFulfillment(ful);
-      try {
-        const del = await api.getFulfillmentDelivery(ful.id);
-        setDelivery(del);
-      } catch (err) {
-        if (!(err instanceof ApiError && err.status === 404)) {
-          throw err;
-        }
-        setDelivery(null);
-      }
-      setError(null);
-    } catch (err) {
-      if (!(err instanceof ApiError && err.status === 404)) {
-        setError(err instanceof ApiError ? err.message : "Could not load tracking");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [api, order.fulfillment_type, order.id, order.state_machine_profile, order.status]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  useEffect(() => {
-    if (order.fulfillment_type === "SELF_PICKUP") return;
-    if (!TRACKABLE.has(order.status) && order.status !== "DELIVERED") return;
-    const timer = window.setInterval(() => {
-      void load();
-    }, 5000);
-    return () => window.clearInterval(timer);
-  }, [load, order.fulfillment_type, order.status]);
-
-  if (order.fulfillment_type === "SELF_PICKUP") return null;
-  if (
-    order.state_machine_profile !== "COURIER" &&
-    !TRACKABLE.has(order.status) &&
-    order.status !== "DELIVERED"
-  ) {
+function formatEta(eta: string | null): string | null {
+  if (!eta) return null;
+  try {
+    return new Date(eta).toLocaleString("en-IN", {
+      hour: "numeric",
+      minute: "2-digit",
+      day: "numeric",
+      month: "short",
+    });
+  } catch {
     return null;
   }
+}
+
+export function OrderTrackingPanel({ order, api, className = "" }: OrderTrackingPanelProps) {
+  const shouldTrack =
+    order.fulfillment_type !== "SELF_PICKUP" &&
+    (order.state_machine_profile === "COURIER" || TRACKABLE.has(order.status) || order.status === "DELIVERED");
+
+  const fetcher = useCallback(async (): Promise<TrackingData> => {
+    try {
+      return await api.getOrderDelivery(order.id);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) return null;
+      throw err;
+    }
+  }, [api, order.id]);
+
+  const { data: tracking, error, loading, refresh } = usePolling(fetcher, {
+    intervalMs: 5000,
+    enabled: shouldTrack && !TERMINAL_ORDER.has(order.status),
+    immediate: shouldTrack,
+  });
+
+  if (!shouldTrack) return null;
 
   const dropAddress =
     typeof order.metadata?.drop === "object" && order.metadata.drop
@@ -99,7 +87,10 @@ export function OrderTrackingPanel({ order, api, className = "" }: OrderTracking
     <section
       className={`rounded-2xl border border-emerald-200/10 bg-emerald-950/30 px-4 py-4 ${className}`}
     >
-      <p className="text-sm font-medium text-emerald-50">Delivery tracking</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-medium text-emerald-50">Delivery tracking</p>
+        {!TERMINAL_ORDER.has(order.status) ? <LiveIndicator /> : null}
+      </div>
       {dropAddress?.line1 ? (
         <p className="mt-1 text-xs text-emerald-100/50">
           {dropAddress.line1}
@@ -107,35 +98,76 @@ export function OrderTrackingPanel({ order, api, className = "" }: OrderTracking
         </p>
       ) : null}
 
-      {loading ? (
+      {loading && !tracking ? (
         <p className="mt-3 text-sm text-emerald-100/45">Loading tracking…</p>
-      ) : (
-        <div className="mt-3 space-y-2 text-sm text-emerald-100/75">
-          {fulfillment ? (
+      ) : null}
+
+      {error && !tracking ? (
+        <ErrorState
+          className="mt-3 !border-rose-400/15 !bg-rose-950/15 !py-6"
+          title="Tracking unavailable"
+          message={error}
+          onRetry={() => void refresh()}
+        />
+      ) : null}
+
+      {tracking ? (
+        <div className="mt-3 space-y-3 text-sm text-emerald-100/75">
+          {tracking.fulfillment_status ? (
             <p>
-              Fulfillment <StatusBadge status={fulfillment.status} className="!text-[10px]" />
+              Fulfillment{" "}
+              <StatusBadge status={tracking.fulfillment_status} className="!text-[10px]" />
             </p>
           ) : null}
-          {delivery ? (
-            <>
-              <p>
-                Delivery <StatusBadge status={delivery.status} className="!text-[10px]" />
-              </p>
-              {delivery.partner_id ? (
-                <p className="text-xs text-emerald-200/70">Rider assigned — on the way</p>
-              ) : (
-                <p className="text-xs text-amber-200/70">Finding a rider…</p>
-              )}
-            </>
-          ) : fulfillment ? (
-            <p className="text-xs text-emerald-100/45">Rider will be assigned when your order is ready.</p>
+          <p>
+            Delivery <StatusBadge status={tracking.status} className="!text-[10px]" />
+          </p>
+          {tracking.partner?.display_name ? (
+            <p className="text-xs text-emerald-200/70">
+              Rider: {tracking.partner.display_name}
+            </p>
+          ) : tracking.status !== "COMPLETED" && tracking.status !== "CANCELLED" ? (
+            <p className="text-xs text-amber-200/70">Finding a rider…</p>
+          ) : null}
+          {formatEta(tracking.eta) ? (
+            <p className="text-xs text-emerald-100/55">ETA {formatEta(tracking.eta)}</p>
+          ) : null}
+          {tracking.last_location ? (
+            <p className="text-xs text-emerald-100/45">
+              Last known location: {tracking.last_location.lat.toFixed(4)},{" "}
+              {tracking.last_location.lng.toFixed(4)}
+            </p>
+          ) : null}
+          {tracking.stops.length ? (
+            <ul className="space-y-2 border-t border-emerald-200/10 pt-3">
+              {tracking.stops.map((stop) => {
+                const addr = stop.address as { line1?: string; city?: string };
+                return (
+                  <li key={stop.id} className="flex items-start justify-between gap-3 text-xs">
+                    <div>
+                      <p className="font-medium text-emerald-50/90">{stopLabel(stop.stop_type)}</p>
+                      {addr?.line1 ? (
+                        <p className="text-emerald-100/45">
+                          {addr.line1}
+                          {addr.city ? `, ${addr.city}` : ""}
+                        </p>
+                      ) : null}
+                    </div>
+                    <StatusBadge status={stop.status} className="!text-[10px] shrink-0" />
+                  </li>
+                );
+              })}
+            </ul>
           ) : null}
         </div>
-      )}
+      ) : !loading && !error ? (
+        <p className="mt-3 text-xs text-emerald-100/45">
+          Rider will be assigned when your order is ready.
+        </p>
+      ) : null}
 
-      {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
-      {!loading && order.status !== "DELIVERED" && order.status !== "CANCELLED" ? (
-        <p className="mt-3 text-xs text-emerald-100/35">Updates every 5 seconds.</p>
+      {error && tracking ? (
+        <p className="mt-3 text-xs text-rose-300/80">Could not refresh: {error}</p>
       ) : null}
     </section>
   );
