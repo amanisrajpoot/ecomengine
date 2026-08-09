@@ -93,7 +93,7 @@ export default function OrderDebuggerPage() {
             </ol>
           </div>
 
-          <JsonBlock title="Order" data={debug.order} />
+          <JsonBlock title="Order" data={debug.order} defaultOpen />
           <JsonBlock title="Payments" data={debug.payments} />
           <JsonBlock title="Ledger entries" data={debug.ledger_entries} />
           <JsonBlock title="Ledger balances" data={debug.ledger_balances} />

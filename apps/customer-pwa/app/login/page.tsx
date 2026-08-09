@@ -2,31 +2,42 @@
 
 import { ApiError } from "@commerce/api-client";
 import { Button, TextField } from "@commerce/ui";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
-import { api, getTenantId, setSession } from "../../lib/session";
+import {
+  api,
+  getCustomerPhone,
+  getDefaultTenantId,
+  getTenantId,
+  setCustomerPhone,
+  setSession,
+} from "../../lib/session";
 
 export default function LoginPage() {
   const router = useRouter();
+  const envTenant = getDefaultTenantId();
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [tenantId, setTenantId] = useState(getTenantId() ?? "");
+  const [tenantId, setTenantId] = useState(getTenantId() ?? envTenant);
   const [email, setEmail] = useState("customer@demo.com");
   const [password, setPassword] = useState("Demo123!");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const tenantFromEnv = Boolean(envTenant);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
-    if (!tenantId.trim()) {
+    const resolvedTenant = (tenantFromEnv ? envTenant : tenantId).trim();
+    if (!resolvedTenant) {
       setError("Tenant ID is required for customer sessions.");
       return;
     }
     setBusy(true);
     try {
-      localStorage.setItem("ce_customer_tenant", tenantId.trim());
+      localStorage.setItem("ce_customer_tenant", resolvedTenant);
       const client = api();
       const token =
         mode === "login"
@@ -36,7 +47,7 @@ export default function LoginPage() {
               password,
               display_name: displayName || undefined,
             });
-      setSession(token.access_token, tenantId.trim());
+      setSession(token.access_token, resolvedTenant);
       router.push("/browse");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not sign in");
@@ -51,14 +62,21 @@ export default function LoginPage() {
       <h1 className="mt-3 text-xl text-emerald-50/90">
         {mode === "login" ? "Sign in to order" : "Create a customer account"}
       </h1>
+      {tenantFromEnv ? (
+        <p className="mt-2 text-sm text-emerald-100/55">
+          Demo tenant loaded from environment — no manual paste needed.
+        </p>
+      ) : null}
       <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4">
-        <TextField
-          label="Tenant ID"
-          value={tenantId}
-          onChange={(e) => setTenantId(e.target.value)}
-          placeholder="UUID from your environment"
-          required
-        />
+        {!tenantFromEnv ? (
+          <TextField
+            label="Tenant ID"
+            value={tenantId}
+            onChange={(e) => setTenantId(e.target.value)}
+            placeholder="UUID from your environment"
+            required
+          />
+        ) : null}
         {mode === "register" ? (
           <TextField
             label="Display name"

@@ -5,11 +5,13 @@ import { createApiClient } from "@commerce/api-client";
 const TOKEN_KEY = "ce_customer_token";
 const TENANT_KEY = "ce_customer_tenant";
 const CART_KEY = "ce_customer_cart";
+const PHONE_KEY = "ce_customer_phone";
 
 export type SessionCart = {
   cartId: string;
   businessId: string;
   locationId?: string | null;
+  itemCount?: number;
 };
 
 export function getToken(): string | null {
@@ -20,6 +22,19 @@ export function getToken(): string | null {
 export function getTenantId(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(TENANT_KEY) || process.env.NEXT_PUBLIC_TENANT_ID || null;
+}
+
+export function getDefaultTenantId(): string {
+  return process.env.NEXT_PUBLIC_TENANT_ID ?? "";
+}
+
+export function getCustomerPhone(): string {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem(PHONE_KEY) ?? "9876543210";
+}
+
+export function setCustomerPhone(phone: string) {
+  localStorage.setItem(PHONE_KEY, phone);
 }
 
 export function setSession(token: string, tenantId: string) {
