@@ -15,6 +15,8 @@ from app.core.errors import AppError
 from app.identity.models import CustomerProfile
 from app.pricing.engine import price_items
 from app.pricing.schemas import PricingContext, PricingInputItem
+from app.taxation.schemas import TaxKind
+from app.taxation.service import load_rules_for_calculation
 
 
 async def get_or_create_customer_profile(
@@ -65,6 +67,11 @@ async def _recalculate(db: AsyncSession, cart: Cart) -> Cart:
             other_fees_paise=0,
             tax_rate_bps=500,
             tax_jurisdiction="IN-INTRA",
+        ),
+        tax_rules=await load_rules_for_calculation(
+            db,
+            tenant_id=cart.tenant_id,
+            kind=TaxKind.CUSTOMER_TRANSACTION.value,
         ),
     )
     cart.pricing_snapshot = breakdown.model_dump(mode="json")

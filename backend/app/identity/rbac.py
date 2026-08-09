@@ -58,6 +58,16 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.BUSINESS_MANAGER,
         Role.CUSTOMER,
     },
+    "tax.manage": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+    },
+    "tax.calculate": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+    },
 }
 
 

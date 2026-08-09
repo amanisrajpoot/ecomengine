@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from app.pricing.schemas import PriceBreakdown, PriceLine, PricingContext, PricingInputItem
-from app.taxation.service import calculate_customer_transaction_tax
+from app.taxation.engine import calculate_customer_transaction_tax
 
 
 def price_items(
     items: list[PricingInputItem],
     context: PricingContext | None = None,
+    *,
+    tax_rules: list[Any] | None = None,
 ) -> PriceBreakdown:
     """
     Pipeline:
@@ -41,11 +45,11 @@ def price_items(
         + ctx.platform_fee_paise
         + ctx.other_fees_paise
     )
-    # Tax is exclusive on the post-discount fee-inclusive base (V1 simplified).
     tax_result = calculate_customer_transaction_tax(
         taxable_paise=max(taxable_base, 0),
         rate_bps=ctx.tax_rate_bps,
         jurisdiction=ctx.tax_jurisdiction,
+        rules=tax_rules,
     )
 
     breakdown = PriceBreakdown(

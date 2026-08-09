@@ -13,6 +13,7 @@ from app.core.config import get_settings
 from app.core.db import get_db
 from app.identity.service import create_bootstrap_super_admin
 from app.main import app as fastapi_app
+from app.taxation.service import seed_india_default_rules
 
 # Import models for metadata.
 import app.businesses.models  # noqa: F401
@@ -21,6 +22,7 @@ import app.catalog.models  # noqa: F401
 import app.identity.models  # noqa: F401
 import app.inventory.models  # noqa: F401
 import app.locations.models  # noqa: F401
+import app.taxation.models  # noqa: F401
 import app.tenants.models  # noqa: F401
 
 TEST_DATABASE_URL = get_settings().database_url
@@ -37,6 +39,7 @@ async def prepare_database() -> AsyncGenerator[None, None]:
         await create_bootstrap_super_admin(
             session, email="admin@example.com", password="ChangeMe123!"
         )
+        await seed_india_default_rules(session)
     await engine.dispose()
     yield
 
