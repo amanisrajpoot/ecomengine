@@ -70,7 +70,10 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phase 10 — Settlements
 
-- Merchant / rider / platform lifecycle
+- Merchant / rider / platform lifecycle from ledger aggregation
+- Links ledger entries once; reconcile → approve → paid
+
+**Status:** implemented — settlements + settlement_ledger_links; calculate/reconcile/approve/mark-paid APIs.
 
 ## Phase 11 — Fulfillment
 

@@ -23,6 +23,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 7** — orders (checkout + configurable state machines)
 - **Phase 8** — payments (multi-gateway: Cashfree + COD; mock mode for local/dev)
 - **Phase 9** — ledger (immutable balanced postings from payment events)
+- **Phase 10** — settlements (ledger → merchant/rider/platform payout lifecycle)
 
 ## Prerequisites
 
