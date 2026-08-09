@@ -10,6 +10,8 @@ Product and variant management in the Merchant PWA for businesses with the `cata
 | `/catalog/new` | Create product + first variant (optional new category) |
 | `/catalog/[productId]` | Edit product, manage variants, toggle availability |
 
+See **Phase 35** (`docs/catalog-addons.md`) for addon management and product-addon linking.
+
 ## API usage
 
 New `@commerce/api-client` methods:
@@ -18,7 +20,7 @@ New `@commerce/api-client` methods:
 - `getProduct`, `createProduct`, `updateProduct`
 - `createVariant`, `updateVariant`
 - `listProducts` now accepts `{ active_only?, category_id? }`
-- `createAddon`, `updateAddon` (API wired; UI deferred)
+- `createAddon`, `updateAddon`
 
 ## Shared UI
 

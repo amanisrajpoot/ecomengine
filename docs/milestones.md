@@ -274,6 +274,14 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/catalog-merchant.md`.
 
+## Phase 35 — Merchant addons UI
+
+- Merchant PWA: `/catalog/addons` + product-addon linking on product detail
+- `AddonCard` in `@commerce/ui`
+- api-client: `linkProductAddon`
+
+**Status:** implemented — `docs/catalog-addons.md`.
+
 ---
 
 ## MVP status

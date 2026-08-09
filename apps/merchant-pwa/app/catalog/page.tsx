@@ -148,9 +148,14 @@ export default function CatalogPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <p className="font-display text-4xl text-amber-50">Catalog</p>
         {selectedBusiness && !loading ? (
-          <Link href="/catalog/new">
-            <Button variant="soft">Add product</Button>
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/catalog/addons">
+              <Button variant="ghost">Addons</Button>
+            </Link>
+            <Link href="/catalog/new">
+              <Button variant="soft">Add product</Button>
+            </Link>
+          </div>
         ) : null}
       </div>
 
