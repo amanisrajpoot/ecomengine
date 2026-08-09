@@ -198,7 +198,7 @@ Order items freeze product/variant/addon names and unit prices at checkout time.
 | `Payment` | Intent / capture against an order |
 | `Refund` | Partial or full |
 
-Providers (V1): one online gateway (Razorpay) + COD. Abstracted behind `PaymentGateway`.
+Providers (V1): Cashfree (online) + COD, behind `PaymentGateway` / registry. Additional gateways register as adapters.
 
 ---
 

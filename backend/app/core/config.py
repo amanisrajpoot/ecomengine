@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "commerce-engine"
-    app_version: str = "0.7.0"
+    app_version: str = "0.8.0"
     environment: str = "development"
 
     database_url: str = "postgresql+asyncpg://commerce:commerce@localhost:5432/commerce"
@@ -29,6 +29,15 @@ class Settings(BaseSettings):
     otp_ttl_seconds: int = 300
     # In development, OTP codes are returned in API responses for testing.
     otp_echo_in_response: bool = True
+
+    # Payments — multi-gateway
+    payments_default_provider: str = "cashfree"
+    # When true (or credentials missing), Cashfree adapter runs in mock mode.
+    payments_mock: bool = True
+    cashfree_client_id: str = ""
+    cashfree_client_secret: str = ""
+    cashfree_env: str = "sandbox"  # sandbox | production
+    cashfree_api_version: str = "2023-08-01"
 
 
 @lru_cache

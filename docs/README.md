@@ -2,7 +2,7 @@
 
 Agent-executable specifications for the Universal Commerce & Fulfillment Engine.
 
-**Market defaults (V1):** India — INR, GST, Razorpay + COD (later), ONDC as a future adapter.
+**Market defaults (V1):** India — INR, GST, Cashfree + COD (multi-gateway; more adapters later), ONDC as a future adapter.
 
 ## Spec index
 

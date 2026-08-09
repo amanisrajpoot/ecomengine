@@ -91,6 +91,16 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.DELIVERY_PARTNER,
         Role.CUSTOMER,
     },
+    "payments.manage": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.CUSTOMER,
+        Role.BUSINESS_OWNER,
+    },
+    "payments.refund": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+    },
 }
 
 

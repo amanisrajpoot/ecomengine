@@ -73,7 +73,9 @@ async def checkout_from_cart(
         currency=cart.currency,
         pricing_snapshot=cart.pricing_snapshot,
         fulfillment_type=payload.fulfillment_type,
-        payment_method=payload.payment_method,
+        payment_method="COD" if (
+            payload.payment_provider == "cod" or payload.payment_method == "COD"
+        ) else "ONLINE",
         placed_at=datetime.now(UTC),
         metadata_json={"created_by": str(user_id)},
     )
@@ -119,20 +121,26 @@ async def checkout_from_cart(
         },
     )
 
-    # COD: confirm payment immediately via state machine.
-    if payload.payment_method == "COD":
-        return await transition_order(
-            db,
-            tenant_id=tenant_id,
-            order_id=order.id,
-            payload=OrderTransitionRequest(
-                to_status="PAYMENT_CONFIRMED",
-                actor="payments",
-                reason="cod_auto_confirm",
-            ),
-            actor_user_id=user_id,
-        )
+    # Legacy payment_method maps COD→cod; otherwise use payment_provider (default cashfree).
+    provider = "cod" if payload.payment_method == "COD" else payload.payment_provider
 
+    from app.payments.schemas import InitiatePaymentBody
+    from app.payments.service import initiate_payment
+
+    await initiate_payment(
+        db,
+        tenant_id=tenant_id,
+        order_id=order.id,
+        payload=InitiatePaymentBody(
+            provider=provider,
+            return_url=payload.return_url,
+            notify_url=payload.notify_url,
+            customer_phone=payload.customer_phone,
+            customer_email=payload.customer_email,
+            idempotency_key=f"checkout-{order.id}",
+        ),
+        actor_user_id=user_id,
+    )
     return await _load_order_graph(db, tenant_id=tenant_id, order_id=order.id)
 
 

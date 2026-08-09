@@ -61,7 +61,7 @@ def _food_delivery() -> StateMachine:
         initial_status="CREATED",
         transitions={
             "CREATED": [
-                Transition("PAYMENT_PENDING", frozenset({"system", "customer"})),
+                Transition("PAYMENT_PENDING", frozenset({"system", "customer", "payments"})),
                 Transition("PAYMENT_CONFIRMED", frozenset({"system", "payments"})),  # COD shortcut
                 Transition("CANCELLED", frozenset({"customer", "system"})),
             ],
@@ -104,7 +104,7 @@ def _hyperlocal_delivery() -> StateMachine:
         initial_status="CREATED",
         transitions={
             "CREATED": [
-                Transition("PAYMENT_PENDING", frozenset({"system", "customer"})),
+                Transition("PAYMENT_PENDING", frozenset({"system", "customer", "payments"})),
                 Transition("PAYMENT_CONFIRMED", frozenset({"system", "payments"})),
                 Transition("CANCELLED", frozenset({"customer", "system"})),
             ],
@@ -146,7 +146,7 @@ def _courier() -> StateMachine:
         initial_status="CREATED",
         transitions={
             "CREATED": [
-                Transition("PAYMENT_PENDING", frozenset({"system", "customer"})),
+                Transition("PAYMENT_PENDING", frozenset({"system", "customer", "payments"})),
                 Transition("PAYMENT_CONFIRMED", frozenset({"system", "payments"})),
                 Transition("CANCELLED", frozenset({"customer", "system"})),
             ],

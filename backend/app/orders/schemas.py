@@ -11,10 +11,17 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class CheckoutRequest(BaseModel):
     cart_id: uuid.UUID
-    payment_method: str = Field(default="ONLINE", pattern=r"^(ONLINE|COD)$")
+    # Multi-gateway provider key (registry-backed). Defaults to Cashfree.
+    payment_provider: str = Field(default="cashfree", min_length=2, max_length=32)
+    # Backward-compatible alias: COD → provider "cod"; ONLINE → payment_provider.
+    payment_method: str | None = Field(default=None, pattern=r"^(ONLINE|COD)$")
     fulfillment_type: str = Field(default="DELIVERY", pattern=r"^(DELIVERY|PICKUP|SELF_PICKUP)$")
     # Optional override; normally derived from business type.
     state_machine_profile: str | None = None
+    return_url: str | None = None
+    notify_url: str | None = None
+    customer_phone: str | None = None
+    customer_email: str | None = None
 
 
 class OrderTransitionRequest(BaseModel):
