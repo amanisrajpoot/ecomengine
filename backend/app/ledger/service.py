@@ -234,8 +234,13 @@ async def list_entries(
     order_id: uuid.UUID | None = None,
     account: str | None = None,
     event_type: str | None = None,
+    business_ids: list[uuid.UUID] | None = None,
 ) -> list[LedgerEntry]:
     stmt: Select[Any] = select(LedgerEntry).where(LedgerEntry.tenant_id == tenant_id)
+    if business_ids is not None:
+        stmt = stmt.join(Order, LedgerEntry.order_id == Order.id).where(
+            Order.business_id.in_(business_ids)
+        )
     if order_id:
         stmt = stmt.where(LedgerEntry.order_id == order_id)
     if account:
@@ -267,6 +272,7 @@ async def account_balances(
     *,
     tenant_id: uuid.UUID,
     order_id: uuid.UUID | None = None,
+    business_ids: list[uuid.UUID] | None = None,
 ) -> list[AccountBalanceRead]:
     stmt = (
         select(
@@ -277,6 +283,10 @@ async def account_balances(
         .where(LedgerEntry.tenant_id == tenant_id)
         .group_by(LedgerEntry.account, LedgerEntry.direction)
     )
+    if business_ids is not None:
+        stmt = stmt.join(Order, LedgerEntry.order_id == Order.id).where(
+            Order.business_id.in_(business_ids)
+        )
     if order_id:
         stmt = stmt.where(LedgerEntry.order_id == order_id)
     rows = await db.execute(stmt)

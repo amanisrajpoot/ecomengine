@@ -223,6 +223,16 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/notifications-ui.md`.
 
+## Phase 30 — Ledger UI
+
+- Admin: `/ledger` list + balances, event detail, manual adjustment form
+- Merchant: read-only `/ledger` + per-order panel on order detail
+- `LedgerEntryCard`, `LedgerBalancesPanel`, `OrderLedgerPanel` in `@commerce/ui`
+- api-client ledger methods; merchant scoping on ledger routes
+- Order debugger uses structured ledger panel instead of JSON blocks
+
+**Status:** implemented — `docs/ledger-ui.md`.
+
 ---
 
 ## MVP status

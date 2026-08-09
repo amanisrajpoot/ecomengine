@@ -9,6 +9,7 @@ import { clearSession, getTenantId, getToken } from "../lib/session";
 const links = [
   { href: "/", label: "Home" },
   { href: "/dispatch", label: "Dispatch" },
+  { href: "/ledger", label: "Ledger" },
   { href: "/settlements", label: "Settlements" },
   { href: "/notifications", label: "Notifications" },
   { href: "/tenants", label: "Tenants" },

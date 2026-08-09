@@ -11,12 +11,18 @@ from app.core.db import get_db
 from app.core.deps import AuthContext, require_permission, resolve_tenant_id
 from app.core.errors import AppError
 from app.ledger import service
+from app.ledger.access import (
+    assert_ledger_entries_readable,
+    assert_order_ledger_readable,
+    resolve_business_scope,
+)
 from app.ledger.schemas import (
     AccountBalanceRead,
     LedgerEntryRead,
     LedgerEventRead,
     ManualAdjustmentBody,
 )
+from app.orders.models import Order
 
 router = APIRouter(tags=["ledger"])
 
@@ -30,20 +36,29 @@ def _require_tenant(tenant_id: uuid.UUID | None) -> uuid.UUID:
 @router.get("/ledger/entries", response_model=list[LedgerEntryRead])
 async def list_ledger_entries(
     order_id: uuid.UUID | None = None,
+    business_id: uuid.UUID | None = None,
     account: str | None = None,
     event_type: str | None = None,
     db: AsyncSession = Depends(get_db),
     ctx: AuthContext = Depends(require_permission("ledger.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[LedgerEntryRead]:
-    _ = ctx
     tid = _require_tenant(tenant_id)
+    business_ids = resolve_business_scope(ctx, business_id=business_id)
+    if business_ids == []:
+        return []
+    if order_id and business_ids is not None:
+        order = await db.get(Order, order_id)
+        if order is None or order.tenant_id != tid:
+            return []
+        assert_order_ledger_readable(ctx, order)
     rows = await service.list_entries(
         db,
         tenant_id=tid,
         order_id=order_id,
         account=account,
         event_type=event_type,
+        business_ids=business_ids,
     )
     return [LedgerEntryRead.model_validate(r) for r in rows]
 
@@ -55,8 +70,11 @@ async def list_order_ledger(
     ctx: AuthContext = Depends(require_permission("ledger.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[LedgerEntryRead]:
-    _ = ctx
     tid = _require_tenant(tenant_id)
+    order = await db.get(Order, order_id)
+    if order is None or order.tenant_id != tid:
+        raise AppError("ORDER_NOT_FOUND", "Order not found", 404)
+    assert_order_ledger_readable(ctx, order)
     rows = await service.list_entries(db, tenant_id=tid, order_id=order_id)
     return [LedgerEntryRead.model_validate(r) for r in rows]
 
@@ -68,21 +86,40 @@ async def get_ledger_event(
     ctx: AuthContext = Depends(require_permission("ledger.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> LedgerEventRead:
-    _ = ctx
     tid = _require_tenant(tenant_id)
-    return await service.get_event_group(db, tenant_id=tid, event_group_id=event_group_id)
+    event = await service.get_event_group(db, tenant_id=tid, event_group_id=event_group_id)
+    assert_ledger_entries_readable(ctx, event.entries)
+    if event.order_id:
+        order = await db.get(Order, event.order_id)
+        if order is None or order.tenant_id != tid:
+            raise AppError("LEDGER_EVENT_NOT_FOUND", "Ledger event not found", 404)
+        assert_order_ledger_readable(ctx, order)
+    return event
 
 
 @router.get("/ledger/balances", response_model=list[AccountBalanceRead])
 async def list_account_balances(
     order_id: uuid.UUID | None = Query(default=None),
+    business_id: uuid.UUID | None = None,
     db: AsyncSession = Depends(get_db),
     ctx: AuthContext = Depends(require_permission("ledger.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[AccountBalanceRead]:
-    _ = ctx
     tid = _require_tenant(tenant_id)
-    return await service.account_balances(db, tenant_id=tid, order_id=order_id)
+    business_ids = resolve_business_scope(ctx, business_id=business_id)
+    if business_ids == []:
+        return []
+    if order_id:
+        order = await db.get(Order, order_id)
+        if order is None or order.tenant_id != tid:
+            raise AppError("ORDER_NOT_FOUND", "Order not found", 404)
+        assert_order_ledger_readable(ctx, order)
+    return await service.account_balances(
+        db,
+        tenant_id=tid,
+        order_id=order_id,
+        business_ids=business_ids,
+    )
 
 
 @router.post("/ledger/adjustments", response_model=LedgerEventRead)
