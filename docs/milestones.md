@@ -14,6 +14,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 - Multi-tenancy (`tenant_id`)
 - `PlatformConfig` / `TenantConfig` / `BusinessConfig`
 
+**Status:** implemented in backend (JWT, OTP + password, tenants, platform config, role bindings, thin `Business` model for config/RBAC scope).
+
 ## Phase 2 — Business & location
 
 - Business onboarding

@@ -11,13 +11,16 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 | `apps/` | Customer / Merchant / Rider PWAs + Admin web |
 | `packages/` | Shared TypeScript types, API client, UI, config |
 
-Phase 0 delivers **specs + scaffold only** (no business logic yet).
+## Current status
+
+- **Phase 0** — specs + scaffold
+- **Phase 1** — auth (OTP + password), identity/RBAC, multi-tenancy, platform/tenant/business config
 
 ## Prerequisites
 
-- Docker & Docker Compose
+- Docker & Docker Compose (recommended), or local PostgreSQL 16+
 - Node.js 22+ and pnpm
-- Python 3.12+ (for local backend tests without Docker)
+- Python 3.12+
 
 ## Quick start
 
@@ -27,18 +30,30 @@ docker compose up --build
 ```
 
 - API health: http://localhost:8000/health
-- API meta: http://localhost:8000/api/v1/meta
+- API docs: http://localhost:8000/docs
 - MinIO console: http://localhost:9001 (minioadmin / minioadmin)
 
-### Backend tests (local)
+### Backend (local without Docker for the API)
 
 ```bash
+# Ensure Postgres is reachable at DATABASE_URL
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pytest
+PYTHONPATH=. alembic upgrade head
+PYTHONPATH=. python -m app.scripts.bootstrap_super_admin
+PYTHONPATH=. uvicorn app.main:app --reload --port 8000
+PYTHONPATH=. pytest
 ```
+
+Default bootstrap admin: `admin@example.com` / `ChangeMe123!` (override via env).
+
+### Phase 1 auth notes
+
+- Send `X-Tenant-ID: <uuid>` for tenant-scoped auth/register/login.
+- In development, `POST /api/v1/auth/otp/request` returns `debug_code`.
+- Use `Authorization: Bearer <access_token>` for protected routes.
 
 ### Frontend apps
 
