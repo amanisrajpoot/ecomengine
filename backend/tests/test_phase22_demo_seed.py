@@ -40,7 +40,7 @@ async def test_seed_demo_is_idempotent() -> None:
         )
         assert partner is not None
 
-    assert seed_demo.DEMO_ENV_PATH.exists()
-    content = seed_demo.DEMO_ENV_PATH.read_text(encoding="utf-8")
+    assert seed_demo._demo_env_path().exists()
+    content = seed_demo._demo_env_path().read_text(encoding="utf-8")
     assert str(tenant.id) in content
     assert "customer@demo.com" in content

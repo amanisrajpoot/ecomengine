@@ -27,24 +27,36 @@ PYTHONPATH=. python -m app.scripts.seed_demo
 PYTHONPATH=. uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. Seed demo (if not using Docker backend)
+### 2. Seed demo credentials
+
+**If Docker API is running** (recommended on Windows — no local Python packages needed):
 
 ```bash
-pnpm demo:seed
+docker compose up -d    # if not already up
+pnpm demo:seed          # runs seed inside the backend container, writes demo.env
 ```
 
-**Windows (PowerShell or cmd)** — same command, or run directly:
+**Or seed manually via Docker:**
+
+```powershell
+docker compose exec -T -e DEMO_ENV_PATH=/app/demo.env backend python -m app.scripts.seed_demo
+docker compose cp backend:/app/demo.env ./demo.env
+```
+
+**Local Python** (only if you installed backend deps in a venv):
 
 ```powershell
 cd backend
-python -m app.scripts.seed_demo
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+.venv\Scripts\python -m app.scripts.seed_demo
 ```
 
-Then load credentials (Git Bash / WSL: `source demo.env`; PowerShell: `Get-Content demo.env` and copy `NEXT_PUBLIC_TENANT_ID`):
+Then set tenant ID — open `demo.env` and copy `NEXT_PUBLIC_TENANT_ID` into each app login, or create `apps/customer-pwa/.env.local`:
 
-```bash
-# Git Bash / WSL / macOS / Linux
-source demo.env
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_TENANT_ID=<uuid-from-demo.env>
 ```
 
 ### 3. Start frontend apps
@@ -112,7 +124,7 @@ pnpm demo:seed
 
 | Issue | Fix |
 |-------|-----|
-| `pnpm demo:seed` fails on Windows (`PYTHONPATH` not recognized) | Use `cd backend` then `python -m app.scripts.seed_demo` |
+| `pnpm demo:seed` / `No module named 'asyncpg'` | Start Docker (`docker compose up -d`) and run `pnpm demo:seed` again — it seeds via the container. Or install backend venv deps (see above). |
 | Empty browse | Confirm `NEXT_PUBLIC_TENANT_ID` matches `demo.env` |
 | Rider login fails | Re-run `seed_demo` (creates partner profile + vehicle) |
 | Merchant sees no orders | Place an order as customer first; select Spice Kitchen business |

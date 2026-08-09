@@ -14,6 +14,7 @@ Run after: bootstrap_super_admin, seed_tax_rules, alembic upgrade head
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 
 from sqlalchemy import select
@@ -36,8 +37,16 @@ from app.verticals.food import FOOD_CAPABILITIES
 from app.verticals.hyperlocal import HYPERLOCAL_CAPABILITIES
 
 DEMO_PASSWORD = "Demo123!"
-REPO_ROOT = Path(__file__).resolve().parents[3]
-DEMO_ENV_PATH = REPO_ROOT / "demo.env"
+
+
+def _demo_env_path() -> Path:
+    if env_path := os.getenv("DEMO_ENV_PATH"):
+        return Path(env_path)
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        if (parent / "package.json").is_file() and (parent / "backend" / "requirements.txt").is_file():
+            return parent / "demo.env"
+    return here.parents[3] / "demo.env"
 
 DEMO_USERS = {
     "customer": ("customer@demo.com", Role.CUSTOMER, None),
@@ -426,7 +435,9 @@ DEMO_FOOD_BUSINESS_ID={food.id}
 DEMO_GROCERY_BUSINESS_ID={grocery.id}
 DEMO_COURIER_BUSINESS_ID={courier.id}
 """
-        DEMO_ENV_PATH.write_text(demo_env, encoding="utf-8")
+        demo_env_path = _demo_env_path()
+        demo_env_path.parent.mkdir(parents=True, exist_ok=True)
+        demo_env_path.write_text(demo_env, encoding="utf-8")
 
         print("=" * 60)
         print("Commerce Engine demo ready")
@@ -447,7 +458,7 @@ DEMO_COURIER_BUSINESS_ID={courier.id}
         print("  Admin     http://localhost:3003")
         print("  API docs  http://localhost:8000/docs")
         print()
-        print(f"Credentials written to: {DEMO_ENV_PATH}")
+        print(f"Credentials written to: {demo_env_path}")
         print("  source demo.env   # then start PWAs")
         print("=" * 60)
 
