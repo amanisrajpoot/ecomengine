@@ -24,6 +24,7 @@ export { OrderTrackingPanel } from "./order-tracking-panel";
 export { SettlementCard } from "./settlement-card";
 export { PaymentPanel } from "./payment-panel";
 export { NotificationCard } from "./notification-card";
+export { ProductCard, VariantRow } from "./product-card";
 export { OrderNotificationsPanel } from "./order-notifications-panel";
 export { LedgerEntryCard } from "./ledger-entry-card";
 export { LedgerBalancesPanel } from "./ledger-balances-panel";

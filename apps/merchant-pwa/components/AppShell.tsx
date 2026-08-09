@@ -13,6 +13,7 @@ const NOTIFICATIONS_SEEN_KEY = "ce.merchant.notifications.lastSeen";
 const links = [
   { href: "/", label: "Home" },
   { href: "/orders", label: "Orders" },
+  { href: "/catalog", label: "Catalog" },
   { href: "/inventory", label: "Inventory" },
   { href: "/ledger", label: "Ledger" },
   { href: "/settlements", label: "Settlements" },

@@ -49,6 +49,15 @@ export interface Product {
   is_active: boolean;
 }
 
+export interface Category {
+  id: string;
+  business_id: BusinessId;
+  parent_id: string | null;
+  name: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
 export interface Variant {
   id: VariantId;
   product_id: ProductId;
