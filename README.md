@@ -22,6 +22,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 6** — tax engine (`TaxRule`; customer vs platform vs settlement kinds)
 - **Phase 7** — orders (checkout + configurable state machines)
 - **Phase 8** — payments (multi-gateway: Cashfree + COD; mock mode for local/dev)
+- **Phase 9** — ledger (immutable balanced postings from payment events)
 
 ## Prerequisites
 

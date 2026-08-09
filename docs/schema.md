@@ -407,10 +407,13 @@ Unique: `(tenant_id, idempotency_key)` where key not null.
 | direction | TEXT |
 | amount_paise | BIGINT |
 | currency | TEXT |
+| reference_key | TEXT |
 | metadata | JSONB |
-| created_at | timestamptz |
+| created_at, updated_at | timestamptz |
 
-Indexes: `(tenant_id, order_id)`, `(tenant_id, account)`, `(event_group_id)`.
+Indexes: `(tenant_id, order_id)`, `(tenant_id, account)`, `(event_group_id)`, `(reference_key)`.
+
+Idempotency: re-posting the same `(tenant_id, reference_key)` returns the existing event group.
 
 ### settlements
 

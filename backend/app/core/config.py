@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "commerce-engine"
-    app_version: str = "0.8.0"
+    app_version: str = "0.9.0"
     environment: str = "development"
 
     database_url: str = "postgresql+asyncpg://commerce:commerce@localhost:5432/commerce"
@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     cashfree_client_secret: str = ""
     cashfree_env: str = "sandbox"  # sandbox | production
     cashfree_api_version: str = "2023-08-01"
+
+    # Ledger — default merchant commission (10%) when tenant config omits commission_bps.
+    ledger_default_commission_bps: int = 1000
 
 
 @lru_cache
