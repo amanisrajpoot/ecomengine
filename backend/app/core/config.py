@@ -49,6 +49,18 @@ class Settings(BaseSettings):
     # Notifications — default SMS channel (mock in dev).
     notifications_default_channel: str = "sms_mock"
 
+    # CORS — comma-separated origins for browser PWAs (different ports than API).
+    cors_origins: str = (
+        "http://localhost:3000,http://localhost:3001,http://localhost:3002,"
+        "http://localhost:3003,http://127.0.0.1:3000,http://127.0.0.1:3001,"
+        "http://127.0.0.1:3002,http://127.0.0.1:3003"
+    )
+
+
+def cors_origin_list(settings: Settings | None = None) -> list[str]:
+    s = settings or get_settings()
+    return [origin.strip() for origin in s.cors_origins.split(",") if origin.strip()]
+
 
 @lru_cache
 def get_settings() -> Settings:

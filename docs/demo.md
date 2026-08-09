@@ -128,4 +128,4 @@ pnpm demo:seed
 | Empty browse | Confirm `NEXT_PUBLIC_TENANT_ID` matches `demo.env` |
 | Rider login fails | Re-run `seed_demo` (creates partner profile + vehicle) |
 | Merchant sees no orders | Place an order as customer first; select Spice Kitchen business |
-| CORS / API errors | Ensure API at `http://localhost:8000` and `NEXT_PUBLIC_API_URL` matches |
+| CORS / API errors / **405 on OPTIONS** | Pull latest and **rebuild Docker**: `docker compose up --build -d`. PWAs on :3000–3003 need CORS from API :8000. |
