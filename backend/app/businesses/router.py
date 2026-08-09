@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.businesses import service
-from app.businesses.schemas import BusinessCreate, BusinessRead, BusinessUpdate
+from app.businesses.schemas import BusinessCreate, BusinessRead, BusinessUpdate, StaffAssign, StaffMemberRead
 from app.core.db import get_db
 from app.core.deps import AuthContext, require_permission, resolve_tenant_id
 from app.core.errors import AppError
@@ -79,3 +79,30 @@ async def update_business(
         db, tenant_id=tid, business_id=business_id, payload=payload
     )
     return BusinessRead.model_validate(business)
+
+
+@router.get("/{business_id}/staff", response_model=list[StaffMemberRead])
+async def list_business_staff(
+    business_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("business.staff.read")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> list[StaffMemberRead]:
+    _ = ctx
+    tid = _require_tenant(tenant_id)
+    return await service.list_business_staff(db, tenant_id=tid, business_id=business_id)
+
+
+@router.post("/{business_id}/staff", response_model=StaffMemberRead)
+async def assign_business_staff(
+    business_id: uuid.UUID,
+    payload: StaffAssign,
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("business.staff.manage")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> StaffMemberRead:
+    _ = ctx
+    tid = _require_tenant(tenant_id)
+    return await service.assign_business_staff(
+        db, tenant_id=tid, business_id=business_id, payload=payload
+    )

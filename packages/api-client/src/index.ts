@@ -24,6 +24,7 @@ import type {
   Product,
   ProductAddonLink,
   Settlement,
+  StaffMember,
   StockMovement,
   Refund,
   Notification,
@@ -466,6 +467,23 @@ export function createApiClient(options: ApiClientOptions = {}) {
           body: JSON.stringify(body),
         },
       ),
+
+    listBusinessStaff: (businessId: string) =>
+      request<StaffMember[]>(`/api/v1/businesses/${businessId}/staff`),
+
+    assignBusinessStaff: (
+      businessId: string,
+      body: {
+        user_id?: string;
+        email?: string;
+        phone?: string;
+        role?: "STAFF" | "BUSINESS_MANAGER";
+      },
+    ) =>
+      request<StaffMember>(`/api/v1/businesses/${businessId}/staff`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
 
     upsertInventoryItem: (
       businessId: string,

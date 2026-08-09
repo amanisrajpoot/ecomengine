@@ -299,6 +299,16 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/fleet-ops-ui.md`.
 
+## Phase 38 — Merchant staff UI
+
+- Merchant: `/settings/staff` — list team, assign STAFF / BUSINESS_MANAGER by email
+- Backend: `GET/POST /businesses/{id}/staff`
+- `StaffCard` in `@commerce/ui`
+- api-client: `listBusinessStaff`, `assignBusinessStaff`
+- RBAC: `business.staff.read`, `business.staff.manage`
+
+**Status:** implemented — `docs/staff-ui.md`.
+
 ---
 
 ## MVP status
