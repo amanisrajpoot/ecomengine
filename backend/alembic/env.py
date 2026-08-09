@@ -15,6 +15,7 @@ from app.core.config import get_settings
 
 # Ensure models are imported for metadata.
 import app.businesses.models  # noqa: F401
+import app.cart.models  # noqa: F401
 import app.catalog.models  # noqa: F401
 import app.identity.models  # noqa: F401
 import app.inventory.models  # noqa: F401

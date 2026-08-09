@@ -18,6 +18,7 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 2** — business onboarding, capability presets, locations (address/geo/hours)
 - **Phase 3** — catalog (categories, products, variants, addons, bundles)
 - **Phase 4** — inventory (optional; receive/reserve/release/consume + movements)
+- **Phase 5** — cart + pricing pipeline (breakdown snapshots; tax stub)
 
 ## Prerequisites
 

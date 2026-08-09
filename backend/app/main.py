@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
 
 from app.businesses.router import router as businesses_router
+from app.cart.router import router as cart_router
 from app.catalog.router import router as catalog_router
 from app.core.config import get_settings
 from app.core.errors import AppError, app_error_handler, http_error_handler
@@ -13,10 +14,12 @@ from app.identity.router import router as auth_router
 from app.identity.router import users_router
 from app.inventory.router import router as inventory_router
 from app.locations.router import router as locations_router
+from app.pricing.router import router as pricing_router
 from app.tenants.router import router as tenants_router
 
 # Import models so metadata is registered for Alembic / create_all.
 import app.businesses.models  # noqa: F401
+import app.cart.models  # noqa: F401
 import app.catalog.models  # noqa: F401
 import app.identity.models  # noqa: F401
 import app.inventory.models  # noqa: F401
@@ -47,6 +50,8 @@ app.include_router(businesses_router, prefix="/api/v1")
 app.include_router(locations_router, prefix="/api/v1")
 app.include_router(catalog_router, prefix="/api/v1")
 app.include_router(inventory_router, prefix="/api/v1")
+app.include_router(cart_router, prefix="/api/v1")
+app.include_router(pricing_router, prefix="/api/v1")
 
 
 @app.get("/health")

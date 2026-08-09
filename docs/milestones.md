@@ -40,6 +40,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Cart aggregate + pricing pipeline + breakdown snapshots
 
+**Status:** implemented — cart CRUD with pricing snapshots; pricing pipeline calls taxation stub (CGST/SGST or IGST). Full TaxRule engine is Phase 6.
+
 ## Phase 6 — Tax
 
 - Independent GST engine (customer vs platform vs settlement kinds)
