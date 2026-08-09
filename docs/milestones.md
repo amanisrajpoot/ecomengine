@@ -184,6 +184,16 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/customer-journey.md`.
 
+## Phase 26 — Inventory merchant UI
+
+- Merchant PWA stock board (`/inventory`) with business/location filters and low/OOS chips
+- Item detail: receive/adjust stock + movement history
+- New item flow: link catalog variant to location
+- api-client: inventory + `listLocations` methods; `locations.read` RBAC for STAFF
+- Demo: `merchant@demo.com` also owns FreshMart grocery
+
+**Status:** implemented — `docs/inventory-merchant.md`.
+
 ---
 
 ## MVP status

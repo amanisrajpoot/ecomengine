@@ -9,6 +9,7 @@ import { clearSession, getBusinessId, getToken } from "../lib/session";
 const links = [
   { href: "/", label: "Home" },
   { href: "/orders", label: "Orders" },
+  { href: "/inventory", label: "Inventory" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {

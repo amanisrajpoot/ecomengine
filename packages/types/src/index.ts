@@ -126,6 +126,52 @@ export interface Business {
   capabilities: Record<string, unknown>;
 }
 
+export type StockReason =
+  | "RECEIVE"
+  | "ADJUSTMENT"
+  | "RESERVE"
+  | "RELEASE"
+  | "CONSUME";
+
+export interface InventoryItem {
+  id: string;
+  tenant_id: string;
+  business_id: BusinessId;
+  location_id: LocationId;
+  variant_id: VariantId;
+  on_hand: number;
+  reserved: number;
+  low_stock_threshold: number | null;
+  updated_at: string;
+  available: number;
+  is_low_stock: boolean;
+  is_out_of_stock: boolean;
+}
+
+export interface StockMovement {
+  id: string;
+  tenant_id: string;
+  inventory_item_id: string;
+  reason: StockReason | string;
+  delta_on_hand: number;
+  delta_reserved: number;
+  reference_type: string | null;
+  reference_id: string | null;
+  created_at: string;
+  created_by: string | null;
+  note: string | null;
+}
+
+export interface BusinessLocation {
+  id: LocationId;
+  business_id: BusinessId;
+  name: string;
+  address: Record<string, unknown>;
+  lat: number;
+  lng: number;
+  is_active: boolean;
+}
+
 export interface Fulfillment {
   id: string;
   order_id: OrderId;
