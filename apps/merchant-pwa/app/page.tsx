@@ -25,6 +25,12 @@ export default function HomePage() {
           Stock board
         </Link>
         <Link
+          href="/settlements"
+          className="rounded-xl border border-amber-200/20 px-5 py-3 text-sm font-medium text-amber-50/90 hover:bg-white/5"
+        >
+          Settlements
+        </Link>
+        <Link
           href="/login"
           className="rounded-xl border border-amber-200/20 px-5 py-3 text-sm font-medium text-amber-50/90 hover:bg-white/5"
         >

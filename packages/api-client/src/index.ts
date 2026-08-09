@@ -15,6 +15,7 @@ import type {
   Partner,
   Product,
   ProductAddonLink,
+  Settlement,
   StockMovement,
   TokenResponse,
   Tenant,
@@ -288,6 +289,52 @@ export function createApiClient(options: ApiClientOptions = {}) {
       request<StockMovement[]>(
         `/api/v1/businesses/${businessId}/inventory/${itemId}/movements`,
       ),
+
+    listSettlements: (params?: {
+      party_type?: string;
+      party_id?: string;
+      status?: string;
+    }) => request<Settlement[]>(`/api/v1/settlements${toQuery(params ?? {})}`),
+
+    getSettlement: (settlementId: string) =>
+      request<Settlement>(`/api/v1/settlements/${settlementId}`),
+
+    createSettlement: (body: {
+      party_type: string;
+      party_id: string;
+      period_start: string;
+      period_end: string;
+      currency?: string;
+    }) =>
+      request<Settlement>("/api/v1/settlements", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    calculateSettlement: (settlementId: string) =>
+      request<Settlement>(`/api/v1/settlements/${settlementId}/calculate`, {
+        method: "POST",
+      }),
+
+    reconcileSettlement: (settlementId: string) =>
+      request<Settlement>(`/api/v1/settlements/${settlementId}/reconcile`, {
+        method: "POST",
+      }),
+
+    approveSettlement: (settlementId: string, body?: { reason?: string }) =>
+      request<Settlement>(`/api/v1/settlements/${settlementId}/approve`, {
+        method: "POST",
+        body: JSON.stringify(body ?? {}),
+      }),
+
+    markSettlementPaid: (settlementId: string, body?: { reason?: string }) =>
+      request<Settlement>(`/api/v1/settlements/${settlementId}/mark-paid`, {
+        method: "POST",
+        body: JSON.stringify(body ?? {}),
+      }),
+
+    listOrderSettlements: (orderId: string) =>
+      request<Settlement[]>(`/api/v1/orders/${orderId}/settlements`),
 
     getOrderFulfillment: (orderId: string) =>
       request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),
