@@ -6,6 +6,7 @@
   --bg: #0f1c14;
   --fg: #f3f7f2;
   --accent: #3d8b5f;
+  --mist: #9bc4a8;
 }
 
 body {
@@ -13,8 +14,48 @@ body {
   min-height: 100vh;
   color: var(--fg);
   background:
-    radial-gradient(1200px 600px at 10% -10%, #1d3a28 0%, transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, #243528 0%, transparent 50%),
-    var(--bg);
-  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    radial-gradient(1200px 700px at 8% -12%, #1f4630 0%, transparent 55%),
+    radial-gradient(900px 520px at 100% 0%, #2a4a35 0%, transparent 48%),
+    linear-gradient(180deg, #122017 0%, var(--bg) 45%, #0c1510 100%);
+  font-family: var(--font-sans), "Segoe UI", sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(12px, -10px, 0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.7s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise 0.8s ease-out 0.12s both;
+}
+
+.animate-rise-late {
+  animation: rise 0.9s ease-out 0.22s both;
+}
+
+.hero-orb {
+  animation: drift 8s ease-in-out infinite alternate;
 }

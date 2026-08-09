@@ -1,6 +1,6 @@
 {
-  "name": "Commerce Engine — Customer PWA",
-  "short_name": "Customer PWA",
+  "name": "Commerce — Customer",
+  "short_name": "Commerce",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f1c14",

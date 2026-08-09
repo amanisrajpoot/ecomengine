@@ -1,4 +1,4 @@
-"""Hyperlocal store discovery — nearby active locations with inventory+delivery."""
+"""Nearby discovery for customer surfaces — Food + Hyperlocal locations."""
 
 from __future__ import annotations
 
@@ -11,7 +11,11 @@ from app.businesses.models import Business
 from app.delivery.geo import haversine_km
 from app.locations.models import BusinessLocation
 from app.locations.schemas import NearbyStoreRead
+from app.verticals.food import FOOD_BUSINESS_TYPE
 from app.verticals.hyperlocal import HYPERLOCAL_TYPES
+
+# Default browse set when no type filter is passed (customer marketplace).
+CUSTOMER_DISCOVERABLE_TYPES = frozenset({*HYPERLOCAL_TYPES, FOOD_BUSINESS_TYPE.value})
 
 
 def _covers_customer(
@@ -34,6 +38,17 @@ def _covers_customer(
     return distance <= query_radius_km, distance
 
 
+def _eligible(business: Business) -> bool:
+    caps = business.capabilities or {}
+    if not caps.get("delivery", True):
+        return False
+    if business.type in HYPERLOCAL_TYPES:
+        return bool(caps.get("inventory", False))
+    if business.type == FOOD_BUSINESS_TYPE.value:
+        return caps.get("catalog", True) is not False
+    return False
+
+
 async def discover_nearby_stores(
     db: AsyncSession,
     *,
@@ -44,7 +59,7 @@ async def discover_nearby_stores(
     business_type: str | None = None,
     limit: int = 50,
 ) -> list[NearbyStoreRead]:
-    types = {business_type} if business_type else set(HYPERLOCAL_TYPES)
+    types = {business_type} if business_type else set(CUSTOMER_DISCOVERABLE_TYPES)
     stmt = (
         select(BusinessLocation, Business)
         .join(Business, Business.id == BusinessLocation.business_id)
@@ -58,11 +73,7 @@ async def discover_nearby_stores(
     rows = list(await db.execute(stmt))
     results: list[NearbyStoreRead] = []
     for location, business in rows:
-        caps = business.capabilities or {}
-        if not caps.get("delivery", True):
-            continue
-        # Hyperlocal discovery prefers inventory-capable stores.
-        if not caps.get("inventory", False):
+        if not _eligible(business):
             continue
         ok, distance = _covers_customer(
             store_lat=float(location.lat),
@@ -86,7 +97,7 @@ async def discover_nearby_stores(
                 lng=float(location.lng),
                 distance_km=round(distance, 3),
                 service_area=location.service_area,
-                capabilities=caps,
+                capabilities=business.capabilities or {},
             )
         )
     results.sort(key=lambda s: s.distance_km)

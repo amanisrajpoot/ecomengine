@@ -63,7 +63,7 @@ async def create_category(
 async def list_categories(
     business_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("catalog.manage")),
+    ctx: AuthContext = Depends(require_permission("catalog.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[CategoryRead]:
     _ = ctx
@@ -120,7 +120,7 @@ async def list_products(
     category_id: uuid.UUID | None = Query(default=None),
     active_only: bool = Query(default=False),
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("catalog.manage")),
+    ctx: AuthContext = Depends(require_permission("catalog.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[ProductRead]:
     _ = ctx
@@ -142,7 +142,7 @@ async def get_product(
     business_id: uuid.UUID,
     product_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("catalog.manage")),
+    ctx: AuthContext = Depends(require_permission("catalog.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> ProductRead:
     _ = ctx
@@ -211,7 +211,7 @@ async def list_variants(
     business_id: uuid.UUID,
     product_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("catalog.manage")),
+    ctx: AuthContext = Depends(require_permission("catalog.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[VariantRead]:
     _ = ctx
@@ -271,7 +271,7 @@ async def create_addon(
 async def list_addons(
     business_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("catalog.manage")),
+    ctx: AuthContext = Depends(require_permission("catalog.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[AddonRead]:
     _ = ctx
@@ -333,7 +333,7 @@ async def list_product_addons(
     business_id: uuid.UUID,
     product_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("catalog.manage")),
+    ctx: AuthContext = Depends(require_permission("catalog.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[ProductAddonLinkRead]:
     _ = ctx
@@ -367,7 +367,7 @@ async def create_bundle(
 async def list_bundles(
     business_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("catalog.manage")),
+    ctx: AuthContext = Depends(require_permission("catalog.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[BundleRead]:
     _ = ctx

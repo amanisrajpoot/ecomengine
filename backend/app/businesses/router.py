@@ -56,7 +56,7 @@ async def list_businesses(
 async def get_business(
     business_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("business.settings")),
+    ctx: AuthContext = Depends(require_permission("businesses.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> BusinessRead:
     _ = ctx
