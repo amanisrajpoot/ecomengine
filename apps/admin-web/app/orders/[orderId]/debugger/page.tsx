@@ -8,6 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { JsonBlock } from "../../../../components/JsonBlock";
+import { PaymentDebuggerActions } from "../../../../components/PaymentDebuggerActions";
 import { api, getTenantId, getToken } from "../../../../lib/session";
 
 export default function OrderDebuggerPage() {
@@ -15,6 +16,12 @@ export default function OrderDebuggerPage() {
   const params = useParams<{ orderId: string }>();
   const [debug, setDebug] = useState<OrderDebugger | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  async function loadDebugger() {
+    const data = await api().getOrderDebugger(params.orderId);
+    setDebug(data);
+    return data;
+  }
 
   useEffect(() => {
     if (!getToken()) {
@@ -28,7 +35,7 @@ export default function OrderDebuggerPage() {
     let cancelled = false;
     (async () => {
       try {
-        const data = await api().getOrderDebugger(params.orderId);
+        const data = await loadDebugger();
         if (!cancelled) setDebug(data);
       } catch (err) {
         if (!cancelled) {
@@ -94,6 +101,13 @@ export default function OrderDebuggerPage() {
           </div>
 
           <JsonBlock title="Order" data={debug.order} defaultOpen />
+          <PaymentDebuggerActions
+            orderId={params.orderId}
+            payments={debug.payments}
+            onRefresh={() => {
+              loadDebugger().catch(() => undefined);
+            }}
+          />
           <JsonBlock title="Payments" data={debug.payments} />
           <JsonBlock title="Ledger entries" data={debug.ledger_entries} />
           <JsonBlock title="Ledger balances" data={debug.ledger_balances} />

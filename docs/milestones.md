@@ -204,6 +204,15 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/settlements-ui.md`.
 
+## Phase 28 — Online payments UI
+
+- Customer PWA: COD vs Cashfree at checkout; `PaymentPanel` on order detail (mock pay + Cashfree link)
+- Admin debugger: verify capture + full refund actions
+- api-client: payment list/verify/refund methods
+- Backend: customer order scoping on payment routes
+
+**Status:** implemented — `docs/payments-ui.md`.
+
 ---
 
 ## MVP status

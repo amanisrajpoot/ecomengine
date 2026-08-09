@@ -34,6 +34,7 @@ export default function CartPage() {
   const [busy, setBusy] = useState(false);
   const [phone, setPhone] = useState(getCustomerPhone());
   const [address, setAddress] = useState<DeliveryAddress>(getDeliveryAddress());
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "cashfree">("cod");
   const [itemBusy, setItemBusy] = useState<string | null>(null);
 
   const loadCart = useCallback(async () => {
@@ -105,10 +106,13 @@ export default function CartPage() {
     try {
       const order = await api().checkout({
         cart_id: cart.id,
-        payment_provider: "cod",
+        payment_provider: paymentMethod,
         fulfillment_type: "DELIVERY",
         customer_phone: phone,
         delivery_address: address,
+        ...(paymentMethod === "cashfree"
+          ? { return_url: `${window.location.origin}/orders` }
+          : {}),
       });
       setSessionCart(null);
       router.push(`/orders/${order.id}`);
@@ -233,9 +237,43 @@ export default function CartPage() {
             />
           </div>
 
+          <div className="mt-6">
+            <p className="text-sm font-medium text-emerald-50/90">Payment</p>
+            <div className="mt-3 flex flex-col gap-2">
+              {(
+                [
+                  ["cod", "Cash on delivery"],
+                  ["cashfree", "Pay online (Cashfree)"],
+                ] as const
+              ).map(([value, label]) => (
+                <label
+                  key={value}
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm transition ${
+                    paymentMethod === value
+                      ? "border-emerald-300/30 bg-emerald-400/10 text-emerald-50"
+                      : "border-emerald-200/10 text-emerald-100/70 hover:border-emerald-200/20"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value={value}
+                    checked={paymentMethod === value}
+                    onChange={() => setPaymentMethod(value)}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+
           {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
           <Button className="mt-6 w-full" disabled={busy || !cart.items.length} onClick={checkout}>
-            {busy ? "Placing order…" : "Pay with COD"}
+            {busy
+              ? "Placing order…"
+              : paymentMethod === "cod"
+                ? "Place order (COD)"
+                : "Place order & pay online"}
           </Button>
         </>
       )}

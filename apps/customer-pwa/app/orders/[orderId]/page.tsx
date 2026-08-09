@@ -6,6 +6,7 @@ import {
   Button,
   OrderStatusStepper,
   OrderTrackingPanel,
+  PaymentPanel,
   PriceBreakdown,
   Spinner,
   StatusBadge,
@@ -105,6 +106,14 @@ export default function OrderDetailPage() {
           </div>
 
           <OrderStatusStepper profile={order.state_machine_profile} status={order.status} />
+
+          <PaymentPanel
+            order={order}
+            api={api()}
+            onUpdate={() => {
+              load().catch(() => undefined);
+            }}
+          />
 
           <OrderTrackingPanel order={order} api={api()} />
 

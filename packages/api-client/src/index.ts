@@ -17,6 +17,9 @@ import type {
   ProductAddonLink,
   Settlement,
   StockMovement,
+  Refund,
+  Payment,
+  PaymentInitiateResponse,
   TokenResponse,
   Tenant,
   Variant,
@@ -202,6 +205,7 @@ export function createApiClient(options: ApiClientOptions = {}) {
       payment_provider?: string;
       fulfillment_type?: string;
       customer_phone?: string;
+      return_url?: string;
       delivery_address?: {
         line1: string;
         city: string;
@@ -335,6 +339,44 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     listOrderSettlements: (orderId: string) =>
       request<Settlement[]>(`/api/v1/orders/${orderId}/settlements`),
+
+    listPaymentProviders: () =>
+      request<{ providers: string[] }>("/api/v1/payments/providers"),
+
+    listOrderPayments: (orderId: string) =>
+      request<Payment[]>(`/api/v1/orders/${orderId}/payments`),
+
+    initiateOrderPayment: (
+      orderId: string,
+      body?: {
+        provider?: string;
+        return_url?: string;
+        customer_phone?: string;
+        customer_email?: string;
+      },
+    ) =>
+      request<PaymentInitiateResponse>(`/api/v1/orders/${orderId}/payments`, {
+        method: "POST",
+        body: JSON.stringify(body ?? {}),
+      }),
+
+    verifyOrderPayment: (
+      orderId: string,
+      body?: { provider?: string; provider_ref?: string },
+    ) =>
+      request<PaymentInitiateResponse>(`/api/v1/orders/${orderId}/payments/verify`, {
+        method: "POST",
+        body: JSON.stringify(body ?? {}),
+      }),
+
+    refundPayment: (
+      paymentId: string,
+      body: { amount_paise: number; reason?: string },
+    ) =>
+      request<Refund>(`/api/v1/payments/${paymentId}/refunds`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
 
     getOrderFulfillment: (orderId: string) =>
       request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),

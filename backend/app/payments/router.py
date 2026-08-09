@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_db
 from app.core.deps import AuthContext, require_permission, resolve_tenant_id
 from app.core.errors import AppError
+from app.orders import service as orders_service
+from app.orders.access import assert_order_readable
 from app.payments import service
 from app.payments.registry import gateway_registry
 from app.payments.schemas import (
@@ -28,6 +30,19 @@ def _require_tenant(tenant_id: uuid.UUID | None) -> uuid.UUID:
     if tenant_id is None:
         raise AppError("TENANT_REQUIRED", "X-Tenant-ID header is required", 400)
     return tenant_id
+
+
+async def _assert_order_payment_access(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    order_id: uuid.UUID,
+    ctx: AuthContext,
+) -> None:
+    order, _, _ = await orders_service.get_order(
+        db, tenant_id=tenant_id, order_id=order_id
+    )
+    await assert_order_readable(db, tenant_id=tenant_id, ctx=ctx, order=order)
 
 
 @router.get("/payments/providers")
@@ -50,6 +65,7 @@ async def initiate_payment(
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> PaymentInitiateResponse:
     tid = _require_tenant(tenant_id)
+    await _assert_order_payment_access(db, tenant_id=tid, order_id=order_id, ctx=ctx)
     payment, order = await service.initiate_payment(
         db,
         tenant_id=tid,
@@ -75,6 +91,7 @@ async def verify_payment(
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> PaymentInitiateResponse:
     tid = _require_tenant(tenant_id)
+    await _assert_order_payment_access(db, tenant_id=tid, order_id=order_id, ctx=ctx)
     payment, order = await service.verify_and_confirm(
         db,
         tenant_id=tid,
@@ -95,8 +112,8 @@ async def list_order_payments(
     ctx: AuthContext = Depends(require_permission("payments.manage")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[PaymentRead]:
-    _ = ctx
     tid = _require_tenant(tenant_id)
+    await _assert_order_payment_access(db, tenant_id=tid, order_id=order_id, ctx=ctx)
     rows = await service.list_payments_for_order(db, tenant_id=tid, order_id=order_id)
     return [PaymentRead.model_validate(r) for r in rows]
 

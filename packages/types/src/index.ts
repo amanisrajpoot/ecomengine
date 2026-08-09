@@ -218,6 +218,41 @@ export interface Tenant {
   config: Record<string, unknown>;
 }
 
+export interface Payment {
+  id: string;
+  tenant_id: string;
+  order_id: string;
+  provider: string;
+  provider_ref: string | null;
+  status: string;
+  amount_paise: number;
+  currency: string;
+  idempotency_key?: string | null;
+  checkout_payload: Record<string, unknown>;
+  raw: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaymentInitiateResponse {
+  payment: Payment;
+  order_status: string;
+}
+
+export interface Refund {
+  id: string;
+  tenant_id: string;
+  payment_id: string;
+  order_id: string;
+  provider_ref: string | null;
+  amount_paise: number;
+  status: string;
+  reason: string | null;
+  raw: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Settlement {
   id: string;
   tenant_id: string;
