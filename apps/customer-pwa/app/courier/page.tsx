@@ -10,7 +10,9 @@ import { api, getToken } from "../../lib/session";
 
 export default function CourierPage() {
   const router = useRouter();
-  const [businessId, setBusinessId] = useState("");
+  const [businessId, setBusinessId] = useState(
+    process.env.NEXT_PUBLIC_COURIER_BUSINESS_ID ?? "",
+  );
   const [weightKg, setWeightKg] = useState("2");
   const [vehicle, setVehicle] = useState("BIKE");
   const [express, setExpress] = useState(false);
@@ -78,14 +80,19 @@ export default function CourierPage() {
       <p className="font-display text-4xl text-emerald-50">Courier</p>
       <p className="mt-2 text-sm text-emerald-100/55">
         Demo route: MG Road → Koramangala. Quote by distance, weight, and vehicle.
+        {process.env.NEXT_PUBLIC_COURIER_BUSINESS_ID
+          ? " Courier business loaded from environment."
+          : ""}
       </p>
       <form onSubmit={onQuote} className="mt-8 flex flex-col gap-4">
-        <TextField
-          label="Courier business ID"
-          value={businessId}
-          onChange={(e) => setBusinessId(e.target.value)}
-          placeholder="COURIER business UUID"
-        />
+        {!process.env.NEXT_PUBLIC_COURIER_BUSINESS_ID ? (
+          <TextField
+            label="Courier business ID"
+            value={businessId}
+            onChange={(e) => setBusinessId(e.target.value)}
+            placeholder="COURIER business UUID"
+          />
+        ) : null}
         <TextField
           label="Weight (kg)"
           type="number"

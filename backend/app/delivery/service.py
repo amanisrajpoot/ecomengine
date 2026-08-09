@@ -450,6 +450,16 @@ async def assign_delivery(
             "status": delivery.status,
         },
     )
+    if order:
+        await event_bus.publish(
+            "RiderAssigned",
+            {
+                "tenant_id": str(tenant_id),
+                "order_id": str(order.id),
+                "delivery_id": str(delivery.id),
+                "partner_id": str(partner.id),
+            },
+        )
     return await _load_delivery(db, tenant_id=tenant_id, delivery_id=delivery.id)
 
 

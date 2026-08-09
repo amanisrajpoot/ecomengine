@@ -166,22 +166,7 @@ async def test_food_golden_path_end_to_end(client: AsyncClient) -> None:
     assert ful.json()["status"] == "PENDING"
     fulfillment_id = ful.json()["id"]
 
-    # 5) Merchant accept → prepare → ready
-    for to_status, actor in (
-        ("ACCEPTED", "merchant"),
-        ("PREPARING", "merchant"),
-        ("READY", "merchant"),
-    ):
-        resp = await client.post(
-            f"/api/v1/orders/{order_id}/transitions",
-            headers=headers,
-            json={"to_status": to_status, "actor": actor},
-        )
-        assert resp.status_code == 200, resp.text
-    ful = await client.get(f"/api/v1/orders/{order_id}/fulfillment", headers=headers)
-    assert ful.json()["status"] == "READY"
-
-    # 6) Rider assign + deliver
+    # 5) Rider online before kitchen marks ready (auto-dispatch on READY)
     partner = await client.post(
         "/api/v1/delivery-partners",
         headers=headers,
@@ -199,18 +184,29 @@ async def test_food_golden_path_end_to_end(client: AsyncClient) -> None:
         json={"partner_id": partner_id, "vehicle_type": "BIKE"},
     )
 
-    delivery = await client.post(
-        f"/api/v1/fulfillments/{fulfillment_id}/deliveries",
+    for to_status, actor in (
+        ("ACCEPTED", "merchant"),
+        ("PREPARING", "merchant"),
+        ("READY", "merchant"),
+    ):
+        resp = await client.post(
+            f"/api/v1/orders/{order_id}/transitions",
+            headers=headers,
+            json={"to_status": to_status, "actor": actor},
+        )
+        assert resp.status_code == 200, resp.text
+    ful = await client.get(f"/api/v1/orders/{order_id}/fulfillment", headers=headers)
+    assert ful.json()["status"] == "AWAITING_PICKUP"
+
+    # 6) Delivery auto-created and rider assigned
+    delivery = await client.get(
+        f"/api/v1/fulfillments/{fulfillment_id}/delivery",
         headers=headers,
-        json={"metadata": {"dropoff": {"lat": 12.9884, "lng": 77.6408}}},
     )
     assert delivery.status_code == 200, delivery.text
     delivery_id = delivery.json()["id"]
-    assigned = await client.post(
-        f"/api/v1/deliveries/{delivery_id}/assign", headers=headers, json={}
-    )
-    assert assigned.status_code == 200, assigned.text
-    assert assigned.json()["partner_id"] == partner_id
+    assert delivery.json()["partner_id"] == partner_id
+    assigned = delivery
 
     pickup = next(s for s in assigned.json()["stops"] if s["stop_type"] == "PICKUP")
     drop = next(s for s in assigned.json()["stops"] if s["stop_type"] == "DROP")

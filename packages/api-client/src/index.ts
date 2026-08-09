@@ -224,6 +224,24 @@ export function createApiClient(options: ApiClientOptions = {}) {
     getOrderFulfillment: (orderId: string) =>
       request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),
 
+    createDelivery: (fulfillmentId: string, body?: Record<string, unknown>) =>
+      request<Delivery>(`/api/v1/fulfillments/${fulfillmentId}/deliveries`, {
+        method: "POST",
+        body: JSON.stringify(body ?? {}),
+      }),
+
+    getFulfillmentDelivery: (fulfillmentId: string) =>
+      request<Delivery>(`/api/v1/fulfillments/${fulfillmentId}/delivery`),
+
+    assignDelivery: (deliveryId: string, body?: { partner_id?: string }) =>
+      request<Delivery>(`/api/v1/deliveries/${deliveryId}/assign`, {
+        method: "POST",
+        body: JSON.stringify(body ?? {}),
+      }),
+
+    listDeliveryPartners: (params?: { online_only?: boolean; status?: string }) =>
+      request<Partner[]>(`/api/v1/delivery-partners${toQuery(params ?? {})}`),
+
     courierQuote: (body: Record<string, unknown>) =>
       request<CourierQuote>("/api/v1/courier/quote", {
         method: "POST",

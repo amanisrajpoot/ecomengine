@@ -151,9 +151,9 @@ async def test_courier_golden_path_end_to_end(client: AsyncClient) -> None:
     assert ful.status_code == 200
     fulfillment_id = ful.json()["id"]
     assert ful.json()["type"] == "MULTI_STOP"
-    assert ful.json()["status"] == "PENDING"
+    assert ful.json()["status"] in {"PENDING", "AWAITING_PICKUP"}
 
-    # 3) Create delivery (auto hop MULTI_STOP to READY) + assign rider
+    # 3) Rider online before dispatch; delivery may already exist from auto-dispatch
     partner = await client.post(
         "/api/v1/delivery-partners",
         headers=headers,
@@ -176,22 +176,31 @@ async def test_courier_golden_path_end_to_end(client: AsyncClient) -> None:
         headers=headers,
         json={},
     )
+    if delivery.status_code != 200:
+        delivery = await client.get(
+            f"/api/v1/fulfillments/{fulfillment_id}/delivery",
+            headers=headers,
+        )
     assert delivery.status_code == 200, delivery.text
     delivery_id = delivery.json()["id"]
-    stops = delivery.json()["stops"]
+    if not delivery.json().get("partner_id"):
+        assigned = await client.post(
+            f"/api/v1/deliveries/{delivery_id}/assign", headers=headers, json={}
+        )
+        assert assigned.status_code == 200, assigned.text
+        assert assigned.json()["partner_id"] == partner_id
+        assert assigned.json()["status"] == "ASSIGNED"
+    else:
+        assert delivery.json()["partner_id"] == partner_id
+        assigned = delivery
+
+    stops = assigned.json()["stops"]
     assert len(stops) == 2
     assert {s["stop_type"] for s in stops} == {"PICKUP", "DROP"}
     pickup_stop = next(s for s in stops if s["stop_type"] == "PICKUP")
     drop_stop = next(s for s in stops if s["stop_type"] == "DROP")
     assert abs(pickup_stop["lat"] - pickup["lat"]) < 0.001
     assert abs(drop_stop["lat"] - drop["lat"]) < 0.001
-
-    assigned = await client.post(
-        f"/api/v1/deliveries/{delivery_id}/assign", headers=headers, json={}
-    )
-    assert assigned.status_code == 200, assigned.text
-    assert assigned.json()["partner_id"] == partner_id
-    assert assigned.json()["status"] == "ASSIGNED"
 
     order_assigned = await client.get(f"/api/v1/orders/{order_id}", headers=headers)
     assert order_assigned.json()["status"] == "PICKUP_ASSIGNED"

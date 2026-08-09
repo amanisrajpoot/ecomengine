@@ -100,4 +100,4 @@ async def test_merchant_lists_and_advances_food_order(client: AsyncClient) -> No
 
     ful = await client.get(f"/api/v1/orders/{order_id}/fulfillment", headers=headers)
     assert ful.status_code == 200
-    assert ful.json()["status"] == "READY"
+    assert ful.json()["status"] == "AWAITING_PICKUP"

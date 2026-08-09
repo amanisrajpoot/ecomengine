@@ -211,6 +211,7 @@ PERMISSIONS: dict[str, set[Role]] = {
     "delivery.assign": {
         Role.SUPER_ADMIN,
         Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
         Role.BUSINESS_MANAGER,
     },
     "delivery.track": {

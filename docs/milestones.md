@@ -163,6 +163,16 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/experience.md`.
 
+## Phase 24 — Dispatch & logistics
+
+- Auto-dispatch on `OrderReady` (food/hyperlocal) and `PaymentCaptured` (courier)
+- `DispatchPanel` in `@commerce/ui` — request/retry rider from merchant + admin
+- Admin dispatch board (`/dispatch`)
+- api-client: `createDelivery`, `assignDelivery`, `getFulfillmentDelivery`, `listDeliveryPartners`
+- RBAC: `BUSINESS_OWNER` may assign deliveries
+
+**Status:** implemented — `docs/dispatch.md`.
+
 ---
 
 ## MVP status

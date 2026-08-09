@@ -28,6 +28,7 @@ from app.taxation.router import router as tax_router
 from app.tenants.router import router as tenants_router
 from app.integrations.ondc.handlers import register_ondc_handlers
 from app.integrations.ondc.router import router as ondc_router
+from app.delivery.handlers import register_dispatch_handlers
 from app.notifications.handlers import register_notification_handlers
 from app.notifications.router import router as notifications_router
 
@@ -98,6 +99,7 @@ app.include_router(notifications_router, prefix="/api/v1")
 
 register_ondc_handlers()
 register_notification_handlers()
+register_dispatch_handlers()
 
 
 @app.get("/health")
