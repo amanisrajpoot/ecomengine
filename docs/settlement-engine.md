@@ -128,10 +128,21 @@ Support inclusion of:
 
 ---
 
-## APIs (future phases)
+## APIs (Phase 10)
 
-- List settlements by party
-- Settlement detail with linked ledger entry ids
-- Approve / mark paid (admin)
+- `POST /api/v1/settlements` — create period for MERCHANT / RIDER / PLATFORM
+- `GET /api/v1/settlements` — list (filter party/status)
+- `GET /api/v1/settlements/{id}` — detail with linked ledger entry ids
+- `POST /api/v1/settlements/{id}/calculate` — aggregate unlinked ledger lines for party accounts
+- `POST /api/v1/settlements/{id}/reconcile` — check payments/refunds vs cash ledger for included orders
+- `POST /api/v1/settlements/{id}/approve` / `mark-paid`
+- `GET /api/v1/orders/{id}/settlements` — settlements touching an order
+
+**Party conventions (V1):**
+- `MERCHANT` → `party_id` = `business_id`; account `MERCHANT_PAYABLE`
+- `RIDER` → `party_id` = rider bucket id; account `RIDER_PAYABLE` (assignment in Phase 12)
+- `PLATFORM` → `party_id` = `tenant_id`; accounts `PLATFORM_COMMISSION` + `PLATFORM_FEE_REVENUE`
+
+Each ledger entry links to at most one settlement (`settlement_ledger_links.ledger_entry_id` unique).
 
 Admin **order debugger** must show Order → … → Ledger → Settlement for any order.

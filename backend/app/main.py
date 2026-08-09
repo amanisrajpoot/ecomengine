@@ -10,6 +10,7 @@ from app.cart.router import router as cart_router
 from app.catalog.router import router as catalog_router
 from app.core.config import get_settings
 from app.core.errors import AppError, app_error_handler, http_error_handler
+from app.fulfillment.router import router as fulfillment_router
 from app.identity.router import router as auth_router
 from app.identity.router import users_router
 from app.inventory.router import router as inventory_router
@@ -26,6 +27,7 @@ from app.tenants.router import router as tenants_router
 import app.businesses.models  # noqa: F401
 import app.cart.models  # noqa: F401
 import app.catalog.models  # noqa: F401
+import app.fulfillment.models  # noqa: F401
 import app.identity.models  # noqa: F401
 import app.inventory.models  # noqa: F401
 import app.ledger.models  # noqa: F401
@@ -67,6 +69,7 @@ app.include_router(orders_router, prefix="/api/v1")
 app.include_router(payments_router, prefix="/api/v1")
 app.include_router(ledger_router, prefix="/api/v1")
 app.include_router(settlements_router, prefix="/api/v1")
+app.include_router(fulfillment_router, prefix="/api/v1")
 
 
 @app.get("/health")

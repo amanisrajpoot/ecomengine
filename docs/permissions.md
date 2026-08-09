@@ -38,6 +38,8 @@ Bindings are always evaluated with **tenant** (and business/location when releva
 | Read settlements | Y | Y | Y | Y | — | — | — |
 | Manage / calculate settlements | Y | Y | — | — | — | — | — |
 | Approve / mark paid settlements | Y | Y | — | — | — | — | — |
+| Read fulfillment | Y | Y | Y | Y | Y | assigned | own |
+| Manage fulfillment | Y | Y | Y | Y | Y | Y | — |
 | Track own orders | — | — | — | — | — | assigned | own |
 | Order debugger | Y | Y | — | — | — | — | — |
 

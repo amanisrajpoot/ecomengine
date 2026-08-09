@@ -15,7 +15,10 @@ class CheckoutRequest(BaseModel):
     payment_provider: str = Field(default="cashfree", min_length=2, max_length=32)
     # Backward-compatible alias: COD → provider "cod"; ONLINE → payment_provider.
     payment_method: str | None = Field(default=None, pattern=r"^(ONLINE|COD)$")
-    fulfillment_type: str = Field(default="DELIVERY", pattern=r"^(DELIVERY|PICKUP|SELF_PICKUP)$")
+    fulfillment_type: str = Field(
+        default="DELIVERY",
+        pattern=r"^(DELIVERY|PICKUP|SELF_PICKUP|SCHEDULED|MULTI_STOP)$",
+    )
     # Optional override; normally derived from business type.
     state_machine_profile: str | None = None
     return_url: str | None = None

@@ -17,6 +17,7 @@ from app.core.config import get_settings
 import app.businesses.models  # noqa: F401
 import app.cart.models  # noqa: F401
 import app.catalog.models  # noqa: F401
+import app.fulfillment.models  # noqa: F401
 import app.identity.models  # noqa: F401
 import app.inventory.models  # noqa: F401
 import app.ledger.models  # noqa: F401

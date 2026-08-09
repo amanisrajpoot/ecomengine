@@ -19,10 +19,11 @@ from app.taxation.service import seed_india_default_rules
 import app.businesses.models  # noqa: F401
 import app.cart.models  # noqa: F401
 import app.catalog.models  # noqa: F401
+import app.fulfillment.models  # noqa: F401
 import app.identity.models  # noqa: F401
 import app.inventory.models  # noqa: F401
-import app.locations.models  # noqa: F401
 import app.ledger.models  # noqa: F401
+import app.locations.models  # noqa: F401
 import app.orders.models  # noqa: F401
 import app.payments.models  # noqa: F401
 import app.settlements.models  # noqa: F401

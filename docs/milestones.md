@@ -77,7 +77,10 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phase 11 — Fulfillment
 
-- Decouple fulfillment from order
+- Decouple fulfillment from order (1:1 `Fulfillment`; no rider fields on Order)
+- Sync projection from order status; logistics remain Phase 12
+
+**Status:** implemented — fulfillments + status events; create at payment confirm; transition API.
 
 ## Phase 12 — Delivery
 

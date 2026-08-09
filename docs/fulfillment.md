@@ -116,3 +116,14 @@ Courier and optionally food/hyperlocal:
 - Signature metadata
 
 Stored on stop / delivery completion event; triggers `OrderDelivered` when policy says order completes.
+
+---
+
+## Phase 11 APIs (fulfillment only)
+
+- `GET /api/v1/orders/{id}/fulfillment`
+- `POST /api/v1/orders/{id}/fulfillment` — idempotent create after payment confirm
+- `GET /api/v1/fulfillments` / `GET /api/v1/fulfillments/{id}`
+- `POST /api/v1/fulfillments/{id}/transitions`
+
+Created automatically when an order reaches `PAYMENT_CONFIRMED`. Order transitions sync the fulfillment projection (`PENDING` → … → `COMPLETED`) without storing rider/vehicle on `Order`. Delivery partners, stops, and assignment arrive in Phase 12.

@@ -191,6 +191,14 @@ async def transition_order(
             "profile": order.state_machine_profile,
         },
     )
+
+    # Keep fulfillment projection in sync (created at PAYMENT_CONFIRMED).
+    from app.fulfillment.service import sync_from_order_status
+
+    await sync_from_order_status(
+        db, tenant_id=tenant_id, order=order, actor_user_id=actor_user_id
+    )
+
     return await _load_order_graph(db, tenant_id=tenant_id, order_id=order.id)
 
 
