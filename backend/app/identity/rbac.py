@@ -236,6 +236,10 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.CUSTOMER,
         Role.DELIVERY_PARTNER,
     },
+    "ondc.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+    },
 }
 
 

@@ -241,6 +241,15 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/rider-ops-ui.md`.
 
+## Phase 32 — ONDC ops UI
+
+- Admin: `/ondc` session list + adapter meta, `/ondc/[id]` detail with callback log
+- `OndcSessionCard` in `@commerce/ui`
+- api-client: `getOndcMeta`, `listOndcSessions`, `getOndcSession`
+- Backend: `GET /integrations/ondc/sessions` (`ondc.read`)
+
+**Status:** implemented — `docs/ondc-ops-ui.md`.
+
 ---
 
 ## MVP status

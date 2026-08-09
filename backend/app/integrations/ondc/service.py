@@ -326,3 +326,31 @@ async def handle_cancel(
         context=_reply_context(request.context, "on_cancel"),
         message={"order": {"id": str(order.id), "state": map_order_state(order.status)}},
     )
+
+
+async def list_sessions(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    stage: str | None = None,
+    limit: int = 50,
+) -> list[OndcSession]:
+    stmt = select(OndcSession).where(OndcSession.tenant_id == tenant_id)
+    if stage:
+        stmt = stmt.where(OndcSession.stage == stage)
+    stmt = stmt.order_by(OndcSession.updated_at.desc()).limit(max(1, min(limit, 200)))
+    return list(await db.scalars(stmt))
+
+
+async def get_session(
+    db: AsyncSession, *, tenant_id: uuid.UUID, session_id: uuid.UUID
+) -> OndcSession:
+    session = await db.scalar(
+        select(OndcSession).where(
+            OndcSession.id == session_id,
+            OndcSession.tenant_id == tenant_id,
+        )
+    )
+    if not session:
+        raise AppError("ONDC_SESSION_NOT_FOUND", "ONDC session not found", 404)
+    return session
