@@ -145,6 +145,14 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — golden test + `docs/notifications.md`.
 
+## Phase 22 — Demo data & local testing
+
+- Unified `seed_demo` — one tenant (`commerce-demo`) with Food + Grocery + Courier + demo users
+- Auto-runs in Docker backend startup; `pnpm demo:seed` for local API
+- `docs/demo.md` — how to test all four PWAs end-to-end
+
+**Status:** implemented — `seed_demo` + demo guide.
+
 ---
 
 ## MVP status

@@ -6,8 +6,9 @@
     "dev:customer": "pnpm --filter @commerce/customer-pwa dev",
     "dev:merchant": "pnpm --filter @commerce/merchant-pwa dev",
     "dev:rider": "pnpm --filter @commerce/rider-pwa dev",
-    "dev:admin": "pnpm --filter @commerce/admin-web dev",
-    "build": "pnpm -r run build",
+  "dev:admin": "pnpm --filter @commerce/admin-web dev",
+  "demo:seed": "cd backend && PYTHONPATH=. python -m app.scripts.seed_demo",
+  "build": "pnpm -r run build",
     "typecheck": "pnpm -r run typecheck"
   },
   "engines": {

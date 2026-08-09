@@ -35,6 +35,22 @@ Universal Commerce & Fulfillment Engine — modular monolith monorepo (India-fir
 - **Phase 19** — Admin web (tenant list, order debugger, ops dashboard on port 3003)
 - **Phase 20** — ONDC adapter (Beckn BPP: search → confirm on shared engines)
 - **Phase 21** — Notifications (order lifecycle SMS fan-out, mock channel)
+- **Phase 22** — Unified demo seed + local testing guide (`docs/demo.md`)
+
+## Test with demo data
+
+**You can test all apps now.** See **[docs/demo.md](docs/demo.md)** for the full walkthrough.
+
+```bash
+docker compose up --build          # API + demo seed on first boot
+pnpm demo:seed && source demo.env  # or re-seed locally
+pnpm dev:customer                  # :3000 — customer@demo.com / Demo123!
+pnpm dev:merchant                  # :3001 — merchant@demo.com / Demo123!
+pnpm dev:rider                     # :3002 — rider@demo.com / Demo123!
+pnpm dev:admin                     # :3003 — admin@example.com / ChangeMe123!
+```
+
+Paste `NEXT_PUBLIC_TENANT_ID` from `demo.env` into each app login screen (or set via `.env.local`).
 
 ## Prerequisites
 
@@ -64,8 +80,9 @@ pip install -r requirements.txt
 PYTHONPATH=. alembic upgrade head
 PYTHONPATH=. python -m app.scripts.bootstrap_super_admin
 PYTHONPATH=. python -m app.scripts.seed_tax_rules
-# Optional Food demo catalog:
-PYTHONPATH=. python -m app.scripts.seed_food_demo
+# Optional unified demo (all verticals + PWA users in one tenant):
+PYTHONPATH=. python -m app.scripts.seed_demo
+# Writes ../demo.env — source it before starting PWAs
 PYTHONPATH=. uvicorn app.main:app --reload --port 8000
 PYTHONPATH=. pytest
 ```

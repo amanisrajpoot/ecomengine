@@ -10,8 +10,8 @@ import { api, getTenantId, setSession } from "../../lib/session";
 export default function LoginPage() {
   const router = useRouter();
   const [tenantId, setTenantId] = useState(getTenantId() ?? "");
-  const [email, setEmail] = useState("admin@example.com");
-  const [password, setPassword] = useState("ChangeMe123!");
+  const [email, setEmail] = useState("merchant@demo.com");
+  const [password, setPassword] = useState("Demo123!");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
