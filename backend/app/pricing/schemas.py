@@ -6,15 +6,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-
-class TaxLine(BaseModel):
-    code: str
-    kind: str = "CUSTOMER_TRANSACTION"
-    category: str = "GOODS"
-    rate_bps: int
-    taxable_paise: int
-    amount_paise: int
-    payer: str = "CUSTOMER"
+from app.taxation.schemas import TaxLine
 
 
 class PriceLine(BaseModel):
@@ -71,6 +63,6 @@ class PricingContext(BaseModel):
     delivery_fee_paise: int = Field(ge=0, default=0)
     platform_fee_paise: int = Field(ge=0, default=0)
     other_fees_paise: int = Field(ge=0, default=0)
-    # Used by Phase 5 tax stub; Phase 6 TaxRule engine will supersede.
+    # Fallback when no TaxRules are loaded.
     tax_rate_bps: int = Field(ge=0, default=500)
     tax_jurisdiction: str = "IN-INTRA"

@@ -46,6 +46,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Independent GST engine (customer vs platform vs settlement kinds)
 
+**Status:** implemented — `TaxRule` persistence, India defaults (CGST/SGST/IGST + commission kinds), calculate API; pricing/cart load rules (fallback stub if none).
+
 ## Phase 7 — Orders
 
 - Universal order + configurable state machines
