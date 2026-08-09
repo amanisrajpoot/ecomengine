@@ -31,7 +31,19 @@ PYTHONPATH=. uvicorn app.main:app --reload --port 8000
 
 ```bash
 pnpm demo:seed
-# writes demo.env at repo root with tenant UUID + credentials
+```
+
+**Windows (PowerShell or cmd)** — same command, or run directly:
+
+```powershell
+cd backend
+python -m app.scripts.seed_demo
+```
+
+Then load credentials (Git Bash / WSL: `source demo.env`; PowerShell: `Get-Content demo.env` and copy `NEXT_PUBLIC_TENANT_ID`):
+
+```bash
+# Git Bash / WSL / macOS / Linux
 source demo.env
 ```
 
@@ -100,7 +112,7 @@ pnpm demo:seed
 
 | Issue | Fix |
 |-------|-----|
-| `backend-1 exited with code 1` / `NoReferencedTableError: tenants` | Pull latest `main` (or phase-22+); scripts now load all ORM models. Then `docker compose down -v && docker compose up --build` |
+| `pnpm demo:seed` fails on Windows (`PYTHONPATH` not recognized) | Use `cd backend` then `python -m app.scripts.seed_demo` |
 | Empty browse | Confirm `NEXT_PUBLIC_TENANT_ID` matches `demo.env` |
 | Rider login fails | Re-run `seed_demo` (creates partner profile + vehicle) |
 | Merchant sees no orders | Place an order as customer first; select Spice Kitchen business |

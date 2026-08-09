@@ -1,7 +1,7 @@
 """Unified demo tenant for local UI testing across all PWAs.
 
 Usage:
-  cd backend && PYTHONPATH=. python -m app.scripts.seed_demo
+  cd backend && python -m app.scripts.seed_demo
 
 Creates (idempotent):
   - Tenant slug `commerce-demo` with Food + Grocery + Courier businesses
