@@ -290,6 +290,15 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/business-settings-ui.md`.
 
+## Phase 37 — Admin fleet ops UI
+
+- Admin: `/fleet`, `/fleet/new`, `/fleet/[partnerId]` — partners + vehicles
+- `PartnerCard` in `@commerce/ui`
+- `DispatchPanel`: manual rider picker + auto-assign
+- api-client: partner/vehicle CRUD methods
+
+**Status:** implemented — `docs/fleet-ops-ui.md`.
+
 ---
 
 ## MVP status

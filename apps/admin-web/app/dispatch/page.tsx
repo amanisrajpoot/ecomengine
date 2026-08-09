@@ -13,6 +13,7 @@ export default function DispatchPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [partnerNames, setPartnerNames] = useState<Map<string, string>>(new Map());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,13 +31,19 @@ export default function DispatchPage() {
     (async () => {
       try {
         const client = api();
-        const [orderRows, deliveryRows] = await Promise.all([
+        const [orderRows, deliveryRows, partnerRows] = await Promise.all([
           client.listOrders(),
           client.listDeliveries({ active_only: true }),
+          client.listDeliveryPartners({ status: "ACTIVE" }),
         ]);
         if (!cancelled) {
           setOrders(orderRows);
           setDeliveries(deliveryRows);
+          setPartnerNames(
+            new Map(
+              partnerRows.map((p) => [p.id, p.display_name ?? `Rider ${p.id.slice(0, 8)}…`]),
+            ),
+          );
         }
       } catch (err) {
         if (!cancelled) {
@@ -47,9 +54,18 @@ export default function DispatchPage() {
       }
     })();
     const timer = window.setInterval(() => {
-      api()
-        .listDeliveries({ active_only: true })
-        .then(setDeliveries)
+      Promise.all([
+        api().listDeliveries({ active_only: true }),
+        api().listDeliveryPartners({ status: "ACTIVE" }),
+      ])
+        .then(([deliveryRows, partnerRows]) => {
+          setDeliveries(deliveryRows);
+          setPartnerNames(
+            new Map(
+              partnerRows.map((p) => [p.id, p.display_name ?? `Rider ${p.id.slice(0, 8)}…`]),
+            ),
+          );
+        })
         .catch(() => undefined);
     }, 8000);
     return () => {
@@ -139,7 +155,10 @@ export default function DispatchPage() {
                     <p className="mt-1 text-xs text-violet-100/50">{delivery.id.slice(0, 8)}…</p>
                   </div>
                   <p className="text-xs text-violet-100/60">
-                    {delivery.partner_id ? `Rider ${delivery.partner_id.slice(0, 8)}…` : "Unassigned"}
+                    {delivery.partner_id
+                      ? partnerNames.get(delivery.partner_id) ??
+                        `Rider ${delivery.partner_id.slice(0, 8)}…`
+                      : "Unassigned"}
                   </p>
                 </li>
               ))}

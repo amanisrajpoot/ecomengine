@@ -241,6 +241,15 @@ export interface Partner {
   is_online: boolean;
   current_lat: number | null;
   current_lng: number | null;
+  service_area?: Record<string, unknown> | null;
+}
+
+export interface Vehicle {
+  id: string;
+  partner_id: string;
+  vehicle_type: string;
+  registration: string | null;
+  is_active: boolean;
 }
 
 export interface Tenant {

@@ -13,6 +13,7 @@ const NOTIFICATIONS_SEEN_KEY = "ce.admin.notifications.lastSeen";
 const links = [
   { href: "/", label: "Home" },
   { href: "/dispatch", label: "Dispatch" },
+  { href: "/fleet", label: "Fleet" },
   { href: "/ledger", label: "Ledger" },
   { href: "/settlements", label: "Settlements" },
   { href: "/notifications", label: "Notifications" },

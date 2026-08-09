@@ -93,6 +93,12 @@ export default function HomePage() {
 
       <div className="animate-rise-delay mt-8 flex flex-wrap gap-3">
         <Link
+          href="/fleet"
+          className="rounded-xl border border-violet-200/20 px-5 py-3 text-sm font-medium text-violet-50/90 hover:bg-white/5"
+        >
+          Fleet
+        </Link>
+        <Link
           href="/dispatch"
           className="rounded-xl border border-violet-200/20 px-5 py-3 text-sm font-medium text-violet-50/90 hover:bg-white/5"
         >
