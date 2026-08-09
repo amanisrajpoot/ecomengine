@@ -250,6 +250,16 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 **Status:** implemented — `docs/ondc-ops-ui.md`.
 
+## Phase 33 — UI foundation + live notifications
+
+- `@commerce/ui`: Toast, Modal, Skeleton, Badge, ErrorState, LiveIndicator, `usePolling`, `useNotificationFeed`, `NotificationFeed`, `NavNotificationBadge`
+- All four apps: `ToastProvider` in `AppShell`, nav unread badges on Alerts/Notifications
+- Notification pages: live polling (10s), mark-seen on visit, skeleton loaders
+- `OrderNotificationsPanel`: 5s polling on order detail
+- Merchant kitchen board: new-order toast on poll
+
+**Status:** implemented — `docs/ui-foundation.md`.
+
 ---
 
 ## MVP status

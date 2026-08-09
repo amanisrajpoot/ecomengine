@@ -4,7 +4,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { NavNotificationBadge, ToastProvider } from "@commerce/ui";
+
 import { api, clearSession, getSessionCart, getToken } from "../lib/session";
+
+const NOTIFICATIONS_SEEN_KEY = "ce.customer.notifications.lastSeen";
 
 const links = [
   { href: "/", label: "Home" },
@@ -45,63 +49,74 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-emerald-200/10 bg-[#0f1c14]/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-3">
-          <Link href="/" className="font-display text-xl tracking-tight text-emerald-50">
-            Commerce
-          </Link>
-          <nav className="flex flex-wrap items-center gap-1 text-sm">
-            {links.map((link) => {
-              const active =
-                link.href === "/"
-                  ? pathname === "/"
-                  : pathname === link.href || pathname.startsWith(`${link.href}/`);
-              const isCart = link.href === "/cart";
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`relative rounded-lg px-2.5 py-1.5 transition ${
-                    active
-                      ? "bg-emerald-400/15 text-emerald-50"
-                      : "text-emerald-100/60 hover:text-emerald-50"
-                  }`}
+    <ToastProvider>
+      <div className="min-h-screen">
+        <header className="sticky top-0 z-20 border-b border-emerald-200/10 bg-[#0f1c14]/80 backdrop-blur-md">
+          <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-3">
+            <Link href="/" className="font-display text-xl tracking-tight text-emerald-50">
+              Commerce
+            </Link>
+            <nav className="flex flex-wrap items-center gap-1 text-sm">
+              {links.map((link) => {
+                const active =
+                  link.href === "/"
+                    ? pathname === "/"
+                    : pathname === link.href || pathname.startsWith(`${link.href}/`);
+                const isCart = link.href === "/cart";
+                const isAlerts = link.href === "/notifications";
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`relative rounded-lg px-2.5 py-1.5 transition ${
+                      active
+                        ? "bg-emerald-400/15 text-emerald-50"
+                        : "text-emerald-100/60 hover:text-emerald-50"
+                    }`}
+                  >
+                    {link.label}
+                    {isCart && cartCount > 0 ? (
+                      <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-400 px-1 text-[10px] font-bold text-emerald-950">
+                        {cartCount > 9 ? "9+" : cartCount}
+                      </span>
+                    ) : null}
+                    {isAlerts && authed ? (
+                      <NavNotificationBadge
+                        enabled={authed}
+                        storageKey={NOTIFICATIONS_SEEN_KEY}
+                        loadNotifications={() => api().listNotifications({ limit: 100 })}
+                        className="!bg-emerald-400 !text-emerald-950"
+                      />
+                    ) : null}
+                  </Link>
+                );
+              })}
+              {authed ? (
+                <button
+                  type="button"
+                  className="ml-1 rounded-lg px-2.5 py-1.5 text-emerald-100/60 hover:text-emerald-50"
+                  onClick={() => {
+                    clearSession();
+                    setAuthed(false);
+                    setCartCount(0);
+                    router.push("/login");
+                  }}
                 >
-                  {link.label}
-                  {isCart && cartCount > 0 ? (
-                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-400 px-1 text-[10px] font-bold text-emerald-950">
-                      {cartCount > 9 ? "9+" : cartCount}
-                    </span>
-                  ) : null}
+                  Sign out
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="ml-1 rounded-lg bg-emerald-500 px-2.5 py-1.5 font-medium text-emerald-950"
+                >
+                  Sign in
                 </Link>
-              );
-            })}
-            {authed ? (
-              <button
-                type="button"
-                className="ml-1 rounded-lg px-2.5 py-1.5 text-emerald-100/60 hover:text-emerald-50"
-                onClick={() => {
-                  clearSession();
-                  setAuthed(false);
-                  setCartCount(0);
-                  router.push("/login");
-                }}
-              >
-                Sign out
-              </button>
-            ) : (
-              <Link
-                href="/login"
-                className="ml-1 rounded-lg bg-emerald-500 px-2.5 py-1.5 font-medium text-emerald-950"
-              >
-                Sign in
-              </Link>
-            )}
-          </nav>
-        </div>
-      </header>
-      {children}
-    </div>
+              )}
+            </nav>
+          </div>
+        </header>
+        {children}
+      </div>
+    </ToastProvider>
   );
 }
