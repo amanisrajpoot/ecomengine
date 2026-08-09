@@ -373,6 +373,13 @@ async def main() -> None:
             role=Role.BUSINESS_MANAGER,
             business_id=food.id,
         )
+        await _ensure_role(
+            db,
+            user_id=merchant.id,
+            tenant_id=tenant.id,
+            role=Role.BUSINESS_OWNER,
+            business_id=grocery.id,
+        )
 
         rider = await _get_or_create_user(
             db,
@@ -448,7 +455,7 @@ DEMO_COURIER_BUSINESS_ID={courier.id}
         print()
         print("Demo users (all passwords: Demo123!):")
         print("  customer@demo.com  — Customer PWA")
-        print("  merchant@demo.com  — Merchant PWA (Spice Kitchen)")
+        print("  merchant@demo.com  — Merchant PWA (Spice Kitchen + FreshMart inventory)")
         print("  rider@demo.com     — Rider PWA")
         print("  admin@example.com  — Admin web (super admin, no tenant)")
         print()

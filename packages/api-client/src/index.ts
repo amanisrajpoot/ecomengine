@@ -3,16 +3,19 @@
 import type {
   Addon,
   Business,
+  BusinessLocation,
   Cart,
   CourierQuote,
   Delivery,
   Fulfillment,
+  InventoryItem,
   NearbyStore,
   Order,
   OrderDebugger,
   Partner,
   Product,
   ProductAddonLink,
+  StockMovement,
   TokenResponse,
   Tenant,
   Variant,
@@ -228,6 +231,63 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     listBusinesses: (params?: { status?: string; type?: string }) =>
       request<Business[]>(`/api/v1/businesses${toQuery(params ?? {})}`),
+
+    listLocations: (businessId: string, activeOnly = true) =>
+      request<BusinessLocation[]>(
+        `/api/v1/businesses/${businessId}/locations${toQuery({ active_only: activeOnly })}`,
+      ),
+
+    upsertInventoryItem: (
+      businessId: string,
+      body: {
+        location_id: string;
+        variant_id: string;
+        low_stock_threshold?: number;
+      },
+    ) =>
+      request<InventoryItem>(`/api/v1/businesses/${businessId}/inventory`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    listInventory: (
+      businessId: string,
+      params?: {
+        location_id?: string;
+        low_stock_only?: boolean;
+        out_of_stock_only?: boolean;
+      },
+    ) =>
+      request<InventoryItem[]>(
+        `/api/v1/businesses/${businessId}/inventory${toQuery(params ?? {})}`,
+      ),
+
+    getInventoryItem: (businessId: string, itemId: string) =>
+      request<InventoryItem>(
+        `/api/v1/businesses/${businessId}/inventory/${itemId}`,
+      ),
+
+    adjustInventory: (
+      businessId: string,
+      itemId: string,
+      body: {
+        delta_on_hand: number;
+        reason?: string;
+        note?: string;
+      },
+    ) =>
+      request<InventoryItem>(
+        `/api/v1/businesses/${businessId}/inventory/${itemId}/adjust`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    listInventoryMovements: (businessId: string, itemId: string) =>
+      request<StockMovement[]>(
+        `/api/v1/businesses/${businessId}/inventory/${itemId}/movements`,
+      ),
 
     getOrderFulfillment: (orderId: string) =>
       request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),

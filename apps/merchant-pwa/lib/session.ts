@@ -5,6 +5,7 @@ import { createApiClient } from "@commerce/api-client";
 const TOKEN_KEY = "ce_merchant_token";
 const TENANT_KEY = "ce_merchant_tenant";
 const BUSINESS_KEY = "ce_merchant_business";
+const LOCATION_KEY = "ce_merchant_location";
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -31,9 +32,20 @@ export function setBusinessId(businessId: string | null) {
   else localStorage.setItem(BUSINESS_KEY, businessId);
 }
 
+export function getLocationId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(LOCATION_KEY);
+}
+
+export function setLocationId(locationId: string | null) {
+  if (!locationId) localStorage.removeItem(LOCATION_KEY);
+  else localStorage.setItem(LOCATION_KEY, locationId);
+}
+
 export function clearSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(BUSINESS_KEY);
+  localStorage.removeItem(LOCATION_KEY);
 }
 
 export function api() {

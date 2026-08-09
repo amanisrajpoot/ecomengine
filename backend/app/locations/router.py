@@ -79,7 +79,7 @@ async def list_locations(
     business_id: uuid.UUID,
     active_only: bool = Query(default=False),
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("business.settings")),
+    ctx: AuthContext = Depends(require_permission("locations.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> list[BusinessLocationRead]:
     _ = ctx
@@ -98,7 +98,7 @@ async def get_location(
     business_id: uuid.UUID,
     location_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    ctx: AuthContext = Depends(require_permission("business.settings")),
+    ctx: AuthContext = Depends(require_permission("locations.read")),
     tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
 ) -> BusinessLocationRead:
     _ = ctx

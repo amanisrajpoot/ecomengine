@@ -80,7 +80,7 @@ Or copy `demo.env` → `apps/customer-pwa/.env.local` (same for other apps).
 | App | URL | Login | Password | Tenant ID |
 |-----|-----|-------|----------|-----------|
 | **Customer** | :3000 | `customer@demo.com` | `Demo123!` | Required — from `demo.env` |
-| **Merchant** | :3001 | `merchant@demo.com` | `Demo123!` | Required |
+| **Merchant** | :3001 | `merchant@demo.com` | `Demo123!` | Required — Spice Kitchen orders + FreshMart inventory |
 | **Rider** | :3002 | `rider@demo.com` | `Demo123!` | Required |
 | **Admin** | :3003 | `admin@example.com` | `ChangeMe123!` | Optional — set tenant for order debugger |
 
@@ -105,6 +105,13 @@ Default browse coordinates: **Bengaluru Indiranagar** (`12.9784, 77.6408`).
 5. **Admin** (:3003) — login (tenant from `demo.env`) → Dispatch or Orders → debugger
 
 If no rider was online at Ready, use **Request rider** on merchant order detail or **Admin → Dispatch**.
+
+## Merchant inventory (grocery)
+
+1. **Merchant** (:3001) — login → switch business to **FreshMart Indiranagar**
+2. Open **Inventory** (nav or home → Stock board)
+3. View Milk 1L stock (seeded at 50 available) → tap → receive or adjust → check movements
+4. **Add stock item** links a new catalog variant to the store location
 
 ## End-to-end courier flow
 
