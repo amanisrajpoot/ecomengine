@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "commerce-engine"
-    app_version: str = "0.19.0"
+    app_version: str = "0.20.0"
     environment: str = "development"
 
     database_url: str = "postgresql+asyncpg://commerce:commerce@localhost:5432/commerce"
@@ -41,6 +41,10 @@ class Settings(BaseSettings):
 
     # Ledger — default merchant commission (10%) when tenant config omits commission_bps.
     ledger_default_commission_bps: int = 1000
+
+    # ONDC adapter — mock mode skips subscriber auth and records callbacks locally.
+    ondc_mock: bool = True
+    ondc_send_callbacks: bool = False
 
 
 @lru_cache

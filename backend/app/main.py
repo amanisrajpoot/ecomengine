@@ -25,6 +25,8 @@ from app.pricing.router import router as pricing_router
 from app.settlements.router import router as settlements_router
 from app.taxation.router import router as tax_router
 from app.tenants.router import router as tenants_router
+from app.integrations.ondc.handlers import register_ondc_handlers
+from app.integrations.ondc.router import router as ondc_router
 
 # Import models so metadata is registered for Alembic / create_all.
 import app.businesses.models  # noqa: F401
@@ -42,12 +44,14 @@ import app.payments.models  # noqa: F401
 import app.settlements.models  # noqa: F401
 import app.taxation.models  # noqa: F401
 import app.tenants.models  # noqa: F401
+import app.integrations.ondc.models  # noqa: F401
 
 settings = get_settings()
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    register_ondc_handlers()
     yield
 
 
@@ -78,6 +82,7 @@ app.include_router(fulfillment_router, prefix="/api/v1")
 app.include_router(partners_router, prefix="/api/v1")
 app.include_router(delivery_router, prefix="/api/v1")
 app.include_router(courier_router, prefix="/api/v1")
+app.include_router(ondc_router, prefix="/api/v1")
 
 
 @app.get("/health")

@@ -131,7 +131,11 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phase 20 — ONDC adapter
 
-- Only after internal order/fulfillment works; adapters under `integrations/ondc`
+- Beckn BPP ingress under `integrations/ondc` (search → confirm on shared engines)
+- `ondc_sessions` links transaction → cart/order; mock mode + callback log
+- Core domain unchanged — adapter only
+
+**Status:** implemented — golden-path test + `docs/ondc.md`.
 
 ---
 

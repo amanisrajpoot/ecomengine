@@ -31,6 +31,7 @@ import app.payments.models  # noqa: F401
 import app.settlements.models  # noqa: F401
 import app.taxation.models  # noqa: F401
 import app.tenants.models  # noqa: F401
+import app.integrations.ondc.models  # noqa: F401
 
 TEST_DATABASE_URL = get_settings().database_url
 
