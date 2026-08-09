@@ -81,3 +81,25 @@ class DeliveryRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     stops: list[DeliveryStopRead] = Field(default_factory=list)
+
+
+class RiderSummary(BaseModel):
+    display_name: str | None
+
+
+class LastLocationRead(BaseModel):
+    lat: float
+    lng: float
+    heading: float | None = None
+    speed_kmh: float | None = None
+    at: datetime | None = None
+
+
+class CustomerDeliveryTrackingRead(BaseModel):
+    delivery_id: uuid.UUID
+    status: str
+    eta: datetime | None
+    stops: list[DeliveryStopRead] = Field(default_factory=list)
+    partner: RiderSummary | None = None
+    last_location: LastLocationRead | None = None
+    fulfillment_status: str | None = None

@@ -28,6 +28,7 @@ import type {
   StockMovement,
   Refund,
   Notification,
+  OrderDeliveryTracking,
   Payment,
   PaymentInitiateResponse,
   TokenResponse,
@@ -389,6 +390,9 @@ export function createApiClient(options: ApiClientOptions = {}) {
       request<Order[]>(`/api/v1/orders${toQuery(params ?? {})}`),
 
     getOrder: (orderId: string) => request<Order>(`/api/v1/orders/${orderId}`),
+
+    getOrderDelivery: (orderId: string) =>
+      request<OrderDeliveryTracking>(`/api/v1/orders/${orderId}/delivery`),
 
     transitionOrder: (
       orderId: string,

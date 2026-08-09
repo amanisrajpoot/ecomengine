@@ -111,7 +111,7 @@ export default function CartPage() {
         customer_phone: phone,
         delivery_address: address,
         ...(paymentMethod === "cashfree"
-          ? { return_url: `${window.location.origin}/orders` }
+          ? { return_url: `${window.location.origin}/orders/{order_id}` }
           : {}),
       });
       setSessionCart(null);

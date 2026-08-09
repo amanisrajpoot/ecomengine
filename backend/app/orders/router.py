@@ -20,6 +20,8 @@ from app.orders.schemas import (
     OrderStatusEventRead,
     OrderTransitionRequest,
 )
+from app.delivery.schemas import CustomerDeliveryTrackingRead
+from app.delivery import service as delivery_service
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -91,6 +93,21 @@ async def get_order(
     )
     await assert_order_readable(db, tenant_id=tid, ctx=ctx, order=order)
     return _to_order_read(order, items, events)
+
+
+@router.get("/{order_id}/delivery", response_model=CustomerDeliveryTrackingRead)
+async def get_order_delivery(
+    order_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("delivery.read")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> CustomerDeliveryTrackingRead:
+    tid = _require_tenant(tenant_id)
+    order, _items, _events = await service.get_order(db, tenant_id=tid, order_id=order_id)
+    await assert_order_readable(db, tenant_id=tid, ctx=ctx, order=order)
+    return await delivery_service.get_order_delivery_tracking(
+        db, tenant_id=tid, order_id=order_id
+    )
 
 
 @router.get("/{order_id}/debugger", response_model=OrderDebuggerRead)
