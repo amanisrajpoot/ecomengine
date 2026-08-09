@@ -17,6 +17,7 @@ from app.main import app as fastapi_app
 # Import models for metadata.
 import app.businesses.models  # noqa: F401
 import app.identity.models  # noqa: F401
+import app.locations.models  # noqa: F401
 import app.tenants.models  # noqa: F401
 
 TEST_DATABASE_URL = get_settings().database_url

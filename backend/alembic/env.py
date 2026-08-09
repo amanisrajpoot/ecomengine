@@ -16,6 +16,7 @@ from app.core.config import get_settings
 # Ensure models are imported for metadata.
 import app.businesses.models  # noqa: F401
 import app.identity.models  # noqa: F401
+import app.locations.models  # noqa: F401
 import app.tenants.models  # noqa: F401
 
 config = context.config

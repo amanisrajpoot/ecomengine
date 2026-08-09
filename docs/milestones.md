@@ -22,6 +22,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 - Types as capabilities (`FOOD`, `RETAIL`, `GROCERY`, `COURIER`)
 - Locations, hours, geo
 
+**Status:** implemented — business CRUD, capability presets/overrides, location CRUD with India address + hours + service area.
+
 ## Phase 3 — Catalog
 
 - Categories, products, variants, addons, bundles, images, availability
