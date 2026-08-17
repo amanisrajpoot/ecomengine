@@ -1,6 +1,6 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 1**. `[empty]` = package `__init__.py` only.
+Status: **Phase 2**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
@@ -18,7 +18,8 @@ Status: **Phase 1**. `[empty]` = package `__init__.py` only.
 | `backend/tests/conftest.py` | Async client + SQLite test DB |
 | `backend/tests/test_health.py` | Health/meta smoke |
 | `backend/tests/test_phase1_foundation.py` | Auth + tenants |
-| `backend/alembic/` | Migrations (`versions/phase1_foundation.py`) |
+| `backend/tests/test_phase2_business_location.py` | Businesses + locations |
+| `backend/alembic/` | Migrations (`phase1_foundation`, `phase2_business_location`) |
 
 ## Backend modules — expected files (do not Glob)
 
@@ -28,8 +29,8 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 |--------|-----|------|-------------------------------|-------------------|
 | `identity` | models, schemas, service, router, rbac | permissions.md | identity ~39 | `main.py` |
 | `tenants` | models, schemas, service, router (+ platform_router) | api-conventions Tenancy | tenancy ~15 | `main.py` |
-| `businesses` | empty | domain-model Business | businesses ~106 | `main.py` |
-| `locations` | empty | domain-model Location | business_locations ~126 | usually mounted under businesses |
+| `businesses` | models, schemas, service, router | domain-model Business | businesses ~106 | `main.py` |
+| `locations` | models, schemas, service, router | domain-model Location | business_locations ~126 | nested under businesses |
 | `catalog` | empty | domain-model Catalog | catalog ~144 | `main.py` |
 | `inventory` | empty | domain-model Inventory | inventory ~225 | `main.py` |
 | `cart` | empty | domain-model Cart | carts ~264 | `main.py` |
@@ -52,8 +53,8 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 
 | Path | Role | Touch when |
 |------|------|------------|
-| `packages/types/src/index.ts` | Shared TS types | Any new API resource |
-| `packages/api-client/src/index.ts` | login, register, OTP, me, tenants | Auth + tenant admin |
+| `packages/types/src/index.ts` | User, Tenant, Business, BusinessLocation | Any new API resource |
+| `packages/api-client/src/index.ts` | auth, tenants, businesses, locations | Auth + tenant + merchant admin |
 | `packages/ui/src/index.ts` | UI barrel | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
 

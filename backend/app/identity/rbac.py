@@ -20,6 +20,32 @@ PERMISSIONS: dict[str, set[Role]] = {
     "tenants.config": {Role.SUPER_ADMIN, Role.TENANT_ADMIN},
     "users.roles.assign": {Role.SUPER_ADMIN, Role.TENANT_ADMIN},
     "platform.config": {Role.SUPER_ADMIN},
+    "business.create": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+    },
+    "business.settings": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+    },
+    "locations.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.STAFF,
+    },
+    "businesses.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.STAFF,
+        Role.CUSTOMER,
+    },
 }
 
 
