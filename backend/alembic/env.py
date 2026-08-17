@@ -31,6 +31,8 @@ from app.payments.models import Payment, Refund  # noqa: F401
 from app.ledger.models import LedgerEntry  # noqa: F401
 from app.settlements.models import Settlement, SettlementLedgerLink  # noqa: F401
 from app.fulfillment.models import Fulfillment  # noqa: F401
+from app.partners.models import DeliveryPartnerProfile, Vehicle  # noqa: F401
+from app.delivery.models import Delivery, DeliveryStop  # noqa: F401
 from app.tenants.models import PlatformConfig, Tenant  # noqa: F401
 
 config = context.config

@@ -6,18 +6,18 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 11 — fulfillment |
-| API version | `0.11.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-11-fulfillment-dfc8` |
+| Checkout | Phase 12 — delivery |
+| API version | `0.12.0` (`backend/app/core/config.py`) |
+| Base branch for new work | `cursor/phase-12-delivery-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| API | fulfillments decoupled from orders, checkout hook, lifecycle |
-| Tests | through `test_phase11_fulfillment.py` (3) — **43 total** |
+| API | partners, vehicles, deliveries, stops, assignment V1 |
+| Tests | through `test_phase12_delivery.py` (3) — **46 total** |
 
 ## Next recommended task
 
-**Phase 12 — Delivery.**
+**Phase 13 — Food golden path.**
 
-Open [PHASES.md](./PHASES.md) Phase 12 section only — do not scan repo.
+Open [PHASES.md](./PHASES.md) Phase 13 section only — do not scan repo.
 
 ## Commands
 
@@ -31,10 +31,10 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 11: Fulfillment entity per order, types, PENDING→ACTIVE→COMPLETED
+- Phase 12: Delivery partners, nearest-rider assign, stop completion + POD
 
 ## Known constraints
 
-- Delivery module in Phase 12
+- Food golden path tests in Phase 13
 - Money: integer paise only
 - ONDC adapter only in Phase 20

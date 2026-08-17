@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 11 done**. Implement **Phase 12** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 12 done**. Implement **Phase 13** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -176,9 +176,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 12 — Delivery
 
+**Status:** implemented (v0.12.0).
+
+- `delivery_partner_profiles`, `vehicles`, `deliveries`, `delivery_stops`
+- Assignment V1: nearest online partner to pickup
+- Stop completion with proof metadata
+- Alembic `phase12_delivery`
+
 **Read:** `docs/fulfillment.md` Delivery + assignment; SCHEMA deliveries/stops (~451–479); SCHEMA partner/vehicle (~78–104)
 
-**Write:** `backend/app/delivery/*`; `backend/app/partners/*`; `test_phase12_*.py`
+**Write:** (done) `delivery/*`, `partners/*`, `test_phase12_delivery.py`, types + api-client
 
 ---
 

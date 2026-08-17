@@ -428,3 +428,55 @@ export interface Fulfillment {
   created_at: string;
   updated_at: string;
 }
+
+export interface DeliveryPartnerProfile {
+  id: string;
+  tenant_id: TenantId;
+  user_id: UserId;
+  status: string;
+  is_online: boolean;
+  documents: Record<string, unknown>;
+  current_lat: number | null;
+  current_lng: number | null;
+  service_area: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Vehicle {
+  id: string;
+  tenant_id: TenantId;
+  partner_id: string;
+  vehicle_type: string;
+  registration: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DeliveryStop {
+  id: string;
+  delivery_id: string;
+  sequence: number;
+  stop_type: string;
+  address: Record<string, unknown>;
+  lat: number;
+  lng: number;
+  contact: Record<string, unknown>;
+  status: string;
+  proof: Record<string, unknown> | null;
+  completed_at: string | null;
+}
+
+export interface Delivery {
+  id: string;
+  tenant_id: TenantId;
+  fulfillment_id: string;
+  partner_id: string | null;
+  vehicle_id: string | null;
+  status: string;
+  eta: string | null;
+  created_at: string;
+  updated_at: string;
+  stops?: DeliveryStop[];
+}

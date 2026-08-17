@@ -82,6 +82,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Partners, vehicles, assignment V1, tracking hooks
 
+**Status:** implemented (API `0.12.0`, alembic `phase12_delivery`).
+
 ## Phase 13 — Vertical 1: Food
 
 - End-to-end restaurant → rider → customer → settlement

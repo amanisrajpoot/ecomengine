@@ -14,6 +14,9 @@ import type {
   Settlement,
   SettlementDetail,
   Fulfillment,
+  Delivery,
+  DeliveryPartnerProfile,
+  Vehicle,
   ProductAddonLink,
   Refund,
   StockMovement,
@@ -776,6 +779,64 @@ export function createApiClient(options: ApiClientOptions = {}) {
         method: "POST",
         body: JSON.stringify(body),
       }),
+
+    createPartnerProfile: (body?: { documents?: Record<string, unknown> }) =>
+      request<DeliveryPartnerProfile>("/api/v1/partners/profiles", {
+        method: "POST",
+        body: JSON.stringify(body ?? {}),
+      }),
+
+    updatePartnerProfile: (body: {
+      is_online?: boolean;
+      current_lat?: number;
+      current_lng?: number;
+      status?: string;
+    }) =>
+      request<DeliveryPartnerProfile>("/api/v1/partners/profiles/me", {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    createVehicle: (body: { vehicle_type: string; registration?: string }) =>
+      request<Vehicle>("/api/v1/partners/vehicles", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    createDelivery: (
+      fulfillmentId: string,
+      body: {
+        auto_assign?: boolean;
+        stops: Array<{
+          sequence: number;
+          stop_type: string;
+          address: Record<string, unknown>;
+          lat: number;
+          lng: number;
+          contact?: Record<string, unknown>;
+        }>;
+      },
+    ) =>
+      request<Delivery>(`/api/v1/fulfillments/${fulfillmentId}/deliveries`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    getFulfillmentDelivery: (fulfillmentId: string) =>
+      request<Delivery>(`/api/v1/fulfillments/${fulfillmentId}/delivery`),
+
+    completeDeliveryStop: (
+      deliveryId: string,
+      stopId: string,
+      body?: { proof?: Record<string, unknown> },
+    ) =>
+      request<Delivery>(
+        `/api/v1/deliveries/${deliveryId}/stops/${stopId}/complete`,
+        {
+          method: "POST",
+          body: JSON.stringify(body ?? {}),
+        },
+      ),
   };
 }
 
