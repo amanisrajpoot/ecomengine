@@ -28,6 +28,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Categories, products, variants, addons, bundles, images, availability
 
+**Status:** implemented (API `0.3.0`, alembic `phase3_catalog`).
+
 ## Phase 4 — Inventory
 
 - Optional; stock, reserved, movements, low/out of stock

@@ -15,6 +15,14 @@ from app.core.db import Base
 from app.identity.models import OtpChallenge, User, UserRoleBinding  # noqa: F401
 from app.businesses.models import Business  # noqa: F401
 from app.locations.models import BusinessLocation  # noqa: F401
+from app.catalog.models import (  # noqa: F401
+    Addon,
+    Bundle,
+    Category,
+    Product,
+    ProductAddonLink,
+    Variant,
+)
 from app.tenants.models import PlatformConfig, Tenant  # noqa: F401
 
 config = context.config

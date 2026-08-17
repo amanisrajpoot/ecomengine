@@ -1,6 +1,6 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 2**. `[empty]` = package `__init__.py` only.
+Status: **Phase 3**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
@@ -19,7 +19,8 @@ Status: **Phase 2**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_health.py` | Health/meta smoke |
 | `backend/tests/test_phase1_foundation.py` | Auth + tenants |
 | `backend/tests/test_phase2_business_location.py` | Businesses + locations |
-| `backend/alembic/` | Migrations (`phase1_foundation`, `phase2_business_location`) |
+| `backend/tests/test_phase3_catalog.py` | Catalog CRUD |
+| `backend/alembic/` | Migrations through `phase3_catalog` |
 
 ## Backend modules — expected files (do not Glob)
 
@@ -31,7 +32,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | `tenants` | models, schemas, service, router (+ platform_router) | api-conventions Tenancy | tenancy ~15 | `main.py` |
 | `businesses` | models, schemas, service, router | domain-model Business | businesses ~106 | `main.py` |
 | `locations` | models, schemas, service, router | domain-model Location | business_locations ~126 | nested under businesses |
-| `catalog` | empty | domain-model Catalog | catalog ~144 | `main.py` |
+| `catalog` | models, schemas, service, router | domain-model Catalog | catalog ~144 | `main.py` |
 | `inventory` | empty | domain-model Inventory | inventory ~225 | `main.py` |
 | `cart` | empty | domain-model Cart | carts ~264 | `main.py` |
 | `pricing` | empty | pricing-engine.md | — | called from cart/orders, maybe no public router |
@@ -53,8 +54,8 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 
 | Path | Role | Touch when |
 |------|------|------------|
-| `packages/types/src/index.ts` | User, Tenant, Business, BusinessLocation | Any new API resource |
-| `packages/api-client/src/index.ts` | auth, tenants, businesses, locations | Auth + tenant + merchant admin |
+| `packages/types/src/index.ts` | User, Tenant, Business, catalog types | Any new API resource |
+| `packages/api-client/src/index.ts` | auth, tenants, businesses, locations, catalog | Merchant admin + catalog |
 | `packages/ui/src/index.ts` | UI barrel | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
 

@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 2 done**. Implement **Phase 3** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 3 done**. Implement **Phase 4** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -40,9 +40,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 3 — Catalog
 
+**Status:** implemented (v0.3.0).
+
+- Categories (hierarchical), products, variants (paise prices)
+- Addons + product links (gated by `capabilities.addons`)
+- Bundles/combos with variant items
+- Alembic `phase3_catalog`
+
 **Read:** domain-model Catalog (~94–141); SCHEMA catalog (~144–223)
 
-**Write:** `backend/app/catalog/*`; `test_phase3_*.py`; types Product/Variant/Addon/Category
+**Write:** (done) `catalog/*`, `test_phase3_catalog.py`, types + api-client
 
 ---
 

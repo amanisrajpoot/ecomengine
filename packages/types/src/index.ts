@@ -113,3 +113,78 @@ export interface BusinessLocation {
   created_at: string;
   updated_at: string;
 }
+
+export interface Category {
+  id: string;
+  tenant_id: TenantId;
+  business_id: string;
+  parent_id: string | null;
+  name: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Product {
+  id: string;
+  tenant_id: TenantId;
+  business_id: string;
+  category_id: string | null;
+  name: string;
+  description: string | null;
+  images: string[];
+  tags: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Variant {
+  id: string;
+  tenant_id: TenantId;
+  product_id: string;
+  name: string;
+  sku: string | null;
+  base_price_paise: number;
+  is_available: boolean;
+  meta: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Addon {
+  id: string;
+  tenant_id: TenantId;
+  business_id: string;
+  name: string;
+  price_paise: number;
+  max_qty: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProductAddonLink {
+  product_id: string;
+  addon_id: string;
+  group_name: string | null;
+  is_required: boolean;
+}
+
+export interface BundleItem {
+  variant_id: string;
+  quantity: number;
+}
+
+export interface Bundle {
+  id: string;
+  tenant_id: TenantId;
+  business_id: string;
+  name: string;
+  price_paise: number | null;
+  items: BundleItem[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}

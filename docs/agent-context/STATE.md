@@ -6,18 +6,18 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 2 — business & location |
-| API version | `0.2.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-2-business-location-dfc8` |
+| Checkout | Phase 3 — catalog |
+| API version | `0.3.0` (`backend/app/core/config.py`) |
+| Base branch for new work | `cursor/phase-3-catalog-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| API | Auth, tenants, RBAC, businesses, locations |
-| Tests | `test_health.py`, `test_phase1_foundation.py` (7), `test_phase2_business_location.py` (4) |
+| API | Auth, tenants, RBAC, businesses, locations, catalog |
+| Tests | `test_health.py`, `test_phase1_foundation.py` (7), `test_phase2_business_location.py` (4), `test_phase3_catalog.py` (4) |
 
 ## Next recommended task
 
-**Phase 3 — Catalog.**
+**Phase 4 — Inventory.**
 
-Open [PHASES.md](./PHASES.md) Phase 3 section only — do not scan repo.
+Open [PHASES.md](./PHASES.md) Phase 4 section only — do not scan repo.
 
 ## Commands
 
@@ -31,7 +31,7 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 2: businesses CRUD, capability presets by type, nested locations, alembic `phase2_business_location`
+- Phase 3: categories, products, variants, addons, bundles, capability gates
 
 ## Known constraints
 
