@@ -6,18 +6,18 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 12 — delivery |
+| Checkout | Phase 13 — Food golden path |
 | API version | `0.12.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-12-delivery-dfc8` |
+| Base branch for new work | `cursor/phase-13-food-golden-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| API | partners, vehicles, deliveries, stops, assignment V1 |
-| Tests | through `test_phase12_delivery.py` (3) — **46 total** |
+| API | unchanged — integration tests only |
+| Tests | through `test_phase13_food_golden.py` (2) — **48 total** |
 
 ## Next recommended task
 
-**Phase 13 — Food golden path.**
+**Phase 14 — Hyperlocal.**
 
-Open [PHASES.md](./PHASES.md) Phase 13 section only — do not scan repo.
+Open [PHASES.md](./PHASES.md) Phase 14 section only — do not scan repo.
 
 ## Commands
 
@@ -31,10 +31,10 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 12: Delivery partners, nearest-rider assign, stop completion + POD
+- Phase 13: Food golden path e2e test through settlement (no new tables)
 
 ## Known constraints
 
-- Food golden path tests in Phase 13
+- Hyperlocal inventory path in Phase 14
 - Money: integer paise only
 - ONDC adapter only in Phase 20

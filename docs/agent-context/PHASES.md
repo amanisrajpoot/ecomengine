@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 12 done**. Implement **Phase 13** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 13 done**. Implement **Phase 14** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -191,9 +191,14 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 13 — Food golden path
 
+**Status:** implemented (tests only).
+
+- E2E: FOOD catalog+addons → cart → COD pay → kitchen FSM → rider delivery → ledger → settlement
+- No `FoodOrder` table — uses universal `Order`
+
 **Read:** order-state-machines FOOD (~43–79); pricing-engine Food example; fulfillment vertical mapping
 
-**Write:** tests `test_phase13_food*.py` wiring existing engines — **no FoodOrder table**
+**Write:** (done) `test_phase13_food_golden.py`
 
 ---
 

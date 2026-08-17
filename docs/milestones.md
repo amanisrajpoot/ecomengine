@@ -88,6 +88,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - End-to-end restaurant → rider → customer → settlement
 
+**Status:** implemented (`test_phase13_food_golden.py`).
+
 ## Phase 14 — Vertical 2: Hyperlocal
 
 - Inventory + store discovery; minimal new core code
