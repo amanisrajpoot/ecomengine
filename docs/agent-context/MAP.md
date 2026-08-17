@@ -1,6 +1,6 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 12**. `[empty]` = package `__init__.py` only.
+Status: **Phase 13**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
@@ -29,6 +29,7 @@ Status: **Phase 12**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_phase10_settlements.py` | Settlement calculate + lifecycle |
 | `backend/tests/test_phase11_fulfillment.py` | Fulfillment checkout + lifecycle |
 | `backend/tests/test_phase12_delivery.py` | Partners, assign, stops |
+| `backend/tests/test_phase13_food_golden.py` | Food e2e golden path |
 | `backend/alembic/` | Migrations through `phase12_delivery` |
 
 ## Backend modules — expected files (do not Glob)
