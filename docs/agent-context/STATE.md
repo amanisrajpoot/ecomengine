@@ -6,16 +6,16 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 28 — Playwright API-backed E2E |
+| Checkout | **Merged to `main`** — phases 0–28 (backend + four PWAs + E2E) |
 | API version | `0.19.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-28-playwright-api-dfc8` |
+| Base branch for new work | `main` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| Ops | CORS for dev/test PWAs; API client JSON Content-Type |
-| Tests | through `e2e/tests/*-api.spec.ts` (2) — **60 backend**, **2 Playwright API**, **12 smoke** |
+| Ops | CORS (dev/test), rate limits, `/metrics`, Playwright smoke + API E2E |
+| Tests | **60** backend pytest, **3** golden, **12** smoke E2E, **2** API E2E |
 
 ## Next recommended task
 
-Merge stacked PR chain to `main`, or extend API E2E (merchant/rider flows, checkout browser path).
+Open a new branch from `main` for the alternate UI stack (phases 22–39 demo/dispatch/UI PRs) or next product slice.
 
 ## Commands
 
@@ -27,10 +27,9 @@ curl -s localhost:8000/health
 
 ## Last change
 
-- Phase 28: Playwright flows wired to live API (customer register + admin settings meta)
-- CORS for localhost PWAs in dev/test; api-client sets JSON Content-Type on POST bodies
+- Stacked phase chain (0–28) fast-forward merged into `main`
 
 ## Known constraints
 
 - E2E API uses SQLite `create_all` (not Alembic) via `scripts/start-e2e-api.sh`
-- Map tiles require network; tracking is poll-based
+- Open PRs #2–53 may still show open on GitHub; code is on `main` — close manually if desired
