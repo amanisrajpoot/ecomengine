@@ -11,12 +11,15 @@ import type {
   InventoryItem,
   Product,
   ProductAddonLink,
+  Refund,
   StockMovement,
   TaxCalculationResult,
   TaxRule,
   Tenant,
   Order,
   OrderDetail,
+  Payment,
+  PaymentInitResponse,
   TokenResponse,
   User,
   Variant,
@@ -658,6 +661,38 @@ export function createApiClient(options: ApiClientOptions = {}) {
       request<OrderDetail>(`/api/v1/orders/${orderId}/transition`, {
         method: "POST",
         body: JSON.stringify(body),
+      }),
+
+    createPayment: (
+      orderId: string,
+      body: { provider?: string },
+      idempotencyKey?: string,
+    ) => {
+      const headers: Record<string, string> = {};
+      if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;
+      return request<PaymentInitResponse>(`/api/v1/orders/${orderId}/payments`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+    },
+
+    listOrderPayments: (orderId: string) =>
+      request<Payment[]>(`/api/v1/orders/${orderId}/payments`),
+
+    getPayment: (paymentId: string) =>
+      request<Payment>(`/api/v1/payments/${paymentId}`),
+
+    capturePayment: (paymentId: string) =>
+      request<Payment>(`/api/v1/payments/${paymentId}/capture`, { method: "POST" }),
+
+    createRefund: (
+      paymentId: string,
+      body?: { amount_paise?: number; reason?: string },
+    ) =>
+      request<Refund>(`/api/v1/payments/${paymentId}/refunds`, {
+        method: "POST",
+        body: JSON.stringify(body ?? {}),
       }),
   };
 }

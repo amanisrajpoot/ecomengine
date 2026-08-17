@@ -6,18 +6,18 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 7 — orders |
-| API version | `0.7.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-7-orders-dfc8` |
+| Checkout | Phase 8 — payments |
+| API version | `0.8.0` (`backend/app/core/config.py`) |
+| Base branch for new work | `cursor/phase-8-payments-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| API | through orders + configurable state machines |
-| Tests | through `test_phase7_orders.py` (4) — **30 total** |
+| API | payments COD + Razorpay stub, refunds, order confirm hook |
+| Tests | through `test_phase8_payments.py` (4) — **34 total** |
 
 ## Next recommended task
 
-**Phase 8 — Payments.**
+**Phase 9 — Ledger.**
 
-Open [PHASES.md](./PHASES.md) Phase 8 section only — do not scan repo.
+Open [PHASES.md](./PHASES.md) Phase 9 section only — do not scan repo.
 
 ## Commands
 
@@ -31,10 +31,10 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 7: universal Order, checkout from cart, state machine profiles, status events
+- Phase 8: PaymentGateway, COD auto-capture, Razorpay stub, refunds, idempotency
 
 ## Known constraints
 
-- Payments module hooks transitions in Phase 8
-- Money: integer paise in pricing snapshots
+- Ledger entries in Phase 9
+- Money: integer paise only
 - ONDC adapter only in Phase 20

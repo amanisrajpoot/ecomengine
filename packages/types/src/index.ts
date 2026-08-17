@@ -345,3 +345,34 @@ export interface Order {
 export interface OrderDetail extends Order {
   status_events?: OrderStatusEvent[];
 }
+
+export interface Payment {
+  id: string;
+  tenant_id: TenantId;
+  order_id: string;
+  provider: string;
+  provider_ref: string | null;
+  status: string;
+  amount_paise: number;
+  currency: string;
+  idempotency_key: string | null;
+  raw: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaymentInitResponse extends Payment {
+  client_payload?: Record<string, unknown> | null;
+}
+
+export interface Refund {
+  id: string;
+  tenant_id: TenantId;
+  payment_id: string;
+  order_id: string;
+  amount_paise: number;
+  status: string;
+  reason: string | null;
+  created_at: string;
+  updated_at: string;
+}

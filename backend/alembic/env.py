@@ -27,6 +27,7 @@ from app.inventory.models import InventoryItem, StockMovement  # noqa: F401
 from app.cart.models import Cart, CartItem  # noqa: F401
 from app.taxation.models import TaxRule  # noqa: F401
 from app.orders.models import Order, OrderItem, OrderStatusEvent  # noqa: F401
+from app.payments.models import Payment, Refund  # noqa: F401
 from app.tenants.models import PlatformConfig, Tenant  # noqa: F401
 
 config = context.config

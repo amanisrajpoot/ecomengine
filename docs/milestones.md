@@ -58,6 +58,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Gateway interface; Razorpay + COD
 
+**Status:** implemented (API `0.8.0`, alembic `phase8_payments`).
+
 ## Phase 9 — Ledger
 
 - Financial events → immutable ledger entries
