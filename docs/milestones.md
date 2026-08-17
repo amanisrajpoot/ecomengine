@@ -34,6 +34,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Optional; stock, reserved, movements, low/out of stock
 
+**Status:** implemented (API `0.4.0`, alembic `phase4_inventory`).
+
 ## Phase 5 — Cart + pricing
 
 - Cart aggregate + pricing pipeline + breakdown snapshots

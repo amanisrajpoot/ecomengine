@@ -60,6 +60,19 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.BUSINESS_OWNER,
         Role.BUSINESS_MANAGER,
     },
+    "inventory.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.STAFF,
+    },
+    "inventory.manage": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+    },
 }
 
 

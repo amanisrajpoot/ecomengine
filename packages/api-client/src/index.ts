@@ -6,8 +6,10 @@ import type {
   Business,
   BusinessLocation,
   Category,
+  InventoryItem,
   Product,
   ProductAddonLink,
+  StockMovement,
   Tenant,
   TokenResponse,
   User,
@@ -421,6 +423,108 @@ export function createApiClient(options: ApiClientOptions = {}) {
         method: "PATCH",
         body: JSON.stringify(body),
       }),
+
+    listInventoryItems: (businessId: string, locationId: string) =>
+      request<InventoryItem[]>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}/inventory-items`,
+      ),
+
+    createInventoryItem: (
+      businessId: string,
+      locationId: string,
+      body: {
+        variant_id: string;
+        on_hand?: number;
+        reserved?: number;
+        low_stock_threshold?: number;
+      },
+    ) =>
+      request<InventoryItem>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}/inventory-items`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    getInventoryItem: (businessId: string, locationId: string, inventoryItemId: string) =>
+      request<InventoryItem>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}/inventory-items/${inventoryItemId}`,
+      ),
+
+    updateInventoryItem: (
+      businessId: string,
+      locationId: string,
+      inventoryItemId: string,
+      body: { low_stock_threshold?: number },
+    ) =>
+      request<InventoryItem>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}/inventory-items/${inventoryItemId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    adjustStock: (
+      businessId: string,
+      locationId: string,
+      inventoryItemId: string,
+      body: {
+        delta_on_hand?: number;
+        delta_reserved?: number;
+        reason?: string;
+        reference_type?: string;
+        reference_id?: string;
+      },
+    ) =>
+      request<InventoryItem>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}/inventory-items/${inventoryItemId}/adjust`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    reserveStock: (
+      businessId: string,
+      locationId: string,
+      inventoryItemId: string,
+      body: { quantity: number; reason?: string; reference_type?: string; reference_id?: string },
+    ) =>
+      request<InventoryItem>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}/inventory-items/${inventoryItemId}/reserve`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    releaseStock: (
+      businessId: string,
+      locationId: string,
+      inventoryItemId: string,
+      body: { quantity: number; reason?: string; reference_type?: string; reference_id?: string },
+    ) =>
+      request<InventoryItem>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}/inventory-items/${inventoryItemId}/release`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    listStockMovements: (
+      businessId: string,
+      locationId: string,
+      inventoryItemId: string,
+    ) =>
+      request<StockMovement[]>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}/inventory-items/${inventoryItemId}/movements`,
+      ),
+
+    listLowStock: (businessId: string) =>
+      request<InventoryItem[]>(`/api/v1/businesses/${businessId}/inventory/low-stock`),
   };
 }
 

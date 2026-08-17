@@ -188,3 +188,29 @@ export interface Bundle {
   created_at: string;
   updated_at: string;
 }
+
+export interface InventoryItem {
+  id: string;
+  tenant_id: TenantId;
+  business_id: string;
+  location_id: string;
+  variant_id: string;
+  on_hand: number;
+  reserved: number;
+  low_stock_threshold: number | null;
+  available: number;
+  updated_at: string;
+}
+
+export interface StockMovement {
+  id: string;
+  tenant_id: TenantId;
+  inventory_item_id: string;
+  reason: string;
+  delta_on_hand: number;
+  delta_reserved: number;
+  reference_type: string | null;
+  reference_id: string | null;
+  created_by: string | null;
+  created_at: string;
+}

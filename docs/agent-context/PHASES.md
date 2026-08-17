@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 3 done**. Implement **Phase 4** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 4 done**. Implement **Phase 5** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -55,9 +55,17 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 4 — Inventory
 
+**Status:** implemented (v0.4.0).
+
+- Optional per business (`capabilities.inventory`)
+- `on_hand`, `reserved`, `available`, low-stock threshold
+- Every mutation records a `stock_movements` row
+- Reserve / release / adjust APIs
+- Alembic `phase4_inventory`
+
 **Read:** domain-model Inventory (~143–156); SCHEMA inventory (~225–260)
 
-**Write:** `backend/app/inventory/*`; `test_phase4_*.py`
+**Write:** (done) `inventory/*`, `test_phase4_inventory.py`, types + api-client
 
 ---
 
