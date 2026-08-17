@@ -61,3 +61,30 @@ class StopComplete(BaseModel):
 class DeliveryAssign(BaseModel):
     partner_id: uuid.UUID
     vehicle_id: uuid.UUID | None = None
+
+
+class TrackingStopRead(BaseModel):
+    id: uuid.UUID
+    sequence: int
+    stop_type: str
+    lat: float
+    lng: float
+    status: str
+
+
+class TrackingRiderRead(BaseModel):
+    partner_id: uuid.UUID
+    lat: float
+    lng: float
+    updated_at: datetime
+    is_online: bool
+
+
+class OrderTrackingRead(BaseModel):
+    order_id: uuid.UUID
+    order_status: str
+    delivery_id: uuid.UUID | None = None
+    delivery_status: str | None = None
+    eta: datetime | None = None
+    rider: TrackingRiderRead | None = None
+    stops: list[TrackingStopRead] = Field(default_factory=list)

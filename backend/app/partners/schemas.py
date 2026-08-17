@@ -23,6 +23,11 @@ class PartnerProfileUpdate(BaseModel):
     service_area: dict[str, Any] | None = None
 
 
+class PartnerLocationUpdate(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
+
+
 class PartnerProfileRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

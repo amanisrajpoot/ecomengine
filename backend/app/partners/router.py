@@ -12,6 +12,7 @@ from app.core.deps import AuthContext, require_permission, resolve_tenant_id
 from app.core.errors import AppError
 from app.partners import service
 from app.partners.schemas import (
+    PartnerLocationUpdate,
     PartnerProfileCreate,
     PartnerProfileRead,
     PartnerProfileUpdate,
@@ -65,6 +66,24 @@ async def update_my_partner_profile(
     tid = _require_tenant(tenant_id)
     profile = await service.update_partner_profile(
         db, tenant_id=tid, user_id=ctx.user.id, payload=payload
+    )
+    return PartnerProfileRead.model_validate(profile)
+
+
+@router.post("/profiles/me/location", response_model=PartnerProfileRead)
+async def update_my_partner_location(
+    payload: PartnerLocationUpdate,
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("partners.manage")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> PartnerProfileRead:
+    tid = _require_tenant(tenant_id)
+    profile = await service.update_partner_location(
+        db,
+        tenant_id=tid,
+        user_id=ctx.user.id,
+        lat=payload.lat,
+        lng=payload.lng,
     )
     return PartnerProfileRead.model_validate(profile)
 

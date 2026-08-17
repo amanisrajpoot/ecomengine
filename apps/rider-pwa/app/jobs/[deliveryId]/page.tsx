@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Delivery, DeliveryStop, Fulfillment, OrderDetail } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Button, Card, OrderTimeline, StatusBadge } from "@commerce/ui";
+import { Button, Card, LiveMap, OrderTimeline, StatusBadge } from "@commerce/ui";
 import type { TimelineStep } from "@commerce/ui";
 
 import { getApiClient } from "@/lib/api";
@@ -20,7 +20,9 @@ import {
   stopsCompletedCount,
   stopsTotalCount,
 } from "@/lib/deliveryHelpers";
+import { deliveryToMarkers } from "@/lib/mapMarkers";
 import { riderTransitionsFor } from "@/lib/orderTransitions";
+import { useLiveGps } from "@/lib/useLiveGps";
 
 function stopTimelineSteps(stops: DeliveryStop[]): TimelineStep[] {
   const sorted = [...stops].sort((a, b) => a.sequence - b.sequence);
@@ -44,6 +46,10 @@ export default function JobDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const [myPosition, setMyPosition] = useState<{ lat: number; lng: number } | null>(null);
+
+  const activeJob = delivery !== null && delivery.status !== "COMPLETED";
+  useLiveGps({ enabled: activeJob });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -66,6 +72,21 @@ export default function JobDetailPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!activeJob || typeof navigator === "undefined" || !navigator.geolocation) return;
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        setMyPosition({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      () => undefined,
+      { enableHighAccuracy: true, maximumAge: 5000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [activeJob]);
 
   async function completeStop(stop: DeliveryStop) {
     setBusy(stop.id);
@@ -106,6 +127,10 @@ export default function JobDetailPage() {
     () => (delivery?.stops ? stopTimelineSteps(delivery.stops) : []),
     [delivery?.stops],
   );
+  const mapMarkers = useMemo(
+    () => (delivery ? deliveryToMarkers(delivery, myPosition) : []),
+    [delivery, myPosition],
+  );
 
   return (
     <div className="space-y-5">
@@ -130,6 +155,16 @@ export default function JobDetailPage() {
               <p className="text-xs text-gray-500">stops done</p>
             </div>
           </div>
+        </div>
+      ) : null}
+
+      {mapMarkers.length > 0 ? (
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-gray-900">Route map</h2>
+          <LiveMap markers={mapMarkers} height={260} />
+          <p className="text-xs text-gray-500">
+            Blue dot is your live GPS. Location syncs to dispatch every ~12 seconds.
+          </p>
         </div>
       ) : null}
 

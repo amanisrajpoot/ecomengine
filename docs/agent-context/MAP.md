@@ -33,6 +33,7 @@ Status: **Phase 15**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_phase14_hyperlocal.py` | Hyperlocal inventory path |
 | `backend/tests/test_phase15_courier.py` | Courier quote + golden path |
 | `backend/tests/test_phase20_ondc.py` | ONDC search → confirm → status |
+| `backend/tests/test_phase24_tracking.py` | Order tracking + partner GPS ping |
 | `backend/alembic/` | Migrations through `phase12_delivery` |
 
 ## Backend modules — expected files (do not Glob)
@@ -69,7 +70,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 |------|------|------------|
 | `packages/types/src/index.ts` | User, Tenant, Business, catalog types | Any new API resource |
 | `packages/api-client/src/index.ts` | auth through delivery + `assignUserRole` | Merchant admin |
-| `packages/ui/src/index.ts` | Button, Card, Input, PriceDisplay, Badge, SearchBar, BusinessCard, ProductCard, CategoryChip, OrderTimeline, Skeleton, EmptyState, StatusBadge, StatTile | New shared component |
+| `packages/ui/src/index.ts` | Button, Card, Input, PriceDisplay, Badge, SearchBar, BusinessCard, ProductCard, CategoryChip, OrderTimeline, Skeleton, EmptyState, StatusBadge, StatTile, LiveMap | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
 
 ## Apps — on disk now
@@ -78,9 +79,9 @@ Do not search other `app/` folders unless sharing components:
 
 | App | Layout | Routes (customer-pwa) | Config |
 |-----|--------|-------------------------|--------|
-| `apps/customer-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/CartPeek.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/cart`, `/checkout`, `/orders`, `/orders/[orderId]`, `/courier` | consumer UX: bottom nav, search, cards |
+| `apps/customer-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/CartPeek.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/cart`, `/checkout`, `/orders`, `/orders/[orderId]`, `/courier` | consumer UX + live order map; `lib/tracking.ts` |
 | `apps/merchant-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/OrderQueueCard.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/business/[businessId]/orders`, `/business/[businessId]/orders/[orderId]`, `/business/[businessId]/catalog`, `/business/[businessId]/catalog/new`, `/business/[businessId]/catalog/[productId]` | partner UX: bottom nav, KDS queue; `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts`, `lib/orderHelpers.ts` |
-| `apps/rider-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/JobCard.tsx` | `/`, `/login`, `/register`, `/settings`, `/onboarding`, `/jobs`, `/jobs/[deliveryId]` | rider UX: bottom nav, job cards; `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts`, `lib/deliveryHelpers.ts` |
+| `apps/rider-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/JobCard.tsx` | `/`, `/login`, `/register`, `/settings`, `/onboarding`, `/jobs`, `/jobs/[deliveryId]` | rider UX + route map; `lib/useLiveGps.ts`, `lib/mapMarkers.ts` |
 | `apps/admin-web` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/settings`, `/tenants`, `/orders`, `/orders/[orderId]`, `/settlements`, `/users/roles` | `lib/api.ts`, `lib/session.ts` |
 
 New screens go next to those `app/` trees. Register the route in this table when added.

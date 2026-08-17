@@ -27,6 +27,7 @@ import type {
   Tenant,
   Order,
   OrderDetail,
+  OrderTracking,
   Payment,
   PaymentInitResponse,
   TokenResponse,
@@ -810,6 +811,15 @@ export function createApiClient(options: ApiClientOptions = {}) {
         method: "PATCH",
         body: JSON.stringify(body),
       }),
+
+    updatePartnerLocation: (body: { lat: number; lng: number }) =>
+      request<DeliveryPartnerProfile>("/api/v1/partners/profiles/me/location", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    getOrderTracking: (orderId: string) =>
+      request<OrderTracking>(`/api/v1/orders/${orderId}/tracking`),
 
     createVehicle: (body: { vehicle_type: string; registration?: string }) =>
       request<Vehicle>("/api/v1/partners/vehicles", {

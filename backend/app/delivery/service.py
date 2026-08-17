@@ -248,3 +248,74 @@ async def list_my_deliveries(
     if active_only:
         stmt = stmt.where(Delivery.status.in_(["ASSIGNED", "IN_PROGRESS"]))
     return list(await db.scalars(stmt))
+
+
+async def get_order_tracking(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    order_id: uuid.UUID,
+) -> dict:
+    from app.fulfillment.models import Fulfillment
+    from app.orders.models import Order
+
+    order = await db.scalar(
+        select(Order).where(Order.id == order_id, Order.tenant_id == tenant_id)
+    )
+    if not order:
+        raise AppError("ORDER_NOT_FOUND", "Order not found", status_code=404)
+
+    fulfillment = await db.scalar(
+        select(Fulfillment).where(
+            Fulfillment.order_id == order_id,
+            Fulfillment.tenant_id == tenant_id,
+        )
+    )
+
+    delivery = None
+    if fulfillment:
+        delivery = await db.scalar(
+            select(Delivery)
+            .options(selectinload(Delivery.stops))
+            .where(
+                Delivery.fulfillment_id == fulfillment.id,
+                Delivery.tenant_id == tenant_id,
+            )
+        )
+
+    rider = None
+    stops: list[dict] = []
+    if delivery:
+        stops = [
+            {
+                "id": s.id,
+                "sequence": s.sequence,
+                "stop_type": s.stop_type,
+                "lat": s.lat,
+                "lng": s.lng,
+                "status": s.status,
+            }
+            for s in sorted(delivery.stops, key=lambda x: x.sequence)
+        ]
+        if delivery.partner_id:
+            partner = await partners_service.get_partner_profile(
+                db, tenant_id=tenant_id, partner_id=delivery.partner_id
+            )
+            if partner.current_lat is not None and partner.current_lng is not None:
+                rider = {
+                    "partner_id": partner.id,
+                    "lat": partner.current_lat,
+                    "lng": partner.current_lng,
+                    "updated_at": partner.updated_at,
+                    "is_online": partner.is_online,
+                }
+
+    return {
+        "order_id": order.id,
+        "order_status": order.status,
+        "delivery_id": delivery.id if delivery else None,
+        "delivery_status": delivery.status if delivery else None,
+        "eta": delivery.eta if delivery else None,
+        "rider": rider,
+        "stops": stops,
+    }
