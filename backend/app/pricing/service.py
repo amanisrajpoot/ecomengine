@@ -12,14 +12,9 @@ from app.businesses.service import get_business
 from app.catalog.models import Addon, Bundle, Variant
 from app.catalog.service import get_product
 from app.core.errors import AppError
-from app.pricing.schemas import PriceBreakdown, PriceLine, TaxLine
+from app.taxation.service import calculate_checkout_tax
+from app.pricing.schemas import PriceBreakdown, PriceLine
 from app.tenants.models import Tenant
-
-
-async def _stub_tax(subtotal_paise: int) -> tuple[int, list[TaxLine]]:
-    """Placeholder until Phase 6 taxation module."""
-    _ = subtotal_paise
-    return 0, []
 
 
 async def calculate_cart_breakdown(
@@ -161,7 +156,13 @@ async def calculate_cart_breakdown(
     other_fees_paise = 0
 
     taxable_base = subtotal_paise - discount_paise + delivery_fee_paise + platform_fee_paise
-    tax_paise, tax_lines = await _stub_tax(taxable_base)
+    tax_paise, tax_lines = await calculate_checkout_tax(
+        db,
+        tenant_id=tenant_id,
+        goods_taxable_paise=subtotal_paise - discount_paise,
+        delivery_taxable_paise=delivery_fee_paise,
+        platform_fee_paise=0,
+    )
 
     total_paise = (
         subtotal_paise

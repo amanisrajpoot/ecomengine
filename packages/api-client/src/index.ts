@@ -12,6 +12,8 @@ import type {
   Product,
   ProductAddonLink,
   StockMovement,
+  TaxCalculationResult,
+  TaxRule,
   Tenant,
   TokenResponse,
   User,
@@ -577,6 +579,58 @@ export function createApiClient(options: ApiClientOptions = {}) {
     priceCart: (cartId: string) =>
       request<CartWithPricing>(`/api/v1/carts/${cartId}/price`, {
         method: "POST",
+      }),
+
+    listTaxRules: (category?: string) => {
+      const qs = category ? `?category=${encodeURIComponent(category)}` : "";
+      return request<TaxRule[]>(`/api/v1/tax-rules${qs}`);
+    },
+
+    createTaxRule: (body: {
+      code: string;
+      category: string;
+      jurisdiction?: string;
+      rate_bps: number;
+      inclusive?: boolean;
+      payer?: string;
+      kind?: string;
+      effective_from?: string;
+      effective_to?: string;
+    }) =>
+      request<TaxRule>("/api/v1/tax-rules", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateTaxRule: (
+      ruleId: string,
+      body: {
+        code?: string;
+        category?: string;
+        jurisdiction?: string;
+        rate_bps?: number;
+        inclusive?: boolean;
+        payer?: string;
+        kind?: string;
+        effective_from?: string;
+        effective_to?: string;
+      },
+    ) =>
+      request<TaxRule>(`/api/v1/tax-rules/${ruleId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    calculateTax: (body: {
+      goods_taxable_paise?: number;
+      delivery_taxable_paise?: number;
+      platform_fee_paise?: number;
+      jurisdiction?: string;
+      kind?: string;
+    }) =>
+      request<TaxCalculationResult>("/api/v1/tax/calculate", {
+        method: "POST",
+        body: JSON.stringify(body),
       }),
   };
 }

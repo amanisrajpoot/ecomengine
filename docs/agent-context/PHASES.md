@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 5 done**. Implement **Phase 6** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 6 done**. Implement **Phase 7** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -86,9 +86,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 6 — Tax
 
+**Status:** implemented (v0.6.0).
+
+- `tax_rules` with CGST/SGST/IGST codes, categories, kinds, payer
+- Platform default rules seeded; tenant overrides supported
+- `POST /tax/calculate` + pricing pipeline integration
+- Alembic `phase6_tax`
+
 **Read:** `docs/tax-engine.md`; SCHEMA tax (~371–390)
 
-**Write:** `backend/app/taxation/*`; `test_phase6_*.py`
+**Write:** (done) `taxation/*`, `test_phase6_tax.py`, types + api-client
 
 ---
 

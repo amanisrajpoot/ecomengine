@@ -115,7 +115,8 @@ async def test_cart_item_and_pricing_breakdown(client: AsyncClient) -> None:
     assert pricing["subtotal_paise"] == 40000  # (18000+2000)*2
     assert pricing["delivery_fee_paise"] == 3000
     assert pricing["platform_fee_paise"] == 500
-    assert pricing["total_paise"] == 43500
+    assert pricing["tax_paise"] == 2150  # 5% CGST+SGST on goods + delivery
+    assert pricing["total_paise"] == 45650
     assert pricing["subtotal_paise"] - pricing["discount_paise"] + pricing["delivery_fee_paise"] + pricing["platform_fee_paise"] + pricing["tax_paise"] == pricing["total_paise"]
 
 
