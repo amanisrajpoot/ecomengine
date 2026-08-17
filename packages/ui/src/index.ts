@@ -6,7 +6,7 @@ export { CategoryChip } from "./CategoryChip";
 export { EmptyState } from "./EmptyState";
 export { Input } from "./Input";
 export { LiveMap } from "./LiveMap";
-export type { MapMarker } from "./LiveMap";
+export type { MapMarker } from "./map-types";
 export { OrderTimeline } from "./OrderTimeline";
 export type { TimelineStep } from "./OrderTimeline";
 export { PriceDisplay } from "./PriceDisplay";

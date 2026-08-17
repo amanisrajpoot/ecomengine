@@ -76,3 +76,31 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
+
+  playwright:
+    name: Playwright PWA smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: e2e
+
+      - name: Run Playwright smoke tests
+        run: pnpm test:e2e
+        env:
+          CI: "true"
