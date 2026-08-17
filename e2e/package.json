@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
+    "test:api": "playwright test --config playwright.api.config.ts",
     "test:ui": "playwright test --ui"
   },
   "devDependencies": {
