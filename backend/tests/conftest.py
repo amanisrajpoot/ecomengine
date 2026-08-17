@@ -6,6 +6,7 @@ import os
 
 # Use in-memory SQLite when Postgres is not available (local pytest without Docker).
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
 
 from collections.abc import AsyncGenerator
 

@@ -5,11 +5,13 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from app.core.config import get_settings
 from app.core.db import SessionLocal
 from app.core.errors import AppError
+from app.core.metrics import metrics_store
+from app.core.middleware import observability_middleware
 from app.identity import service as identity_service
 from app.identity.router import router as auth_router
 from app.identity.router import users_router
@@ -51,6 +53,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.middleware("http")(observability_middleware)
+
 
 @app.exception_handler(AppError)
 async def app_error_handler(_request: Request, exc: AppError) -> JSONResponse:
@@ -67,8 +71,18 @@ async def app_error_handler(_request: Request, exc: AppError) -> JSONResponse:
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+async def health() -> dict[str, object]:
+    return {
+        "status": "ok",
+        "version": settings.app_version,
+        "environment": settings.environment,
+    }
+
+
+@app.get("/metrics")
+async def metrics() -> Response:
+    body = "\n".join(metrics_store.prometheus_lines()) + "\n"
+    return Response(content=body, media_type="text/plain; version=0.0.4")
 
 
 @app.get("/api/v1/meta")
