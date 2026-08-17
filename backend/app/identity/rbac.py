@@ -92,6 +92,27 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.SUPER_ADMIN,
         Role.TENANT_ADMIN,
     },
+    "orders.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.STAFF,
+        Role.CUSTOMER,
+        Role.DELIVERY_PARTNER,
+    },
+    "orders.place": {
+        Role.SUPER_ADMIN,
+        Role.CUSTOMER,
+    },
+    "orders.manage": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.STAFF,
+        Role.DELIVERY_PARTNER,
+    },
 }
 
 

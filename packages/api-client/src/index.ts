@@ -15,6 +15,8 @@ import type {
   TaxCalculationResult,
   TaxRule,
   Tenant,
+  Order,
+  OrderDetail,
   TokenResponse,
   User,
   Variant,
@@ -629,6 +631,31 @@ export function createApiClient(options: ApiClientOptions = {}) {
       kind?: string;
     }) =>
       request<TaxCalculationResult>("/api/v1/tax/calculate", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    checkoutOrder: (body: { cart_id: string; fulfillment_type?: string }) =>
+      request<Order>("/api/v1/orders/checkout", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    getOrder: (orderId: string) => request<OrderDetail>(`/api/v1/orders/${orderId}`),
+
+    listOrders: (params?: { business_id?: string; status?: string }) => {
+      const search = new URLSearchParams();
+      if (params?.business_id) search.set("business_id", params.business_id);
+      if (params?.status) search.set("status", params.status);
+      const qs = search.toString();
+      return request<Order[]>(`/api/v1/orders${qs ? `?${qs}` : ""}`);
+    },
+
+    transitionOrder: (
+      orderId: string,
+      body: { to_status: string; reason?: string },
+    ) =>
+      request<OrderDetail>(`/api/v1/orders/${orderId}/transition`, {
         method: "POST",
         body: JSON.stringify(body),
       }),

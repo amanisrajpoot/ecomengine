@@ -1,6 +1,6 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 6**. `[empty]` = package `__init__.py` only.
+Status: **Phase 7**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
@@ -23,7 +23,8 @@ Status: **Phase 6**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_phase4_inventory.py` | Inventory + movements |
 | `backend/tests/test_phase5_cart_pricing.py` | Cart + pricing |
 | `backend/tests/test_phase6_tax.py` | Tax rules + calculate |
-| `backend/alembic/` | Migrations through `phase6_tax` |
+| `backend/tests/test_phase7_orders.py` | Checkout + FSM |
+| `backend/alembic/` | Migrations through `phase7_orders` |
 
 ## Backend modules — expected files (do not Glob)
 
@@ -40,7 +41,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | `cart` | models, schemas, service, router | domain-model Cart | carts ~264 | `main.py` |
 | `pricing` | schemas, service | pricing-engine.md | — | called from cart |
 | `taxation` | models, schemas, service, router | tax-engine.md | tax ~371 | `main.py` |
-| `orders` | empty | order-state-machines.md | orders ~290 | `main.py` |
+| `orders` | models, schemas, service, router, states | order-state-machines.md | orders ~290 | `main.py` |
 | `payments` | empty | domain-model Payments | payments ~336 | `main.py` |
 | `ledger` | empty | settlement-engine LedgerEntry | ledger ~394 | `main.py` |
 | `settlements` | empty | settlement-engine.md | settlements ~412 | `main.py` |

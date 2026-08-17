@@ -52,6 +52,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Universal order + configurable state machines
 
+**Status:** implemented (API `0.7.0`, alembic `phase7_orders`).
+
 ## Phase 8 — Payments
 
 - Gateway interface; Razorpay + COD

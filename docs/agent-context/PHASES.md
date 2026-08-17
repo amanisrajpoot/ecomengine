@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 6 done**. Implement **Phase 7** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 7 done**. Implement **Phase 8** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -101,9 +101,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 7 — Orders
 
+**Status:** implemented (v0.7.0).
+
+- Universal `Order` + frozen items + pricing snapshot
+- Configurable profiles: FOOD_DELIVERY, HYPERLOCAL_DELIVERY, COURIER
+- Checkout from cart; `order_status_events` audit trail
+- Alembic `phase7_orders`
+
 **Read:** `docs/order-state-machines.md`; domain-model Order (~175–192); SCHEMA orders (~290–334)
 
-**Write:** `backend/app/orders/*`; `test_phase7_*.py`
+**Write:** (done) `orders/*`, `test_phase7_orders.py`, types + api-client
 
 ---
 

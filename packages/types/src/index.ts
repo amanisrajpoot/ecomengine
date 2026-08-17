@@ -303,3 +303,45 @@ export interface TaxCalculationResult {
   tax_paise: number;
   lines: TaxCalculationLine[];
 }
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  variant_id: string | null;
+  name_snapshot: string;
+  quantity: number;
+  unit_price_paise: number;
+  addons_snapshot: Record<string, unknown>[];
+  meta: Record<string, unknown>;
+}
+
+export interface OrderStatusEvent {
+  id: string;
+  order_id: string;
+  from_status: string | null;
+  to_status: string;
+  actor_user_id: string | null;
+  reason: string | null;
+  created_at: string;
+}
+
+export interface Order {
+  id: string;
+  tenant_id: TenantId;
+  customer_id: UserId;
+  business_id: string | null;
+  location_id: string | null;
+  status: string;
+  state_machine_profile: string;
+  currency: string;
+  pricing_snapshot: Record<string, unknown>;
+  fulfillment_type: string;
+  placed_at: string | null;
+  created_at: string;
+  updated_at: string;
+  items?: OrderItem[];
+}
+
+export interface OrderDetail extends Order {
+  status_events?: OrderStatusEvent[];
+}
