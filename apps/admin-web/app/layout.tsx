@@ -1,15 +1,25 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+
+import { ClientAppShell } from "@/components/ClientAppShell";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Commerce Engine — Admin Web",
-  description: "Commerce Engine Admin Web scaffold",
+  title: "Commerce Engine — Admin",
+  description: "Platform and tenant administration",
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#12101a",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ClientAppShell>{children}</ClientAppShell>
+      </body>
     </html>
   );
 }
