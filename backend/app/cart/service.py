@@ -91,6 +91,17 @@ async def add_cart_item(
     if cart.business_id is None:
         raise AppError("CART_INCOMPLETE", "Cart has no business context", status_code=400)
 
+    business = await get_business(db, tenant_id=tenant_id, business_id=cart.business_id)
+    unit_price_paise = 0
+    if payload.meta.get("line_type") == "COURIER_QUOTE":
+        if business.type != "COURIER":
+            raise AppError(
+                "NOT_COURIER_BUSINESS",
+                "Courier quote lines require a COURIER business cart",
+                status_code=400,
+            )
+        unit_price_paise = int(payload.meta["quoted_paise"])
+
     item = CartItem(
         cart_id=cart.id,
         variant_id=payload.variant_id,
@@ -98,6 +109,7 @@ async def add_cart_item(
         quantity=payload.quantity,
         addons=[a.model_dump(mode="json") for a in payload.addons],
         meta=payload.meta,
+        unit_price_paise=unit_price_paise,
     )
     db.add(item)
     await db.flush()

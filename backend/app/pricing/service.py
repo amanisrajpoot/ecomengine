@@ -13,7 +13,8 @@ from app.catalog.models import Addon, Bundle, Variant
 from app.catalog.service import get_product
 from app.core.errors import AppError
 from app.taxation.service import calculate_checkout_tax
-from app.pricing.schemas import PriceBreakdown, PriceLine
+from app.pricing.schemas import CourierQuoteRequest, PriceBreakdown, PriceLine
+from app.pricing.courier import quote_courier_fare_paise
 from app.tenants.models import Tenant
 
 
@@ -34,6 +35,22 @@ async def calculate_cart_breakdown(
 
     for row in items:
         quantity = row.quantity
+        meta = row.meta if isinstance(row.meta, dict) else {}
+        if meta.get("line_type") == "COURIER_QUOTE":
+            unit_price_paise = int(meta.get("quoted_paise", row.unit_price_paise or 0))
+            line_total = unit_price_paise * quantity
+            subtotal_paise += line_total
+            lines.append(
+                PriceLine(
+                    cart_item_id=str(row.id) if hasattr(row, "id") else None,
+                    name="Courier package",
+                    quantity=quantity,
+                    unit_price_paise=unit_price_paise,
+                    line_total_paise=line_total,
+                )
+            )
+            continue
+
         addons_json = row.addons or []
         unit_price_paise = 0
         name = "Item"
@@ -147,7 +164,7 @@ async def calculate_cart_breakdown(
     _ = location_id
 
     delivery_fee_paise = 0
-    if business.capabilities.get("delivery", False):
+    if business.type != "COURIER" and business.capabilities.get("delivery", False):
         settings_extra = business.settings.get("extra", {}) if isinstance(business.settings, dict) else {}
         delivery_fee_paise = int(settings_extra.get("delivery_fee_paise", 3000))
 
@@ -184,3 +201,84 @@ async def calculate_cart_breakdown(
         total_paise=total_paise,
         lines=lines,
     )
+
+
+async def quote_courier_delivery(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    payload: CourierQuoteRequest,
+) -> tuple[PriceBreakdown, dict]:
+    business = await get_business(
+        db, tenant_id=tenant_id, business_id=payload.business_id
+    )
+    if business.type != "COURIER":
+        raise AppError(
+            "NOT_COURIER_BUSINESS",
+            "Courier quotes require a COURIER business",
+            status_code=400,
+        )
+
+    tenant = await db.get(Tenant, tenant_id)
+    tenant_config = tenant.config if tenant else {}
+
+    try:
+        fare_paise, distance_km, fare_details = quote_courier_fare_paise(
+            pickup_lat=payload.pickup.lat,
+            pickup_lng=payload.pickup.lng,
+            drop_lat=payload.drop.lat,
+            drop_lng=payload.drop.lng,
+            weight_kg=payload.weight_kg,
+            vehicle_type=payload.vehicle_type,
+            express=payload.express,
+            tenant_config=tenant_config,
+        )
+    except ValueError as exc:
+        raise AppError("INVALID_COURIER_QUOTE", str(exc), status_code=400) from exc
+
+    platform_fee_paise = int(tenant_config.get("platform_fee_paise", 500))
+    discount_paise = 0
+    delivery_fee_paise = 0
+    other_fees_paise = 0
+
+    tax_paise, tax_lines = await calculate_checkout_tax(
+        db,
+        tenant_id=tenant_id,
+        goods_taxable_paise=fare_paise,
+        delivery_taxable_paise=0,
+        platform_fee_paise=0,
+    )
+
+    total_paise = fare_paise + platform_fee_paise + tax_paise
+
+    breakdown = PriceBreakdown(
+        subtotal_paise=fare_paise,
+        discount_paise=discount_paise,
+        delivery_fee_paise=delivery_fee_paise,
+        platform_fee_paise=platform_fee_paise,
+        other_fees_paise=other_fees_paise,
+        tax_paise=tax_paise,
+        tax_lines=tax_lines,
+        total_paise=total_paise,
+        lines=[
+            PriceLine(
+                name="Courier package",
+                quantity=1,
+                unit_price_paise=fare_paise,
+                line_total_paise=fare_paise,
+            )
+        ],
+    )
+
+    quote = {
+        "line_type": "COURIER_QUOTE",
+        "quoted_paise": fare_paise,
+        "pickup": payload.pickup.model_dump(),
+        "drop": payload.drop.model_dump(),
+        "weight_kg": payload.weight_kg,
+        "vehicle_type": payload.vehicle_type.upper(),
+        "express": payload.express,
+        "distance_km": distance_km,
+        "fare_details": fare_details,
+    }
+    return breakdown, quote

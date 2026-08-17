@@ -480,3 +480,17 @@ export interface Delivery {
   updated_at: string;
   stops?: DeliveryStop[];
 }
+
+export interface CourierQuoteRequest {
+  business_id: string;
+  pickup: { lat: number; lng: number; address?: Record<string, unknown> };
+  drop: { lat: number; lng: number; address?: Record<string, unknown> };
+  weight_kg: number;
+  vehicle_type?: string;
+  express?: boolean;
+}
+
+export interface CourierQuoteResponse {
+  breakdown: Record<string, unknown>;
+  quote: Record<string, unknown>;
+}
