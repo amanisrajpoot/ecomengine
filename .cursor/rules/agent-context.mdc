@@ -1,0 +1,12 @@
+---
+description: Load the compact agent index instead of the full docs tree
+alwaysApply: true
+---
+
+Token budget: do not read all of `docs/` or recap every phase.
+
+First coding step in a conversation: read `docs/agent-context/INDEX.md` and `docs/agent-context/STATE.md` once. Then open only the files the INDEX row lists.
+
+Follow `docs/agent-context/PROTOCOL.md`. After a feature ships, update `STATE.md` in the same PR (replace lines, keep it ≤80 lines).
+
+Use Grep before Read. Prefer `offset`/`limit` on large specs.

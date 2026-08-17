@@ -20,6 +20,7 @@ Agent-executable specifications for the Universal Commerce & Fulfillment Engine.
 | [permissions.md](./permissions.md) | Roles and capability matrix |
 | [coding-conventions.md](./coding-conventions.md) | Module layout, money, IDs, events, timezones |
 | [milestones.md](./milestones.md) | Phased delivery order and golden-flow acceptance |
+| [agent-context/](./agent-context/INDEX.md) | Short index + living STATE for low-token agent sessions |
 
 ## Critical rules
 
