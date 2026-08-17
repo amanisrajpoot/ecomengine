@@ -24,6 +24,7 @@ from app.catalog.models import (  # noqa: F401
     Variant,
 )
 from app.inventory.models import InventoryItem, StockMovement  # noqa: F401
+from app.cart.models import Cart, CartItem  # noqa: F401
 from app.tenants.models import PlatformConfig, Tenant  # noqa: F401
 
 config = context.config

@@ -17,6 +17,7 @@ from app.businesses.router import router as businesses_router
 from app.locations.router import router as locations_router
 from app.catalog.router import router as catalog_router
 from app.inventory.router import router as inventory_router
+from app.cart.router import router as carts_router
 from app.tenants.router import platform_router
 from app.tenants.router import router as tenants_router
 
@@ -69,5 +70,5 @@ async def meta() -> dict[str, str]:
     }
 
 
-for r in (auth_router, users_router, tenants_router, platform_router, businesses_router, locations_router, catalog_router, inventory_router):
+for r in (auth_router, users_router, tenants_router, platform_router, businesses_router, locations_router, catalog_router, inventory_router, carts_router):
     app.include_router(r, prefix="/api/v1")

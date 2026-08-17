@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 4 done**. Implement **Phase 5** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 5 done**. Implement **Phase 6** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -71,9 +71,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 5 — Cart + pricing
 
+**Status:** implemented (v0.5.0).
+
+- Cart + cart_items with variant/bundle lines and addons
+- Pricing pipeline → `PriceBreakdown` (tax stub until Phase 6)
+- `pricing_snapshot` on cart; customer-scoped RBAC
+- Alembic `phase5_cart`
+
 **Read:** `docs/pricing-engine.md`; domain-model Cart (~158–173); SCHEMA carts (~262–288)
 
-**Write:** `backend/app/cart/*`; `backend/app/pricing/*`; `test_phase5_*.py`
+**Write:** (done) `cart/*`, `pricing/*`, `test_phase5_cart_pricing.py`, types + api-client
 
 ---
 

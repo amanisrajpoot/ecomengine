@@ -214,3 +214,61 @@ export interface StockMovement {
   created_by: string | null;
   created_at: string;
 }
+
+export interface TaxLine {
+  code: string;
+  rate_bps: number;
+  amount_paise: number;
+}
+
+export interface PriceLine {
+  cart_item_id?: string | null;
+  variant_id?: string | null;
+  bundle_id?: string | null;
+  name: string;
+  quantity: number;
+  unit_price_paise: number;
+  line_total_paise: number;
+  addons?: Record<string, unknown>[];
+}
+
+export interface PriceBreakdown {
+  currency: string;
+  subtotal_paise: number;
+  discount_paise: number;
+  delivery_fee_paise: number;
+  platform_fee_paise: number;
+  other_fees_paise: number;
+  tax_paise: number;
+  tax_lines: TaxLine[];
+  total_paise: number;
+  lines: PriceLine[];
+}
+
+export interface CartItem {
+  id: string;
+  cart_id: string;
+  variant_id: string | null;
+  bundle_id: string | null;
+  quantity: number;
+  addons: Record<string, unknown>[];
+  unit_price_paise: number;
+  meta: Record<string, unknown>;
+}
+
+export interface Cart {
+  id: string;
+  tenant_id: TenantId;
+  customer_id: UserId;
+  business_id: string | null;
+  location_id: string | null;
+  currency: string;
+  pricing_snapshot: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  items?: CartItem[];
+}
+
+export interface CartWithPricing extends Cart {
+  pricing?: PriceBreakdown | null;
+}
