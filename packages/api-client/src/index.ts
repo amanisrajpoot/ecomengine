@@ -1,11 +1,17 @@
 /** Thin fetch wrapper against the Commerce Engine API. */
 
 import type {
+  Addon,
+  Bundle,
   Business,
   BusinessLocation,
+  Category,
+  Product,
+  ProductAddonLink,
   Tenant,
   TokenResponse,
   User,
+  Variant,
 } from "@commerce/types";
 
 export type ApiClientOptions = {
@@ -210,6 +216,211 @@ export function createApiClient(options: ApiClientOptions = {}) {
           body: JSON.stringify(body),
         },
       ),
+
+    listCategories: (businessId: string, activeOnly = true) =>
+      request<Category[]>(
+        `/api/v1/businesses/${businessId}/categories?active_only=${activeOnly}`,
+      ),
+
+    createCategory: (
+      businessId: string,
+      body: {
+        name: string;
+        parent_id?: string;
+        sort_order?: number;
+        is_active?: boolean;
+      },
+    ) =>
+      request<Category>(`/api/v1/businesses/${businessId}/categories`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateCategory: (
+      businessId: string,
+      categoryId: string,
+      body: {
+        name?: string;
+        parent_id?: string;
+        sort_order?: number;
+        is_active?: boolean;
+      },
+    ) =>
+      request<Category>(`/api/v1/businesses/${businessId}/categories/${categoryId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    listProducts: (
+      businessId: string,
+      params?: { category_id?: string; active_only?: boolean },
+    ) => {
+      const search = new URLSearchParams();
+      if (params?.category_id) search.set("category_id", params.category_id);
+      if (params?.active_only !== undefined) {
+        search.set("active_only", String(params.active_only));
+      }
+      const qs = search.toString();
+      return request<Product[]>(
+        `/api/v1/businesses/${businessId}/products${qs ? `?${qs}` : ""}`,
+      );
+    },
+
+    createProduct: (
+      businessId: string,
+      body: {
+        name: string;
+        category_id?: string;
+        description?: string;
+        images?: string[];
+        tags?: string[];
+        is_active?: boolean;
+      },
+    ) =>
+      request<Product>(`/api/v1/businesses/${businessId}/products`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    getProduct: (businessId: string, productId: string) =>
+      request<Product>(`/api/v1/businesses/${businessId}/products/${productId}`),
+
+    updateProduct: (
+      businessId: string,
+      productId: string,
+      body: {
+        name?: string;
+        category_id?: string;
+        description?: string;
+        images?: string[];
+        tags?: string[];
+        is_active?: boolean;
+      },
+    ) =>
+      request<Product>(`/api/v1/businesses/${businessId}/products/${productId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    listVariants: (businessId: string, productId: string, availableOnly = true) =>
+      request<Variant[]>(
+        `/api/v1/businesses/${businessId}/products/${productId}/variants?available_only=${availableOnly}`,
+      ),
+
+    createVariant: (
+      businessId: string,
+      productId: string,
+      body: {
+        name: string;
+        sku?: string;
+        base_price_paise: number;
+        is_available?: boolean;
+        meta?: Record<string, unknown>;
+      },
+    ) =>
+      request<Variant>(
+        `/api/v1/businesses/${businessId}/products/${productId}/variants`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    updateVariant: (
+      businessId: string,
+      productId: string,
+      variantId: string,
+      body: {
+        name?: string;
+        sku?: string;
+        base_price_paise?: number;
+        is_available?: boolean;
+        meta?: Record<string, unknown>;
+      },
+    ) =>
+      request<Variant>(
+        `/api/v1/businesses/${businessId}/products/${productId}/variants/${variantId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    listAddons: (businessId: string, activeOnly = true) =>
+      request<Addon[]>(
+        `/api/v1/businesses/${businessId}/addons?active_only=${activeOnly}`,
+      ),
+
+    createAddon: (
+      businessId: string,
+      body: { name: string; price_paise: number; max_qty?: number; is_active?: boolean },
+    ) =>
+      request<Addon>(`/api/v1/businesses/${businessId}/addons`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateAddon: (
+      businessId: string,
+      addonId: string,
+      body: { name?: string; price_paise?: number; max_qty?: number; is_active?: boolean },
+    ) =>
+      request<Addon>(`/api/v1/businesses/${businessId}/addons/${addonId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    linkProductAddon: (
+      businessId: string,
+      productId: string,
+      body: { addon_id: string; group_name?: string; is_required?: boolean },
+    ) =>
+      request<ProductAddonLink>(
+        `/api/v1/businesses/${businessId}/products/${productId}/addon-links`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+
+    listProductAddonLinks: (businessId: string, productId: string) =>
+      request<ProductAddonLink[]>(
+        `/api/v1/businesses/${businessId}/products/${productId}/addon-links`,
+      ),
+
+    listBundles: (businessId: string, activeOnly = true) =>
+      request<Bundle[]>(
+        `/api/v1/businesses/${businessId}/bundles?active_only=${activeOnly}`,
+      ),
+
+    createBundle: (
+      businessId: string,
+      body: {
+        name: string;
+        price_paise?: number;
+        items?: { variant_id: string; quantity?: number }[];
+        is_active?: boolean;
+      },
+    ) =>
+      request<Bundle>(`/api/v1/businesses/${businessId}/bundles`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateBundle: (
+      businessId: string,
+      bundleId: string,
+      body: {
+        name?: string;
+        price_paise?: number;
+        items?: { variant_id: string; quantity?: number }[];
+        is_active?: boolean;
+      },
+    ) =>
+      request<Bundle>(`/api/v1/businesses/${businessId}/bundles/${bundleId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
   };
 }
 
