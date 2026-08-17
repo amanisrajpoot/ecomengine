@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import type { Product } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Button, Card } from "@commerce/ui";
+import { Badge, Button, EmptyState, Skeleton } from "@commerce/ui";
 
 import { getApiClient } from "@/lib/api";
 import { session } from "@/lib/session";
@@ -36,36 +36,57 @@ export default function CatalogPage() {
   }, [businessId]);
 
   return (
-    <div className="space-y-4">
-      <Link href={`/business/${businessId}`} className="text-xs text-amber-300/70 hover:text-amber-100">
-        ← Dashboard
-      </Link>
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Catalog</h1>
+    <div className="space-y-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Menu</h1>
+          <p className="text-sm text-gray-500">Products and variants for this store.</p>
+        </div>
         <Link href={`/business/${businessId}/catalog/new`}>
-          <Button variant="secondary">Add product</Button>
+          <Button variant="brand">Add item</Button>
         </Link>
       </div>
-      {loading ? <p className="text-sm text-amber-200/60">Loading…</p> : null}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
 
-      <ul className="space-y-2">
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-16" />
+          <Skeleton className="h-16" />
+        </div>
+      ) : null}
+
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+
+      <ul className="space-y-3">
         {products.map((product) => (
           <li key={product.id}>
-            <Link href={`/business/${businessId}/catalog/${product.id}`}>
-              <Card className="transition-colors hover:border-emerald-500/50">
-                <p className="font-medium">{product.name}</p>
-                <p className="text-xs text-amber-200/60">
-                  {product.is_active ? "Active" : "Inactive"}
-                </p>
-              </Card>
+            <Link
+              href={`/business/${businessId}/catalog/${product.id}`}
+              className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div>
+                <p className="font-semibold text-gray-900">{product.name}</p>
+                {product.description ? (
+                  <p className="mt-1 text-sm text-gray-500 line-clamp-1">{product.description}</p>
+                ) : null}
+              </div>
+              <Badge variant={product.is_active ? "accent" : "muted"}>
+                {product.is_active ? "Active" : "Inactive"}
+              </Badge>
             </Link>
           </li>
         ))}
       </ul>
 
       {!loading && products.length === 0 ? (
-        <p className="text-sm text-amber-200/60">No products yet.</p>
+        <EmptyState
+          title="No menu items"
+          description="Add products so customers can order from this store."
+          action={
+            <Link href={`/business/${businessId}/catalog/new`}>
+              <Button variant="brand">Add first item</Button>
+            </Link>
+          }
+        />
       ) : null}
     </div>
   );

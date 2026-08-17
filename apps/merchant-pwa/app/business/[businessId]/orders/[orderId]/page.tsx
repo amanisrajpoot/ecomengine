@@ -2,18 +2,33 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { OrderDetail, PriceBreakdown } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Button, Card, PriceDisplay } from "@commerce/ui";
+import { Button, Card, OrderTimeline, PriceDisplay, StatusBadge } from "@commerce/ui";
+import type { TimelineStep } from "@commerce/ui";
 
 import { getApiClient } from "@/lib/api";
+import { formatOrderTime } from "@/lib/orderHelpers";
 import { merchantTransitionsFor } from "@/lib/orderTransitions";
 
 function pricingFromSnapshot(snapshot: Record<string, unknown>): PriceBreakdown | null {
   if (typeof snapshot.total_paise !== "number") return null;
   return snapshot as unknown as PriceBreakdown;
+}
+
+function timelineSteps(order: OrderDetail): TimelineStep[] {
+  if (!order.status_events?.length) {
+    return [{ id: order.status, label: order.status.replace(/_/g, " "), active: true }];
+  }
+  return order.status_events.map((event, index) => ({
+    id: event.id,
+    label: event.to_status.replace(/_/g, " "),
+    time: formatOrderTime(event.created_at),
+    done: index < order.status_events!.length - 1,
+    active: index === order.status_events!.length - 1,
+  }));
 }
 
 export default function MerchantOrderDetailPage() {
@@ -59,73 +74,80 @@ export default function MerchantOrderDetailPage() {
   const nextStatuses = order
     ? merchantTransitionsFor(order.state_machine_profile, order.status)
     : [];
+  const steps = useMemo(() => (order ? timelineSteps(order) : []), [order]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Link
         href={`/business/${businessId}/orders`}
-        className="text-xs text-amber-300/70 hover:text-amber-100"
+        className="text-sm font-medium text-[var(--brand)]"
       >
-        ← Orders
+        ← Back to queue
       </Link>
-      <h1 className="text-2xl font-semibold">Order detail</h1>
-      {loading ? <p className="text-sm text-amber-200/60">Loading…</p> : null}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+
+      {loading ? <p className="text-sm text-gray-500">Loading…</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       {order ? (
         <>
-          <Card title="Status">
-            <p className="text-lg font-medium">{order.status}</p>
-            <p className="mt-1 text-xs font-mono text-amber-300/60">{order.id}</p>
-            <p className="text-sm text-amber-200/70 mt-2">{order.state_machine_profile}</p>
-          </Card>
+          <div className="rounded-2xl bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <StatusBadge status={order.status} />
+                <p className="mt-2 font-mono text-xs text-gray-400">{order.id}</p>
+                <p className="mt-1 text-sm text-gray-500">{order.state_machine_profile}</p>
+              </div>
+              {pricing ? (
+                <PriceDisplay paise={pricing.total_paise} className="text-xl font-bold text-gray-900" />
+              ) : null}
+            </div>
+          </div>
 
-          {pricing ? (
-            <Card title="Total">
-              <PriceDisplay paise={pricing.total_paise} className="text-lg" />
-            </Card>
+          {nextStatuses.length > 0 ? (
+            <div className="space-y-2">
+              {nextStatuses.map((status) => (
+                <Button
+                  key={status}
+                  variant={status === "CANCELLED" ? "ghost" : "brand"}
+                  className={
+                    status === "CANCELLED"
+                      ? "w-full border border-red-200 text-red-600 hover:bg-red-50"
+                      : "w-full py-4 text-base font-bold"
+                  }
+                  disabled={transitioning !== null}
+                  onClick={() => transition(status)}
+                >
+                  {transitioning === status
+                    ? "Updating…"
+                    : status === "CANCELLED"
+                      ? "Cancel order"
+                      : `Mark ${status.replace(/_/g, " ").toLowerCase()}`}
+                </Button>
+              ))}
+            </div>
           ) : null}
 
           {order.items && order.items.length > 0 ? (
-            <Card title="Items">
-              <ul className="space-y-2 text-sm">
+            <Card variant="light" title="Items">
+              <ul className="divide-y divide-gray-100">
                 {order.items.map((item) => (
-                  <li key={item.id} className="flex justify-between gap-2">
-                    <span>{item.name_snapshot} × {item.quantity}</span>
-                    <PriceDisplay paise={item.unit_price_paise * item.quantity} />
+                  <li key={item.id} className="flex justify-between gap-3 py-3 text-sm first:pt-0 last:pb-0">
+                    <span className="font-medium text-gray-900">
+                      {item.name_snapshot} <span className="text-gray-500">× {item.quantity}</span>
+                    </span>
+                    <PriceDisplay
+                      paise={item.unit_price_paise * item.quantity}
+                      className="text-gray-900"
+                    />
                   </li>
                 ))}
               </ul>
             </Card>
           ) : null}
 
-          {nextStatuses.length > 0 ? (
-            <Card title="Actions">
-              <div className="flex flex-wrap gap-2">
-                {nextStatuses.map((status) => (
-                  <Button
-                    key={status}
-                    variant={status === "CANCELLED" ? "ghost" : "primary"}
-                    disabled={transitioning !== null}
-                    onClick={() => transition(status)}
-                  >
-                    {transitioning === status ? "…" : status.replace(/_/g, " ")}
-                  </Button>
-                ))}
-              </div>
-            </Card>
-          ) : null}
-
-          {order.status_events && order.status_events.length > 0 ? (
-            <Card title="Timeline">
-              <ul className="space-y-1 text-sm text-amber-200/80">
-                {order.status_events.map((event) => (
-                  <li key={event.id}>
-                    {event.to_status}{" "}
-                    <span className="text-amber-400/60">{event.created_at}</span>
-                  </li>
-                ))}
-              </ul>
+          {steps.length > 0 ? (
+            <Card variant="light" title="Timeline">
+              <OrderTimeline steps={steps} />
             </Card>
           ) : null}
         </>

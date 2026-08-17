@@ -52,21 +52,46 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Settings</h1>
-      <Card title="Tenant">
-        <Input label="Tenant ID" value={tenantId} onChange={(e) => setTenantId(e.target.value)} />
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <p className="text-sm text-gray-500">Tenant and session for this partner app.</p>
+      </div>
+
+      <Card variant="light" title="Tenant">
+        <Input
+          variant="light"
+          label="Tenant ID"
+          value={tenantId}
+          onChange={(e) => setTenantId(e.target.value)}
+        />
         <div className="mt-3 flex gap-2">
-          <Button onClick={saveTenant}>Save</Button>
-          <Button variant="secondary" onClick={checkApi}>Check API</Button>
+          <Button variant="brand" onClick={saveTenant}>Save</Button>
+          <Button
+            variant="secondary"
+            className="border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200"
+            onClick={checkApi}
+          >
+            Check API
+          </Button>
         </div>
       </Card>
-      <Card title="Session">
-        <p className="text-sm">{userEmail ? `Signed in as ${userEmail}` : "Not signed in"}</p>
-        <Button variant="secondary" className="mt-3" onClick={signOut}>Sign out</Button>
+
+      <Card variant="light" title="Session">
+        <p className="text-sm text-gray-600">
+          {userEmail ? `Signed in as ${userEmail}` : "Not signed in"}
+        </p>
+        <Button
+          variant="secondary"
+          className="mt-3 border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200"
+          onClick={signOut}
+        >
+          Sign out
+        </Button>
       </Card>
-      {message ? <p className="text-sm text-emerald-300">{message}</p> : null}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+
+      {message ? <p className="text-sm text-emerald-600">{message}</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </div>
   );
 }

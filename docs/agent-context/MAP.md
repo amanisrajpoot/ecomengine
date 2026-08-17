@@ -69,7 +69,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 |------|------|------------|
 | `packages/types/src/index.ts` | User, Tenant, Business, catalog types | Any new API resource |
 | `packages/api-client/src/index.ts` | auth through delivery + `assignUserRole` | Merchant admin |
-| `packages/ui/src/index.ts` | Button, Card, Input, PriceDisplay, Badge, SearchBar, BusinessCard, ProductCard, CategoryChip, OrderTimeline, Skeleton, EmptyState | New shared component |
+| `packages/ui/src/index.ts` | Button, Card, Input, PriceDisplay, Badge, SearchBar, BusinessCard, ProductCard, CategoryChip, OrderTimeline, Skeleton, EmptyState, StatusBadge, StatTile | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
 
 ## Apps — on disk now
@@ -79,7 +79,7 @@ Do not search other `app/` folders unless sharing components:
 | App | Layout | Routes (customer-pwa) | Config |
 |-----|--------|-------------------------|--------|
 | `apps/customer-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/CartPeek.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/cart`, `/checkout`, `/orders`, `/orders/[orderId]`, `/courier` | consumer UX: bottom nav, search, cards |
-| `apps/merchant-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/business/[businessId]/orders`, `/business/[businessId]/orders/[orderId]`, `/business/[businessId]/catalog`, `/business/[businessId]/catalog/new`, `/business/[businessId]/catalog/[productId]` | `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts` |
+| `apps/merchant-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/OrderQueueCard.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/business/[businessId]/orders`, `/business/[businessId]/orders/[orderId]`, `/business/[businessId]/catalog`, `/business/[businessId]/catalog/new`, `/business/[businessId]/catalog/[productId]` | partner UX: bottom nav, KDS queue; `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts`, `lib/orderHelpers.ts` |
 | `apps/rider-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/onboarding`, `/jobs`, `/jobs/[deliveryId]` | `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts` |
 | `apps/admin-web` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/settings`, `/tenants`, `/orders`, `/orders/[orderId]`, `/settlements`, `/users/roles` | `lib/api.ts`, `lib/session.ts` |
 

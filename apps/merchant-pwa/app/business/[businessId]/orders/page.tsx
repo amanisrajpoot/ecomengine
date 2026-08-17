@@ -1,21 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { Order } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Card } from "@commerce/ui";
+import { CategoryChip, EmptyState, Skeleton } from "@commerce/ui";
 
+import { OrderQueueCard } from "@/components/OrderQueueCard";
 import { getApiClient } from "@/lib/api";
+import { orderNeedsMerchantAction } from "@/lib/orderHelpers";
 import { session } from "@/lib/session";
+
+type Filter = "ACTION" | "ALL";
 
 export default function BusinessOrdersPage() {
   const params = useParams<{ businessId: string }>();
   const businessId = params.businessId;
 
   const [orders, setOrders] = useState<Order[]>([]);
+  const [filter, setFilter] = useState<Filter>("ACTION");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,36 +39,59 @@ export default function BusinessOrdersPage() {
     load();
   }, [businessId]);
 
-  return (
-    <div className="space-y-4">
-      <Link href={`/business/${businessId}`} className="text-xs text-amber-300/70 hover:text-amber-100">
-        ← Dashboard
-      </Link>
-      <h1 className="text-2xl font-semibold">Orders</h1>
-      {loading ? <p className="text-sm text-amber-200/60">Loading…</p> : null}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+  const filtered = useMemo(() => {
+    if (filter === "ALL") return orders;
+    return orders.filter((o) => orderNeedsMerchantAction(o.state_machine_profile, o.status));
+  }, [orders, filter]);
 
-      <ul className="space-y-2">
-        {orders.map((order) => (
+  const actionCount = useMemo(
+    () =>
+      orders.filter((o) => orderNeedsMerchantAction(o.state_machine_profile, o.status)).length,
+    [orders],
+  );
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+        <p className="text-sm text-gray-500">Kitchen display queue for this store.</p>
+      </div>
+
+      <div className="flex gap-2">
+        <CategoryChip
+          label={`Action needed (${actionCount})`}
+          active={filter === "ACTION"}
+          onClick={() => setFilter("ACTION")}
+        />
+        <CategoryChip label="All orders" active={filter === "ALL"} onClick={() => setFilter("ALL")} />
+      </div>
+
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
+      ) : null}
+
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+
+      <ul className="space-y-3">
+        {filtered.map((order) => (
           <li key={order.id}>
-            <Link href={`/business/${businessId}/orders/${order.id}`}>
-              <Card className="transition-colors hover:border-emerald-500/50">
-                <div className="flex justify-between gap-3">
-                  <div>
-                    <p className="font-medium">{order.status}</p>
-                    <p className="font-mono text-xs text-amber-300/60">{order.id.slice(0, 8)}…</p>
-                    <p className="text-xs text-amber-200/60">{order.placed_at ?? order.created_at}</p>
-                  </div>
-                  <span className="text-xs text-amber-300/60">Open →</span>
-                </div>
-              </Card>
-            </Link>
+            <OrderQueueCard order={order} businessId={businessId} />
           </li>
         ))}
       </ul>
 
-      {!loading && orders.length === 0 ? (
-        <p className="text-sm text-amber-200/60">No orders for this store yet.</p>
+      {!loading && filtered.length === 0 ? (
+        <EmptyState
+          title={filter === "ACTION" ? "No orders need action" : "No orders yet"}
+          description={
+            filter === "ACTION"
+              ? "New orders will appear here when customers place them."
+              : "Orders for this store will show up here."
+          }
+        />
       ) : null}
     </div>
   );

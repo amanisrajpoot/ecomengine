@@ -12,7 +12,7 @@ export function ClientAppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!mounted) {
-    return <div className="mx-auto max-w-3xl px-4 py-6">{children}</div>;
+    return <div className="mx-auto max-w-lg px-4 py-6">{children}</div>;
   }
 
   return <AppShell>{children}</AppShell>;

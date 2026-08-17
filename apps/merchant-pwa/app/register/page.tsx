@@ -47,14 +47,33 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md space-y-4">
-      <h1 className="text-2xl font-semibold">Merchant register</h1>
-      <Card>
+    <div className="mx-auto max-w-md space-y-5">
+      <h1 className="text-2xl font-bold text-gray-900">Partner register</h1>
+      <Card variant="light">
         <form className="space-y-3" onSubmit={onSubmit}>
-          <Input label="Tenant ID" value={tenantId} onChange={(e) => setTenantId(e.target.value)} required />
-          <Input label="Display name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-          <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <Input
+            variant="light"
+            label="Tenant ID"
+            value={tenantId}
+            onChange={(e) => setTenantId(e.target.value)}
+            required
+          />
+          <Input
+            variant="light"
+            label="Display name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+          />
+          <Input
+            variant="light"
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            variant="light"
             label="Password"
             type="password"
             value={password}
@@ -62,15 +81,17 @@ export default function RegisterPage() {
             required
             minLength={8}
           />
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button type="submit" variant="brand" disabled={loading} className="w-full">
             {loading ? "Creating…" : "Register"}
           </Button>
         </form>
       </Card>
-      <p className="text-sm text-amber-200/70">
-        <Link href="/login" className="underline">Sign in</Link>
+      <p className="text-sm text-gray-500">
+        <Link href="/login" className="font-medium text-[var(--brand)] underline">
+          Sign in
+        </Link>
       </p>
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </div>
   );
 }
