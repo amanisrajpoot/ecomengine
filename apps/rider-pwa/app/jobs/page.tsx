@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import type { Delivery } from "@commerce/types";
+import type { Delivery, DeliveryPartnerProfile } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Card } from "@commerce/ui";
+import { Button, EmptyState, Skeleton, StatTile } from "@commerce/ui";
 
+import { JobCard } from "@/components/JobCard";
 import { getApiClient } from "@/lib/api";
+import { deliveryNeedsAction } from "@/lib/deliveryHelpers";
 import { session } from "@/lib/session";
 
 export default function JobsPage() {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [profile, setProfile] = useState<DeliveryPartnerProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +27,14 @@ export default function JobsPage() {
           setError("Sign in to view jobs.");
           return;
         }
-        const list = await getApiClient().listMyDeliveries(true);
+        const api = getApiClient();
+        try {
+          const p = await api.getMyPartnerProfile();
+          setProfile(p);
+        } catch {
+          setProfile(null);
+        }
+        const list = await api.listMyDeliveries(true);
         setDeliveries(list);
       } catch (err) {
         if (err instanceof ApiError && err.code === "PARTNER_NOT_FOUND") {
@@ -39,46 +49,77 @@ export default function JobsPage() {
     load();
   }, []);
 
+  const stats = useMemo(() => {
+    const actionNeeded = deliveries.filter(deliveryNeedsAction).length;
+    const inProgress = deliveries.filter((d) => d.status === "IN_PROGRESS").length;
+    return { actionNeeded, inProgress, total: deliveries.length };
+  }, [deliveries]);
+
+  const urgentJobs = useMemo(
+    () => deliveries.filter(deliveryNeedsAction),
+    [deliveries],
+  );
+
+  const displayJobs = urgentJobs.length > 0 ? urgentJobs : deliveries;
+
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Active jobs</h1>
-      <p className="text-sm text-sky-200/70">Deliveries assigned to you.</p>
-      {loading ? <p className="text-sm text-sky-200/60">Loading…</p> : null}
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Active jobs</h1>
+        <p className="text-sm text-gray-500">
+          {profile?.is_online ? "You are online and ready for assignments." : "Go online on your profile to receive jobs."}
+        </p>
+      </div>
+
+      {!loading && profile ? (
+        <div className="grid grid-cols-3 gap-3">
+          <StatTile
+            label="Action needed"
+            value={stats.actionNeeded}
+            accent={stats.actionNeeded > 0}
+            className={stats.actionNeeded > 0 ? "border-blue-200 bg-blue-50" : ""}
+          />
+          <StatTile label="In progress" value={stats.inProgress} />
+          <StatTile label="Active" value={stats.total} />
+        </div>
+      ) : null}
+
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
+      ) : null}
+
       {error ? (
-        <p className="text-sm text-red-300">
+        <p className="text-sm text-red-600">
           {error}{" "}
-          <Link href="/onboarding" className="underline">Partner profile</Link>
+          <Link href="/onboarding" className="font-medium underline">Partner profile</Link>
           {" · "}
-          <Link href="/login" className="underline">Sign in</Link>
+          <Link href="/login" className="font-medium underline">Sign in</Link>
         </p>
       ) : null}
 
-      <ul className="space-y-2">
-        {deliveries.map((delivery) => (
+      <ul className="space-y-3">
+        {displayJobs.map((delivery) => (
           <li key={delivery.id}>
-            <Link href={`/jobs/${delivery.id}`}>
-              <Card className="transition-colors hover:border-emerald-500/50">
-                <div className="flex justify-between gap-3">
-                  <div>
-                    <p className="font-medium">{delivery.status}</p>
-                    <p className="font-mono text-xs text-sky-300/60">{delivery.id.slice(0, 8)}…</p>
-                    <p className="text-xs text-sky-200/60">
-                      {delivery.stops?.length ?? 0} stops
-                    </p>
-                  </div>
-                  <span className="text-xs text-sky-300/60">Open →</span>
-                </div>
-              </Card>
-            </Link>
+            <JobCard delivery={delivery} />
           </li>
         ))}
       </ul>
 
       {!loading && !error && deliveries.length === 0 ? (
-        <p className="text-sm text-sky-200/60">
-          No active jobs. Stay online on your{" "}
-          <Link href="/onboarding" className="underline">profile</Link> page.
-        </p>
+        <EmptyState
+          title="No active jobs"
+          description="Stay online on your profile page. Jobs appear here when dispatch assigns you."
+          action={
+            <Link href="/onboarding">
+              <Button variant="brand" className="bg-[var(--brand)] hover:bg-[var(--brand-dark)]">
+                Go to profile
+              </Button>
+            </Link>
+          }
+        />
       ) : null}
     </div>
   );

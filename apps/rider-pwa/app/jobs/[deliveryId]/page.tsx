@@ -2,25 +2,36 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Delivery, DeliveryStop, Fulfillment, OrderDetail } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Button, Card } from "@commerce/ui";
+import { Button, Card, OrderTimeline, StatusBadge } from "@commerce/ui";
+import type { TimelineStep } from "@commerce/ui";
 
 import { getApiClient } from "@/lib/api";
+import {
+  defaultProof,
+  formatAddress,
+  formatTime,
+  orderNeedsRiderAction,
+  primaryRiderAction,
+  stopIcon,
+  stopsCompletedCount,
+  stopsTotalCount,
+} from "@/lib/deliveryHelpers";
 import { riderTransitionsFor } from "@/lib/orderTransitions";
 
-function formatAddress(address: Record<string, unknown>): string {
-  const parts = [address.line1, address.city, address.pincode].filter(Boolean);
-  return parts.join(", ") || "Address";
-}
-
-function defaultProof(stop: DeliveryStop): Record<string, unknown> {
-  if (stop.stop_type === "PICKUP") {
-    return { type: "OTP", code: "1234" };
-  }
-  return { type: "PHOTO", url: "s3://pod/rider-pwa.jpg" };
+function stopTimelineSteps(stops: DeliveryStop[]): TimelineStep[] {
+  const sorted = [...stops].sort((a, b) => a.sequence - b.sequence);
+  const firstPending = sorted.findIndex((s) => s.status !== "COMPLETED");
+  return sorted.map((stop, index) => ({
+    id: stop.id,
+    label: `${stop.stop_type} · ${formatAddress(stop.address)}`,
+    time: stop.completed_at ? formatTime(stop.completed_at) : undefined,
+    done: stop.status === "COMPLETED",
+    active: index === firstPending,
+  }));
 }
 
 export default function JobDetailPage() {
@@ -88,68 +99,121 @@ export default function JobDetailPage() {
   const nextOrderStatuses = order
     ? riderTransitionsFor(order.state_machine_profile, order.status)
     : [];
+  const primaryAction = order
+    ? primaryRiderAction(order.state_machine_profile, order.status)
+    : null;
+  const steps = useMemo(
+    () => (delivery?.stops ? stopTimelineSteps(delivery.stops) : []),
+    [delivery?.stops],
+  );
 
   return (
-    <div className="space-y-4">
-      <Link href="/jobs" className="text-xs text-sky-300/70 hover:text-sky-100">
-        ← Jobs
+    <div className="space-y-5">
+      <Link href="/jobs" className="text-sm font-medium text-[var(--brand)]">
+        ← Back to jobs
       </Link>
-      <h1 className="text-2xl font-semibold">Job detail</h1>
-      {loading ? <p className="text-sm text-sky-200/60">Loading…</p> : null}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+
+      {loading ? <p className="text-sm text-gray-500">Loading…</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       {delivery ? (
-        <Card title="Delivery">
-          <p className="font-medium">{delivery.status}</p>
-          <p className="text-xs font-mono text-sky-300/60">{delivery.id}</p>
-        </Card>
+        <div className="rounded-2xl bg-white p-5 shadow-sm">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <StatusBadge status={delivery.status} />
+              <p className="mt-2 font-mono text-xs text-gray-400">{delivery.id}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-bold text-gray-900">
+                {stopsCompletedCount(delivery)}/{stopsTotalCount(delivery)}
+              </p>
+              <p className="text-xs text-gray-500">stops done</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {order && primaryAction && orderNeedsRiderAction(order.state_machine_profile, order.status) ? (
+        <Button
+          variant="brand"
+          className="w-full py-4 text-base font-bold bg-[var(--brand)] hover:bg-[var(--brand-dark)]"
+          disabled={busy !== null}
+          onClick={() => transitionOrder(primaryAction)}
+        >
+          {busy === primaryAction
+            ? "Updating…"
+            : `Mark ${primaryAction.replace(/_/g, " ").toLowerCase()}`}
+        </Button>
+      ) : null}
+
+      {nextOrderStatuses.length > 1 ? (
+        <div className="flex flex-wrap gap-2">
+          {nextOrderStatuses
+            .filter((s) => s !== primaryAction)
+            .map((status) => (
+              <Button
+                key={status}
+                variant="secondary"
+                className="border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200"
+                disabled={busy !== null}
+                onClick={() => transitionOrder(status)}
+              >
+                {busy === status ? "…" : status.replace(/_/g, " ")}
+              </Button>
+            ))}
+        </div>
       ) : null}
 
       {order ? (
-        <Card title="Order">
-          <p className="font-medium">{order.status}</p>
-          <p className="text-sm text-sky-200/70">{order.state_machine_profile}</p>
-          {nextOrderStatuses.length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {nextOrderStatuses.map((status) => (
-                <Button
-                  key={status}
-                  variant="secondary"
-                  disabled={busy !== null}
-                  onClick={() => transitionOrder(status)}
-                >
-                  {busy === status ? "…" : status.replace(/_/g, " ")}
-                </Button>
-              ))}
-            </div>
-          ) : null}
+        <Card variant="light" title="Order">
+          <div className="flex items-center justify-between gap-3">
+            <StatusBadge status={order.status} />
+            <span className="text-xs text-gray-500">{order.state_machine_profile}</span>
+          </div>
         </Card>
       ) : null}
 
       {delivery?.stops && delivery.stops.length > 0 ? (
-        <Card title="Stops">
-          <ul className="space-y-3">
+        <Card variant="light" title="Route">
+          <OrderTimeline steps={steps} />
+          <ul className="mt-4 space-y-3">
             {delivery.stops
               .sort((a, b) => a.sequence - b.sequence)
               .map((stop) => (
                 <li
                   key={stop.id}
-                  className="rounded-lg bg-emerald-950/40 px-3 py-2 text-sm"
+                  className={`rounded-xl border p-4 ${
+                    stop.status === "COMPLETED"
+                      ? "border-gray-100 bg-gray-50"
+                      : "border-blue-200 bg-blue-50/50"
+                  }`}
                 >
-                  <p className="font-medium">
-                    {stop.stop_type} · {stop.status}
-                  </p>
-                  <p className="text-sky-200/70">{formatAddress(stop.address)}</p>
-                  {stop.status !== "COMPLETED" ? (
-                    <Button
-                      className="mt-2"
-                      variant="secondary"
-                      disabled={busy !== null}
-                      onClick={() => completeStop(stop)}
-                    >
-                      {busy === stop.id ? "Completing…" : "Complete with POD"}
-                    </Button>
-                  ) : null}
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl leading-none">{stopIcon(stop.stop_type)}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <StatusBadge status={stop.stop_type} />
+                        <StatusBadge status={stop.status} />
+                      </div>
+                      <p className="mt-2 text-sm font-medium text-gray-900">
+                        {formatAddress(stop.address)}
+                      </p>
+                      {stop.status !== "COMPLETED" ? (
+                        <Button
+                          variant="brand"
+                          className="mt-3 w-full bg-[var(--brand)] hover:bg-[var(--brand-dark)]"
+                          disabled={busy !== null}
+                          onClick={() => completeStop(stop)}
+                        >
+                          {busy === stop.id ? "Completing…" : "Complete with POD"}
+                        </Button>
+                      ) : (
+                        <p className="mt-2 text-xs text-emerald-600">
+                          Completed {formatTime(stop.completed_at)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </li>
               ))}
           </ul>
@@ -157,7 +221,7 @@ export default function JobDetailPage() {
       ) : null}
 
       {fulfillment ? (
-        <p className="text-xs text-sky-300/50">
+        <p className="text-xs text-gray-400">
           Fulfillment {fulfillment.id.slice(0, 8)}… · {fulfillment.type} · {fulfillment.status}
         </p>
       ) : null}
