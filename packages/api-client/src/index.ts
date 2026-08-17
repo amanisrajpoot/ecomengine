@@ -20,6 +20,7 @@ import type {
   Vehicle,
   ProductAddonLink,
   Refund,
+  RoleBinding,
   StockMovement,
   TaxCalculationResult,
   TaxRule,
@@ -123,6 +124,15 @@ export function createApiClient(options: ApiClientOptions = {}) {
       }),
 
     me: () => request<User>("/api/v1/auth/me"),
+
+    assignUserRole: (
+      userId: string,
+      body: { role: string; tenant_id?: string; business_id?: string },
+    ) =>
+      request<RoleBinding>(`/api/v1/users/${userId}/roles`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
 
     listTenants: () => request<Tenant[]>("/api/v1/tenants"),
 

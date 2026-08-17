@@ -67,7 +67,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | Path | Role | Touch when |
 |------|------|------------|
 | `packages/types/src/index.ts` | User, Tenant, Business, catalog types | Any new API resource |
-| `packages/api-client/src/index.ts` | auth through catalog + inventory | Merchant admin |
+| `packages/api-client/src/index.ts` | auth through delivery + `assignUserRole` | Merchant admin |
 | `packages/ui/src/index.ts` | Button, Card, Input, PriceDisplay, formatPaise | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
 
