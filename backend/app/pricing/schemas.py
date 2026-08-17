@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import uuid
+
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -49,3 +51,23 @@ class PriceBreakdown(BaseModel):
         if self.total_paise != expected:
             raise ValueError(f"total_paise {self.total_paise} != expected {expected}")
         return self
+
+
+class CourierAddress(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
+    address: dict[str, Any] = Field(default_factory=dict)
+
+
+class CourierQuoteRequest(BaseModel):
+    business_id: uuid.UUID
+    pickup: CourierAddress
+    drop: CourierAddress
+    weight_kg: float = Field(gt=0, le=500)
+    vehicle_type: str = Field(default="BIKE", min_length=1, max_length=16)
+    express: bool = False
+
+
+class CourierQuoteResponse(BaseModel):
+    breakdown: PriceBreakdown
+    quote: dict[str, Any]

@@ -15,6 +15,7 @@ import type {
   SettlementDetail,
   Fulfillment,
   Delivery,
+  CourierQuoteResponse,
   DeliveryPartnerProfile,
   Vehicle,
   ProductAddonLink,
@@ -837,6 +838,19 @@ export function createApiClient(options: ApiClientOptions = {}) {
           body: JSON.stringify(body ?? {}),
         },
       ),
+
+    quoteCourier: (body: {
+      business_id: string;
+      pickup: { lat: number; lng: number; address?: Record<string, unknown> };
+      drop: { lat: number; lng: number; address?: Record<string, unknown> };
+      weight_kg: number;
+      vehicle_type?: string;
+      express?: boolean;
+    }) =>
+      request<CourierQuoteResponse>("/api/v1/courier/quote", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
   };
 }
 

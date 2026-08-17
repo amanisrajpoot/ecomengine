@@ -25,6 +25,10 @@ class CartItemCreate(BaseModel):
 
     @model_validator(mode="after")
     def require_target(self) -> CartItemCreate:
+        if self.meta.get("line_type") == "COURIER_QUOTE":
+            if "quoted_paise" not in self.meta:
+                raise ValueError("quoted_paise required for courier quote line")
+            return self
         if self.variant_id is None and self.bundle_id is None:
             raise ValueError("variant_id or bundle_id is required")
         if self.variant_id is not None and self.bundle_id is not None:

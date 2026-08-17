@@ -90,6 +90,9 @@ async def _item_name_snapshot(
             raise AppError("BUNDLE_NOT_FOUND", "Bundle not found", status_code=404)
         unit_price = cart_item.unit_price_paise or (bundle.price_paise or 0)
         return bundle.name, unit_price, []
+    meta = cart_item.meta if isinstance(cart_item.meta, dict) else {}
+    if meta.get("line_type") == "COURIER_QUOTE":
+        return "Courier package", cart_item.unit_price_paise or int(meta.get("quoted_paise", 0)), []
     raise AppError("INVALID_CART_ITEM", "Cart item has no variant or bundle", status_code=400)
 
 

@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 14 done**. Implement **Phase 15** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 15 done**. Implement **Phase 16** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -218,13 +218,19 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 15 — Courier
 
+**Status:** implemented (v0.15.0).
+
+- `POST /courier/quote` — base + distance + weight + vehicle + express
+- Courier cart lines (`line_type: COURIER_QUOTE`) without catalog
+- Golden path: quote → pay → `PICKUP_ASSIGNED` → rider POD → settlement
+
 **Read:** order-state-machines COURIER; pricing Courier; fulfillment courier mapping
 
-**Write:** `test_phase15_*.py` + any courier quote helpers in pricing/delivery
+**Write:** (done) `pricing/courier.py`, `pricing/router.py`, `test_phase15_courier.py`, types + api-client
 
 ---
 
-## Phases 16–19 — Experience apps
+## Phase 16 — Experience apps
 
 **Write under only the named app:**
 

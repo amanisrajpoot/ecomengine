@@ -100,6 +100,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Pickup/drop package flow; proves generic engine
 
+**Status:** implemented (API `0.15.0`, `test_phase15_courier.py`).
+
 ## Phases 16–19 — Experience apps
 
 - Customer PWA, Merchant PWA, Rider PWA, Admin (incl. order debugger)
