@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { Product, Variant } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Button, Card, PriceDisplay } from "@commerce/ui";
+import { EmptyState, ProductCard, Skeleton } from "@commerce/ui";
 
 import { getApiClient } from "@/lib/api";
 import { session } from "@/lib/session";
@@ -29,7 +29,7 @@ export default function BusinessCatalogPage() {
     setError(null);
     try {
       if (!session.getAccessToken()) {
-        setError("Sign in to view catalog.");
+        setError("Sign in to view menu.");
         return;
       }
       const api = getApiClient();
@@ -44,7 +44,7 @@ export default function BusinessCatalogPage() {
       );
       setProducts(withVariants);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to load catalog");
+      setError(err instanceof ApiError ? err.message : "Failed to load menu");
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ export default function BusinessCatalogPage() {
     loadCatalog();
   }, [loadCatalog]);
 
-  async function addToCart(variant: Variant) {
+  async function addToCart(variant: Variant, product: Product) {
     setMessage(null);
     setError(null);
     setAddingVariantId(variant.id);
@@ -76,7 +76,7 @@ export default function BusinessCatalogPage() {
       }
 
       await api.addCartItem(cartId, { variant_id: variant.id, quantity: 1 });
-      setMessage(`Added ${variant.name} to cart.`);
+      setMessage(`Added ${product.name} to cart`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not add to cart");
     } finally {
@@ -86,58 +86,44 @@ export default function BusinessCatalogPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <Link href="/businesses" className="text-xs text-emerald-300/70 hover:text-emerald-100">
-          ← Businesses
-        </Link>
-        <h1 className="mt-1 text-2xl font-semibold">{businessName || "Catalog"}</h1>
+      <Link href="/businesses" className="text-sm font-medium text-[var(--brand)]">
+        ← Back
+      </Link>
+      <div className="rounded-2xl bg-white p-4 shadow-sm">
+        <h1 className="text-xl font-bold text-gray-900">{businessName || "Menu"}</h1>
+        <p className="text-sm text-gray-500">Tap ADD to build your cart</p>
       </div>
 
-      {loading ? <p className="text-sm text-emerald-200/60">Loading catalog…</p> : null}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
-      {message ? <p className="text-sm text-emerald-300">{message}</p> : null}
+      {message ? (
+        <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>
+      ) : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
-      <div className="space-y-4">
-        {products.map((product) => (
-          <Card key={product.id} title={product.name}>
-            {product.description ? (
-              <p className="mb-3 text-sm text-emerald-200/70">{product.description}</p>
-            ) : null}
-            {product.variants.length === 0 ? (
-              <p className="text-sm text-emerald-200/50">No variants available.</p>
-            ) : (
-              <ul className="space-y-2">
-                {product.variants.map((variant) => (
-                  <li
-                    key={variant.id}
-                    className="flex items-center justify-between gap-3 rounded-lg bg-emerald-950/50 px-3 py-2"
-                  >
-                    <div>
-                      <p className="font-medium">{variant.name}</p>
-                      <PriceDisplay paise={variant.base_price_paise} />
-                    </div>
-                    <Button
-                      variant="secondary"
-                      disabled={addingVariantId === variant.id}
-                      onClick={() => addToCart(variant)}
-                    >
-                      {addingVariantId === variant.id ? "Adding…" : "Add"}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-        ))}
-      </div>
-
-      {!loading && products.length === 0 && !error ? (
-        <p className="text-sm text-emerald-200/60">No products in this catalog.</p>
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
       ) : null}
 
-      <Link href="/cart">
-        <Button>View cart</Button>
-      </Link>
+      {!loading && products.length === 0 && !error ? (
+        <EmptyState title="Menu is empty" />
+      ) : null}
+
+      <div className="space-y-3">
+        {products.flatMap((product) =>
+          product.variants.map((variant) => (
+            <ProductCard
+              key={variant.id}
+              name={`${product.name} — ${variant.name}`}
+              description={product.description}
+              pricePaise={variant.base_price_paise}
+              adding={addingVariantId === variant.id}
+              onAdd={() => addToCart(variant, product)}
+            />
+          )),
+        )}
+      </div>
     </div>
   );
 }

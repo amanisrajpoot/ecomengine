@@ -8,7 +8,7 @@ export type PriceDisplayProps = {
 
 export function PriceDisplay({ paise, currency = "INR", className = "" }: PriceDisplayProps) {
   return (
-    <span className={`tabular-nums font-medium text-emerald-100 ${className}`}>
+    <span className={`tabular-nums font-medium ${className || "text-emerald-100"}`}>
       {formatPaise(paise, currency)}
     </span>
   );

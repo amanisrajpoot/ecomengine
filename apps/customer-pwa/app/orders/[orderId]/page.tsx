@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { OrderDetail, Payment, PriceBreakdown } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Card, PriceDisplay } from "@commerce/ui";
+import { OrderTimeline, PriceDisplay, Skeleton } from "@commerce/ui";
 
 import { getApiClient } from "@/lib/api";
 
@@ -45,73 +45,62 @@ export default function OrderDetailPage() {
 
   const pricing = order ? pricingFromSnapshot(order.pricing_snapshot) : null;
 
+  const timelineSteps = useMemo(() => {
+    if (!order?.status_events?.length) return [];
+    const events = order.status_events;
+    return events.map((event, index) => ({
+      id: event.id,
+      label: event.to_status.replace(/_/g, " "),
+      time: new Date(event.created_at).toLocaleString(),
+      done: index < events.length - 1 || order.status === "DELIVERED",
+      active: index === events.length - 1,
+    }));
+  }, [order]);
+
   return (
     <div className="space-y-4">
-      <div>
-        <Link href="/orders" className="text-xs text-emerald-300/70 hover:text-emerald-100">
-          ← Orders
-        </Link>
-        <h1 className="mt-1 text-2xl font-semibold">Order</h1>
-      </div>
+      <Link href="/orders" className="text-sm font-medium text-[var(--brand)]">← Orders</Link>
 
-      {loading ? <p className="text-sm text-emerald-200/60">Loading…</p> : null}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+      {loading ? <Skeleton className="h-32" /> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       {order ? (
         <>
-          <Card title="Status">
-            <p className="text-lg font-medium">{order.status}</p>
-            <p className="mt-1 text-xs text-emerald-200/60 font-mono">{order.id}</p>
-            <p className="text-sm text-emerald-200/70 mt-2">
-              Profile: {order.state_machine_profile} · {order.fulfillment_type}
-            </p>
-          </Card>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Live status</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{order.status.replace(/_/g, " ")}</p>
+            {pricing ? (
+              <p className="mt-2 text-lg">
+                <PriceDisplay paise={pricing.total_paise} className="!text-[var(--brand)] font-bold" />
+              </p>
+            ) : null}
+          </div>
 
-          {pricing ? (
-            <Card title="Total">
-              <PriceDisplay paise={pricing.total_paise} className="text-lg" />
-            </Card>
+          {timelineSteps.length > 0 ? (
+            <div className="rounded-2xl bg-white p-4 shadow-sm">
+              <h2 className="mb-4 text-sm font-semibold text-gray-900">Tracking</h2>
+              <OrderTimeline steps={timelineSteps} />
+            </div>
           ) : null}
 
           {order.items && order.items.length > 0 ? (
-            <Card title="Items">
+            <div className="rounded-2xl bg-white p-4 shadow-sm">
+              <h2 className="mb-3 text-sm font-semibold text-gray-900">Items</h2>
               <ul className="space-y-2 text-sm">
                 {order.items.map((item) => (
-                  <li key={item.id} className="flex justify-between gap-2">
-                    <span>
-                      {item.name_snapshot} × {item.quantity}
-                    </span>
+                  <li key={item.id} className="flex justify-between gap-2 text-gray-700">
+                    <span>{item.name_snapshot} × {item.quantity}</span>
                     <PriceDisplay paise={item.unit_price_paise * item.quantity} />
                   </li>
                 ))}
               </ul>
-            </Card>
+            </div>
           ) : null}
 
           {payments.length > 0 ? (
-            <Card title="Payments">
-              <ul className="space-y-2 text-sm">
-                {payments.map((payment) => (
-                  <li key={payment.id} className="flex justify-between gap-2">
-                    <span>{payment.provider} — {payment.status}</span>
-                    <PriceDisplay paise={payment.amount_paise} />
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          ) : null}
-
-          {order.status_events && order.status_events.length > 0 ? (
-            <Card title="Timeline">
-              <ul className="space-y-1 text-sm text-emerald-200/80">
-                {order.status_events.map((event) => (
-                  <li key={event.id}>
-                    {event.to_status}{" "}
-                    <span className="text-emerald-400/60">{event.created_at}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+            <div className="rounded-2xl bg-white p-4 shadow-sm text-sm text-gray-600">
+              Payment: {payments[0].provider} · {payments[0].status}
+            </div>
           ) : null}
         </>
       ) : null}
