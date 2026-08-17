@@ -9,6 +9,7 @@ import type {
   CartWithPricing,
   Category,
   InventoryItem,
+  LedgerPostingGroup,
   Product,
   ProductAddonLink,
   Refund,
@@ -694,6 +695,12 @@ export function createApiClient(options: ApiClientOptions = {}) {
         method: "POST",
         body: JSON.stringify(body ?? {}),
       }),
+
+    listOrderLedgerEntries: (orderId: string) =>
+      request<LedgerPostingGroup[]>(`/api/v1/orders/${orderId}/ledger-entries`),
+
+    getLedgerEventGroup: (eventGroupId: string) =>
+      request<LedgerPostingGroup>(`/api/v1/ledger/event-groups/${eventGroupId}`),
   };
 }
 

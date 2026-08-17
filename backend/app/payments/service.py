@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.errors import AppError
 from app.orders.schemas import OrderTransition
 from app.orders.service import get_order, transition_order
+from app.ledger import service as ledger_service
 from app.payments.gateway import PaymentStatus, get_gateway
 from app.payments.models import Payment, Refund
 from app.payments.schemas import PaymentCreate, RefundCreate
@@ -31,6 +32,7 @@ async def _confirm_order_payment(
     *,
     tenant_id: uuid.UUID,
     order_id: uuid.UUID,
+    payment: Payment,
     actor_user_id: uuid.UUID | None,
 ) -> None:
     order = await get_order(db, tenant_id=tenant_id, order_id=order_id)
@@ -42,6 +44,14 @@ async def _confirm_order_payment(
             payload=OrderTransition(to_status="PAYMENT_CONFIRMED", reason="payment captured"),
             actor_user_id=actor_user_id,
         )
+    await ledger_service.post_payment_captured(
+        db,
+        tenant_id=tenant_id,
+        order_id=order_id,
+        payment_id=payment.id,
+        pricing_snapshot=order.pricing_snapshot,
+        currency=order.currency,
+    )
 
 
 async def create_payment_for_order(
@@ -112,7 +122,11 @@ async def create_payment_for_order(
         payment.status = captured_status.value
         await db.flush()
         await _confirm_order_payment(
-            db, tenant_id=tenant_id, order_id=order_id, actor_user_id=customer_id
+            db,
+            tenant_id=tenant_id,
+            order_id=order_id,
+            payment=payment,
+            actor_user_id=customer_id,
         )
 
     await db.commit()
@@ -148,6 +162,7 @@ async def capture_payment(
         db,
         tenant_id=tenant_id,
         order_id=payment.order_id,
+        payment=payment,
         actor_user_id=actor_user_id,
     )
     await db.commit()
@@ -189,6 +204,8 @@ async def create_refund(
             status_code=400,
         )
 
+    order = await get_order(db, tenant_id=tenant_id, order_id=payment.order_id)
+
     amount = payload.amount_paise if payload.amount_paise is not None else payment.amount_paise
     if amount <= 0 or amount > payment.amount_paise:
         raise AppError("INVALID_REFUND_AMOUNT", "Invalid refund amount", status_code=400)
@@ -220,6 +237,19 @@ async def create_refund(
     db.add(refund)
     if existing_refunded + amount >= payment.amount_paise:
         payment.status = PaymentStatus.REFUNDED.value
+
+    await db.flush()
+    await ledger_service.post_refund_completed(
+        db,
+        tenant_id=tenant_id,
+        order_id=payment.order_id,
+        refund_id=refund.id,
+        payment_id=payment.id,
+        refund_amount_paise=amount,
+        payment_amount_paise=payment.amount_paise,
+        pricing_snapshot=order.pricing_snapshot,
+        currency=order.currency,
+    )
 
     await db.commit()
     await db.refresh(refund)

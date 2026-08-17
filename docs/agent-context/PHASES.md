@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 8 done**. Implement **Phase 9** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 9 done**. Implement **Phase 10** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -131,9 +131,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 9 — Ledger
 
+**Status:** implemented (v0.9.0).
+
+- Immutable `ledger_entries` with `event_group_id`, balanced postings
+- Post on `PAYMENT_CAPTURED` (payment capture hook)
+- Refund reversal postings on `REFUND_COMPLETED`
+- Alembic `phase9_ledger`
+
 **Read:** `docs/settlement-engine.md` § LedgerEntry (~41–60); SCHEMA ledger (~394–410)
 
-**Write:** `backend/app/ledger/*`; `test_phase9_*.py`
+**Write:** (done) `ledger/*`, `test_phase9_ledger.py`, types + api-client
 
 ---
 

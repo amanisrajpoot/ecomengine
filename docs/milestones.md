@@ -64,6 +64,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Financial events → immutable ledger entries
 
+**Status:** implemented (API `0.9.0`, alembic `phase9_ledger`).
+
 ## Phase 10 — Settlements
 
 - Merchant / rider / platform lifecycle

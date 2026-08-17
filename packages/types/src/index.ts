@@ -376,3 +376,24 @@ export interface Refund {
   created_at: string;
   updated_at: string;
 }
+
+export interface LedgerEntry {
+  id: string;
+  tenant_id: TenantId;
+  order_id: string | null;
+  event_group_id: string;
+  event_type: string;
+  account: string;
+  direction: string;
+  amount_paise: number;
+  currency: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface LedgerPostingGroup {
+  event_group_id: string;
+  event_type: string;
+  order_id: string | null;
+  entries: LedgerEntry[];
+}

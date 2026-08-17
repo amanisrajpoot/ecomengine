@@ -6,18 +6,18 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 8 — payments |
-| API version | `0.8.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-8-payments-dfc8` |
+| Checkout | Phase 9 — ledger |
+| API version | `0.9.0` (`backend/app/core/config.py`) |
+| Base branch for new work | `cursor/phase-9-ledger-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| API | payments COD + Razorpay stub, refunds, order confirm hook |
-| Tests | through `test_phase8_payments.py` (4) — **34 total** |
+| API | immutable ledger on payment capture + refund reversal |
+| Tests | through `test_phase9_ledger.py` (3) — **37 total** |
 
 ## Next recommended task
 
-**Phase 9 — Ledger.**
+**Phase 10 — Settlements.**
 
-Open [PHASES.md](./PHASES.md) Phase 9 section only — do not scan repo.
+Open [PHASES.md](./PHASES.md) Phase 10 section only — do not scan repo.
 
 ## Commands
 
@@ -31,10 +31,10 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 8: PaymentGateway, COD auto-capture, Razorpay stub, refunds, idempotency
+- Phase 9: Ledger entries on PAYMENT_CAPTURED / REFUND_COMPLETED, balanced postings
 
 ## Known constraints
 
-- Ledger entries in Phase 9
+- Settlements aggregate ledger in Phase 10
 - Money: integer paise only
 - ONDC adapter only in Phase 20
