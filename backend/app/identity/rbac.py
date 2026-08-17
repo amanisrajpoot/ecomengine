@@ -73,6 +73,15 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.BUSINESS_OWNER,
         Role.BUSINESS_MANAGER,
     },
+    "cart.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.CUSTOMER,
+    },
+    "cart.manage": {
+        Role.SUPER_ADMIN,
+        Role.CUSTOMER,
+    },
 }
 
 

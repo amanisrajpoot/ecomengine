@@ -40,6 +40,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Cart aggregate + pricing pipeline + breakdown snapshots
 
+**Status:** implemented (API `0.5.0`, alembic `phase5_cart`).
+
 ## Phase 6 — Tax
 
 - Independent GST engine (customer vs platform vs settlement kinds)

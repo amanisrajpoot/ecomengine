@@ -1,6 +1,6 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 4**. `[empty]` = package `__init__.py` only.
+Status: **Phase 5**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
@@ -21,7 +21,8 @@ Status: **Phase 4**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_phase2_business_location.py` | Businesses + locations |
 | `backend/tests/test_phase3_catalog.py` | Catalog CRUD |
 | `backend/tests/test_phase4_inventory.py` | Inventory + movements |
-| `backend/alembic/` | Migrations through `phase4_inventory` |
+| `backend/tests/test_phase5_cart_pricing.py` | Cart + pricing |
+| `backend/alembic/` | Migrations through `phase5_cart` |
 
 ## Backend modules — expected files (do not Glob)
 
@@ -35,8 +36,8 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | `locations` | models, schemas, service, router | domain-model Location | business_locations ~126 | nested under businesses |
 | `catalog` | models, schemas, service, router | domain-model Catalog | catalog ~144 | `main.py` |
 | `inventory` | models, schemas, service, router | domain-model Inventory | inventory ~225 | `main.py` |
-| `cart` | empty | domain-model Cart | carts ~264 | `main.py` |
-| `pricing` | empty | pricing-engine.md | — | called from cart/orders, maybe no public router |
+| `cart` | models, schemas, service, router | domain-model Cart | carts ~264 | `main.py` |
+| `pricing` | schemas, service | pricing-engine.md | — | called from cart |
 | `taxation` | empty | tax-engine.md | tax ~371 | admin rules + calculate |
 | `orders` | empty | order-state-machines.md | orders ~290 | `main.py` |
 | `payments` | empty | domain-model Payments | payments ~336 | `main.py` |

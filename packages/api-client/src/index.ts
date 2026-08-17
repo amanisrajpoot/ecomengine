@@ -5,6 +5,8 @@ import type {
   Bundle,
   Business,
   BusinessLocation,
+  Cart,
+  CartWithPricing,
   Category,
   InventoryItem,
   Product,
@@ -525,6 +527,57 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     listLowStock: (businessId: string) =>
       request<InventoryItem[]>(`/api/v1/businesses/${businessId}/inventory/low-stock`),
+
+    createCart: (body: {
+      business_id: string;
+      location_id?: string;
+      currency?: string;
+    }) =>
+      request<Cart>("/api/v1/carts", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    getCart: (cartId: string) => request<Cart>(`/api/v1/carts/${cartId}`),
+
+    addCartItem: (
+      cartId: string,
+      body: {
+        variant_id?: string;
+        bundle_id?: string;
+        quantity?: number;
+        addons?: { addon_id: string; quantity?: number }[];
+        meta?: Record<string, unknown>;
+      },
+    ) =>
+      request<Cart>(`/api/v1/carts/${cartId}/items`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    updateCartItem: (
+      cartId: string,
+      itemId: string,
+      body: {
+        quantity?: number;
+        addons?: { addon_id: string; quantity?: number }[];
+        meta?: Record<string, unknown>;
+      },
+    ) =>
+      request<Cart>(`/api/v1/carts/${cartId}/items/${itemId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    removeCartItem: (cartId: string, itemId: string) =>
+      request<Cart>(`/api/v1/carts/${cartId}/items/${itemId}`, {
+        method: "DELETE",
+      }),
+
+    priceCart: (cartId: string) =>
+      request<CartWithPricing>(`/api/v1/carts/${cartId}/price`, {
+        method: "POST",
+      }),
   };
 }
 
