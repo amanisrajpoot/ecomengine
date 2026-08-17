@@ -259,4 +259,18 @@ Plus `packages/ui`, `packages/api-client`, `packages/types` as ROUTES.md says.
 
 ---
 
+## Phase 25 — E2E golden tests in CI
+
+**Status:** implemented.
+
+- GitHub Actions `.github/workflows/ci.yml` — full pytest, `-m golden` job, `pnpm typecheck`
+- `@pytest.mark.golden` on Food, Hyperlocal, Courier vertical golden paths
+- `scripts/ci.sh` and `pnpm ci` for local parity
+
+**Read:** `docs/milestones.md` Acceptance tests (golden)
+
+**Write:** (done) CI workflow, pytest marker, root scripts
+
+---
+
 When a phase ships: set [STATE.md](./STATE.md) to the next phase; mark MAP modules non-empty; do not copy this file into chat.

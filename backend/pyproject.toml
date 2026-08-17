@@ -9,3 +9,6 @@ select = ["E", "F", "I", "UP"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
+markers = [
+    "golden: vertical golden-path E2E integration tests (Food, Hyperlocal, Courier)",
+]

@@ -91,6 +91,8 @@ New screens go next to those `app/` trees. Register the route in this table when
 | Path | Role |
 |------|------|
 | `docker-compose.yml` | API, Postgres, Redis, MinIO |
+| `.github/workflows/ci.yml` | CI: backend pytest, golden E2E job, frontend typecheck |
+| `scripts/ci.sh` | Local CI script (`pnpm ci`) |
 | `.env.example` | Local env |
 | `package.json` | pnpm scripts: `typecheck`, `dev:*` |
 | `pnpm-workspace.yaml` | workspaces |
