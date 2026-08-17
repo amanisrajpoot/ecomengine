@@ -142,6 +142,7 @@ async def _transition_order(
     assert resp.json()["status"] == to_status
 
 
+@pytest.mark.golden
 @pytest.mark.asyncio
 async def test_food_golden_path_to_settlement(client: AsyncClient) -> None:
     """Food: catalog+addons → cart → pay → kitchen → rider → ledger → settlement."""

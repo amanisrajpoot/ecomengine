@@ -135,6 +135,7 @@ async def _transition(client: AsyncClient, headers: dict[str, str], order_id: st
     assert resp.status_code == 200, resp.text
 
 
+@pytest.mark.golden
 @pytest.mark.asyncio
 async def test_hyperlocal_reserve_on_pay_consume_on_deliver(client: AsyncClient) -> None:
     headers = await _tenant_and_customer(client, "p14-golden")

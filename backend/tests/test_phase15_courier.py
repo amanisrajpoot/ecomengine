@@ -124,6 +124,7 @@ async def test_courier_quote_formula(client: AsyncClient) -> None:
     )
 
 
+@pytest.mark.golden
 @pytest.mark.asyncio
 async def test_courier_golden_path_to_settlement(client: AsyncClient) -> None:
     headers = await _tenant_and_customer(client, "p15-golden")

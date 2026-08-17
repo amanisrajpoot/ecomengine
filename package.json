@@ -8,7 +8,10 @@
     "dev:rider": "pnpm --filter @commerce/rider-pwa dev",
     "dev:admin": "pnpm --filter @commerce/admin-web dev",
     "build": "pnpm -r run build",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "test:backend": "cd backend && PYTHONPATH=. python3 -m pytest -q",
+    "test:golden": "cd backend && PYTHONPATH=. python3 -m pytest -q -m golden",
+    "ci": "bash scripts/ci.sh"
   },
   "engines": {
     "node": ">=20"
