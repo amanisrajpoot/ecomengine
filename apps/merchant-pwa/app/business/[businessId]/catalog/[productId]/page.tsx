@@ -67,47 +67,53 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Link
         href={`/business/${businessId}/catalog`}
-        className="text-xs text-amber-300/70 hover:text-amber-100"
+        className="text-sm font-medium text-[var(--brand)]"
       >
-        ← Catalog
+        ← Back to menu
       </Link>
-      <h1 className="text-2xl font-semibold">{product?.name ?? "Product"}</h1>
-      {product?.description ? (
-        <p className="text-sm text-amber-200/70">{product.description}</p>
-      ) : null}
-      {loading ? <p className="text-sm text-amber-200/60">Loading…</p> : null}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
 
-      <Card title="Variants">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">{product?.name ?? "Item"}</h1>
+        {product?.description ? (
+          <p className="mt-1 text-sm text-gray-500">{product.description}</p>
+        ) : null}
+      </div>
+
+      {loading ? <p className="text-sm text-gray-500">Loading…</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+
+      <Card variant="light" title="Variants">
         {variants.length === 0 ? (
-          <p className="text-sm text-amber-200/60">No variants yet.</p>
+          <p className="text-sm text-gray-500">No variants yet — add a size or price option below.</p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="divide-y divide-gray-100">
             {variants.map((variant) => (
               <li
                 key={variant.id}
-                className="flex justify-between gap-3 rounded-lg bg-emerald-950/40 px-3 py-2 text-sm"
+                className="flex justify-between gap-3 py-3 text-sm first:pt-0 last:pb-0"
               >
-                <span>{variant.name}</span>
-                <PriceDisplay paise={variant.base_price_paise} />
+                <span className="font-medium text-gray-900">{variant.name}</span>
+                <PriceDisplay paise={variant.base_price_paise} className="text-gray-900" />
               </li>
             ))}
           </ul>
         )}
       </Card>
 
-      <Card title="Add variant">
+      <Card variant="light" title="Add variant">
         <form className="space-y-3" onSubmit={addVariant}>
           <Input
+            variant="light"
             label="Variant name"
             value={variantName}
             onChange={(e) => setVariantName(e.target.value)}
             required
           />
           <Input
+            variant="light"
             label="Price (₹)"
             type="number"
             min="0.01"
@@ -116,7 +122,7 @@ export default function ProductDetailPage() {
             onChange={(e) => setPriceRupees(e.target.value)}
             required
           />
-          <Button type="submit" disabled={adding || !variantName.trim()}>
+          <Button type="submit" variant="brand" disabled={adding || !variantName.trim()}>
             {adding ? "Adding…" : "Add variant"}
           </Button>
         </form>

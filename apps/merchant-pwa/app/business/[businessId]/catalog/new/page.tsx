@@ -37,28 +37,35 @@ export default function NewProductPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Link
         href={`/business/${businessId}/catalog`}
-        className="text-xs text-amber-300/70 hover:text-amber-100"
+        className="text-sm font-medium text-[var(--brand)]"
       >
-        ← Catalog
+        ← Back to menu
       </Link>
-      <h1 className="text-2xl font-semibold">New product</h1>
-      <Card>
+      <h1 className="text-2xl font-bold text-gray-900">New menu item</h1>
+      <Card variant="light">
         <form className="space-y-3" onSubmit={onSubmit}>
-          <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
           <Input
+            variant="light"
+            label="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <Input
+            variant="light"
             label="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-          <Button type="submit" disabled={loading || !name.trim()}>
-            {loading ? "Creating…" : "Create product"}
+          <Button type="submit" variant="brand" disabled={loading || !name.trim()}>
+            {loading ? "Creating…" : "Create item"}
           </Button>
         </form>
       </Card>
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </div>
   );
 }

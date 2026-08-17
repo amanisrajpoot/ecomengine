@@ -11,4 +11,6 @@ export { PriceDisplay } from "./PriceDisplay";
 export { ProductCard } from "./ProductCard";
 export { SearchBar } from "./SearchBar";
 export { Skeleton } from "./Skeleton";
+export { StatTile } from "./StatTile";
+export { StatusBadge } from "./StatusBadge";
 export { formatPaise } from "./format";

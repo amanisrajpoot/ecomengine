@@ -4,34 +4,31 @@ import { Button } from "@commerce/ui";
 
 export default function HomePage() {
   return (
-    <div className="space-y-8 py-4">
-      <div className="space-y-3">
-        <p className="text-sm uppercase tracking-[0.2em] text-amber-300/80">Commerce Engine</p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Merchant</h1>
-        <p className="max-w-xl text-lg text-amber-50/75">
-          Manage stores, fulfill orders, and update catalog — wired to{" "}
-          <code className="text-amber-200">@commerce/api-client</code>.
+    <div className="space-y-6">
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-widest text-orange-600">Commerce Engine</p>
+        <h1 className="mt-2 text-2xl font-bold text-gray-900">Partner hub</h1>
+        <p className="mt-2 text-sm text-gray-500">
+          Accept orders, run your kitchen display, and manage menu items — wired to your tenant API.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link href="/businesses">
+            <Button variant="brand">My stores</Button>
+          </Link>
+          <Link href="/login">
+            <Button variant="secondary" className="border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200">
+              Sign in
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Link href="/businesses">
-          <Button>My stores</Button>
-        </Link>
-        <Link href="/login">
-          <Button variant="secondary">Sign in</Button>
-        </Link>
-        <Link href="/settings">
-          <Button variant="ghost">Settings</Button>
-        </Link>
-      </div>
-
-      <div className="rounded-xl border border-amber-800/30 bg-amber-950/30 p-4 text-sm text-amber-200/80">
-        <p className="font-medium text-amber-100">Merchant workflow</p>
-        <ol className="mt-2 list-inside list-decimal space-y-1">
-          <li>Set tenant ID and sign in (or register).</li>
-          <li>Create a store or open an existing one.</li>
-          <li>Accept and progress orders; add products and variants.</li>
+      <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-5 text-sm text-gray-600">
+        <p className="font-semibold text-gray-900">Quick start</p>
+        <ol className="mt-3 list-inside list-decimal space-y-2">
+          <li>Set tenant ID in Settings and sign in.</li>
+          <li>Open a store or create a new one.</li>
+          <li>Use the Orders tab to accept and progress live orders.</li>
         </ol>
       </div>
     </div>

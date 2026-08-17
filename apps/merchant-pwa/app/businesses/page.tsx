@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import type { Business, BusinessType } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Button, Card, Input } from "@commerce/ui";
+import { Badge, Button, Card, EmptyState, Input, Skeleton } from "@commerce/ui";
 
 import { getApiClient } from "@/lib/api";
 import { session } from "@/lib/session";
@@ -21,6 +21,7 @@ export default function BusinessesPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -57,49 +58,86 @@ export default function BusinessesPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">My stores</h1>
-      {loading ? <p className="text-sm text-amber-200/60">Loading…</p> : null}
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">My stores</h1>
+        <p className="text-sm text-gray-500">Select a store to manage orders and menu.</p>
+      </div>
+
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+        </div>
+      ) : null}
+
       {error ? (
-        <p className="text-sm text-red-300">
+        <p className="text-sm text-red-600">
           {error}{" "}
-          <Link href="/login" className="underline">Sign in</Link>
+          <Link href="/login" className="font-medium underline">Sign in</Link>
         </p>
       ) : null}
 
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {businesses.map((b) => (
           <li key={b.id}>
-            <Link href={`/business/${b.id}`} onClick={() => session.setActiveBusinessId(b.id)}>
-              <Card className="transition-colors hover:border-emerald-500/50">
-                <p className="font-medium">{b.name}</p>
-                <p className="text-xs uppercase text-amber-300/70">{b.type} · {b.status}</p>
-              </Card>
+            <Link
+              href={`/business/${b.id}`}
+              onClick={() => session.setActiveBusinessId(b.id)}
+              className="block rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-gray-900">{b.name}</p>
+                  <p className="mt-1 text-xs text-gray-500">{b.type}</p>
+                </div>
+                <Badge variant={b.status === "ACTIVE" ? "accent" : "muted"}>{b.status}</Badge>
+              </div>
             </Link>
           </li>
         ))}
       </ul>
 
-      <Card title="Create store">
-        <form className="space-y-3" onSubmit={createStore}>
-          <Input label="Store name" value={name} onChange={(e) => setName(e.target.value)} required />
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="text-emerald-200/80">Type</span>
-            <select
-              className="rounded-lg border border-emerald-700/40 bg-emerald-950/60 px-3 py-2"
-              value={type}
-              onChange={(e) => setType(e.target.value as BusinessType)}
-            >
-              {BUSINESS_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-          </label>
-          <Button type="submit" disabled={creating || !name.trim()}>
-            {creating ? "Creating…" : "Create store"}
-          </Button>
-        </form>
-      </Card>
+      {!loading && businesses.length === 0 && !error ? (
+        <EmptyState
+          title="No stores yet"
+          description="Create your first store to start accepting orders."
+          action={
+            <Button variant="brand" onClick={() => setShowCreate(true)}>
+              Create store
+            </Button>
+          }
+        />
+      ) : null}
+
+      {showCreate || businesses.length > 0 ? (
+        <Card variant="light" title={businesses.length ? "Add store" : "Create store"}>
+          <form className="space-y-3" onSubmit={createStore}>
+            <Input
+              variant="light"
+              label="Store name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-gray-600">Type</span>
+              <select
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500/40"
+                value={type}
+                onChange={(e) => setType(e.target.value as BusinessType)}
+              >
+                {BUSINESS_TYPES.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </label>
+            <Button type="submit" variant="brand" disabled={creating || !name.trim()}>
+              {creating ? "Creating…" : "Create store"}
+            </Button>
+          </form>
+        </Card>
+      ) : null}
     </div>
   );
 }
