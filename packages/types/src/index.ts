@@ -1,16 +1,42 @@
-/** Shared domain primitives (Phase 0 placeholders). */
+/** Shared domain primitives. */
 
 export type TenantId = string;
 export type UserId = string;
-export type BusinessId = string;
-export type OrderId = string;
 
-/** Money in integer paise (INR). Never use floating point for currency. */
-export type MoneyPaise = number;
-
-export interface Money {
-  amountPaise: MoneyPaise;
-  currency: "INR";
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+  user_id: UserId;
+  tenant_id: TenantId | null;
 }
 
-export type BusinessType = "FOOD" | "RETAIL" | "GROCERY" | "COURIER";
+export interface RoleBinding {
+  id: string;
+  user_id: UserId;
+  role: string;
+  tenant_id: TenantId | null;
+  business_id: string | null;
+  created_at: string;
+}
+
+export interface User {
+  id: UserId;
+  tenant_id: TenantId | null;
+  email: string | null;
+  phone: string | null;
+  status: string;
+  display_name: string | null;
+  created_at: string;
+  updated_at: string;
+  roles: RoleBinding[];
+}
+
+export interface Tenant {
+  id: TenantId;
+  name: string;
+  slug: string;
+  status: string;
+  config: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}

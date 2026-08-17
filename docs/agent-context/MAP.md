@@ -1,20 +1,24 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 0**. `[empty]` = package `__init__.py` only. When you add `models.py` / `router.py`, tick this table in the same PR.
+Status: **Phase 1**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
 | Path | Role |
 |------|------|
-| `backend/app/main.py` | FastAPI app; `/health`, `/api/v1/meta` — **include new routers here** |
+| `backend/app/main.py` | FastAPI app; routers under `/api/v1`; lifespan bootstrap |
 | `backend/app/core/config.py` | Settings + `app_version` |
-| `backend/app/core/db.py` | Engine / session |
+| `backend/app/core/db.py` | Engine / session / `Base` |
+| `backend/app/core/base.py` | ORM mixins |
+| `backend/app/core/errors.py` | `AppError` |
+| `backend/app/core/security.py` | JWT + passwords + OTP |
+| `backend/app/core/deps.py` | Auth, tenant header, RBAC |
 | `backend/app/core/redis.py` | Redis |
-| `backend/app/core/events.py` | In-process event bus |
-| `backend/tests/test_health.py` | Health test |
-| `backend/requirements.txt` | Python deps |
-| `backend/Dockerfile` | API image |
-| `backend/alembic/` | **Create at Phase 1** with first migration |
+| `backend/app/core/events.py` | Event bus |
+| `backend/tests/conftest.py` | Async client + SQLite test DB |
+| `backend/tests/test_health.py` | Health/meta smoke |
+| `backend/tests/test_phase1_foundation.py` | Auth + tenants |
+| `backend/alembic/` | Migrations (`versions/phase1_foundation.py`) |
 
 ## Backend modules — expected files (do not Glob)
 
@@ -22,8 +26,8 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 
 | Module | Now | Spec | Schema offset (see SCHEMA.md) | Include router in |
 |--------|-----|------|-------------------------------|-------------------|
-| `identity` | empty | permissions.md | identity ~39 | `main.py` |
-| `tenants` | empty | api-conventions Tenancy | tenancy ~15 | `main.py` |
+| `identity` | models, schemas, service, router, rbac | permissions.md | identity ~39 | `main.py` |
+| `tenants` | models, schemas, service, router (+ platform_router) | api-conventions Tenancy | tenancy ~15 | `main.py` |
 | `businesses` | empty | domain-model Business | businesses ~106 | `main.py` |
 | `locations` | empty | domain-model Location | business_locations ~126 | usually mounted under businesses |
 | `catalog` | empty | domain-model Catalog | catalog ~144 | `main.py` |
@@ -49,7 +53,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | Path | Role | Touch when |
 |------|------|------------|
 | `packages/types/src/index.ts` | Shared TS types | Any new API resource |
-| `packages/api-client/src/index.ts` | `createApiClient` — only `getHealth`/`getMeta` now | Any new HTTP method |
+| `packages/api-client/src/index.ts` | login, register, OTP, me, tenants | Auth + tenant admin |
 | `packages/ui/src/index.ts` | UI barrel | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
 

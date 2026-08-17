@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 0 done**. Implement **Phase 1** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 1 done**. Implement **Phase 2** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -10,11 +10,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 1 — Platform foundation
 
-**Read:** `docs/permissions.md`; `docs/api-conventions.md`; [SCHEMA.md](./SCHEMA.md) tenancy + identity; `docs/milestones.md` Phase 1 heading only (lines ~10–15); `backend/app/main.py`; `backend/app/core/*`
+**Status:** implemented (v0.1.0).
 
-**Write:** `backend/app/identity/{models,schemas,service,router,rbac}.py`; `backend/app/tenants/{models,schemas,service,router}.py`; `backend/app/core/deps.py` (auth/tenant deps); `backend/alembic/` first migration; `backend/tests/test_phase1_*.py`; `packages/types` User/Tenant; `packages/api-client` login/register/me
+- Auth: OTP, email/password, JWT, bootstrap super admin
+- Identity + RBAC (`user_role_bindings`)
+- Tenants + `platform_config`
+- Alembic `phase1_foundation` migration
 
-**Do not open:** catalog, orders, payments, any PWA beyond types/client if unused.
+**Read:** `docs/permissions.md`; `docs/api-conventions.md`; SCHEMA tenancy + identity
+
+**Write:** (done) `identity/*`, `tenants/*`, `core/deps.py`, `tests/test_phase1_foundation.py`
 
 ---
 
