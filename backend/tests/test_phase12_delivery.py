@@ -237,3 +237,47 @@ async def test_partner_vehicle_registration(client: AsyncClient) -> None:
     listed = await client.get("/api/v1/partners/vehicles", headers=rider)
     assert listed.status_code == 200
     assert len(listed.json()) == 1
+
+
+@pytest.mark.asyncio
+async def test_list_my_deliveries(client: AsyncClient) -> None:
+    headers = await _tenant_and_customer(client, "p12-my-deliveries")
+    tenant_id = headers["X-Tenant-ID"]
+    admin = await _admin_headers(client, tenant_id)
+    rider = await _register_rider(client, tenant_id, "p12-my")
+    await client.post("/api/v1/partners/profiles", headers=rider, json={})
+    await client.patch(
+        "/api/v1/partners/profiles/me",
+        headers=rider,
+        json={"is_online": True, "current_lat": 12.97, "current_lng": 77.59},
+    )
+
+    fulfillment_id, _ = await _checkout_with_fulfillment(client, headers, "my-del")
+    await client.post(
+        f"/api/v1/fulfillments/{fulfillment_id}/deliveries",
+        headers=admin,
+        json={
+            "auto_assign": True,
+            "stops": [
+                {
+                    "sequence": 0,
+                    "stop_type": "PICKUP",
+                    "address": PICKUP,
+                    "lat": 12.97,
+                    "lng": 77.59,
+                },
+                {
+                    "sequence": 1,
+                    "stop_type": "DROP",
+                    "address": DROP,
+                    "lat": 12.98,
+                    "lng": 77.61,
+                },
+            ],
+        },
+    )
+
+    mine = await client.get("/api/v1/deliveries/me", headers=rider)
+    assert mine.status_code == 200, mine.text
+    assert len(mine.json()) == 1
+    assert mine.json()[0]["status"] == "ASSIGNED"

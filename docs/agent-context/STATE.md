@@ -6,25 +6,25 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 16 — customer PWA |
+| Checkout | Phase 18 — rider PWA |
 | API version | `0.15.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-16-customer-pwa-dfc8` |
+| Base branch for new work | `cursor/phase-18-rider-pwa-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| Customer PWA | browse, catalog, cart, checkout, orders, courier quote |
-| Tests | through `test_phase15_courier.py` (2) — **52 total** |
+| Rider PWA | jobs, POD stops, order transitions, partner onboarding |
+| Tests | through `test_phase12_delivery.py` (4) — **53 total** |
 
 ## Next recommended task
 
-**Phase 17 — Merchant PWA** (`apps/merchant-pwa`).
+**Phase 19 — Admin web** (`apps/admin-web`).
 
-Open [PHASES.md](./PHASES.md) Phase 17 section only — do not scan repo.
+Open [PHASES.md](./PHASES.md) Phase 19 section only — do not scan repo.
 
 ## Commands
 
 ```bash
 cd backend && PYTHONPATH=. python3 -m pytest -q
 pnpm typecheck
-pnpm --filter @commerce/customer-pwa dev   # port 3000
+pnpm --filter @commerce/rider-pwa dev   # port 3002
 alembic upgrade head   # Postgres / Docker deploy
 ```
 
@@ -32,10 +32,10 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 16: Customer PWA wired to api-client (auth, catalog, cart, COD checkout, orders, courier)
+- Phase 18: Rider PWA + `GET /deliveries/me` for assigned jobs
 
 ## Known constraints
 
-- Merchant / rider / admin UIs Phases 17–19
+- Admin UI Phase 19
 - Money: integer paise only
 - ONDC adapter only in Phase 20

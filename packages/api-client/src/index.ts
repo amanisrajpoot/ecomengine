@@ -781,6 +781,9 @@ export function createApiClient(options: ApiClientOptions = {}) {
         body: JSON.stringify(body),
       }),
 
+    getMyPartnerProfile: () =>
+      request<DeliveryPartnerProfile>("/api/v1/partners/profiles/me"),
+
     createPartnerProfile: (body?: { documents?: Record<string, unknown> }) =>
       request<DeliveryPartnerProfile>("/api/v1/partners/profiles", {
         method: "POST",
@@ -804,6 +807,8 @@ export function createApiClient(options: ApiClientOptions = {}) {
         body: JSON.stringify(body),
       }),
 
+    listMyVehicles: () => request<Vehicle[]>("/api/v1/partners/vehicles"),
+
     createDelivery: (
       fulfillmentId: string,
       body: {
@@ -825,6 +830,12 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     getFulfillmentDelivery: (fulfillmentId: string) =>
       request<Delivery>(`/api/v1/fulfillments/${fulfillmentId}/delivery`),
+
+    listMyDeliveries: (activeOnly = true) =>
+      request<Delivery[]>(`/api/v1/deliveries/me?active_only=${activeOnly}`),
+
+    getDelivery: (deliveryId: string) =>
+      request<Delivery>(`/api/v1/deliveries/${deliveryId}`),
 
     completeDeliveryStop: (
       deliveryId: string,

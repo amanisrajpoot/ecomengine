@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_db
@@ -75,6 +75,23 @@ async def get_fulfillment_delivery(
         db, tenant_id=tid, fulfillment_id=fulfillment_id
     )
     return _to_read(delivery)
+
+
+@router.get("/deliveries/me", response_model=list[DeliveryRead])
+async def list_my_deliveries(
+    active_only: bool = Query(default=True),
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("delivery.read")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> list[DeliveryRead]:
+    tid = _require_tenant(tenant_id)
+    deliveries = await service.list_my_deliveries(
+        db,
+        tenant_id=tid,
+        user_id=ctx.user.id,
+        active_only=active_only,
+    )
+    return [_to_read(d) for d in deliveries]
 
 
 @router.get("/deliveries/{delivery_id}", response_model=DeliveryRead)

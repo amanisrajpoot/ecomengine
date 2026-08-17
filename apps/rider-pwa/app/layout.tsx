@@ -1,20 +1,25 @@
 import type { Metadata, Viewport } from "next";
+
+import { ClientAppShell } from "@/components/ClientAppShell";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Commerce Engine — Rider PWA",
-  description: "Commerce Engine Rider PWA scaffold",
+  description: "Delivery partner app for Commerce Engine",
   manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f1c14",
+  themeColor: "#0c1520",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ClientAppShell>{children}</ClientAppShell>
+      </body>
     </html>
   );
 }

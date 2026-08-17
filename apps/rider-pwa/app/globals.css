@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0f1c14;
-  --fg: #f3f7f2;
-  --accent: #3d8b5f;
+  --bg: #0c1520;
+  --fg: #f0f6fc;
+  --accent: #3b82f6;
 }
 
 body {
@@ -13,8 +13,8 @@ body {
   min-height: 100vh;
   color: var(--fg);
   background:
-    radial-gradient(1200px 600px at 10% -10%, #1d3a28 0%, transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, #243528 0%, transparent 50%),
+    radial-gradient(1200px 600px at 10% -10%, #1a2d45 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #152238 0%, transparent 50%),
     var(--bg);
   font-family: "Segoe UI", "Helvetica Neue", sans-serif;
 }

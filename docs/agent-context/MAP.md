@@ -79,7 +79,7 @@ Do not search other `app/` folders unless sharing components:
 |-----|--------|-------------------------|--------|
 | `apps/customer-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/cart`, `/checkout`, `/orders`, `/orders/[orderId]`, `/courier` | `package.json`, `next.config.ts`, `lib/api.ts`, `lib/session.ts` |
 | `apps/merchant-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/business/[businessId]/orders`, `/business/[businessId]/orders/[orderId]`, `/business/[businessId]/catalog`, `/business/[businessId]/catalog/new`, `/business/[businessId]/catalog/[productId]` | `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts` |
-| `apps/rider-pwa` | same | same | same |
+| `apps/rider-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/onboarding`, `/jobs`, `/jobs/[deliveryId]` | `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts` |
 | `apps/admin-web` | same | same | same |
 
 New screens go next to those `app/` trees. Register the route in this table when added.
