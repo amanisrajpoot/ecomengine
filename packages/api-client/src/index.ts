@@ -1,6 +1,12 @@
 /** Thin fetch wrapper against the Commerce Engine API. */
 
-import type { Tenant, TokenResponse, User } from "@commerce/types";
+import type {
+  Business,
+  BusinessLocation,
+  Tenant,
+  TokenResponse,
+  User,
+} from "@commerce/types";
 
 export type ApiClientOptions = {
   baseUrl?: string;
@@ -111,6 +117,99 @@ export function createApiClient(options: ApiClientOptions = {}) {
         method: "PATCH",
         body: JSON.stringify(body),
       }),
+
+    listBusinesses: (params?: { status?: string; type?: string }) => {
+      const search = new URLSearchParams();
+      if (params?.status) search.set("status", params.status);
+      if (params?.type) search.set("type", params.type);
+      const qs = search.toString();
+      return request<Business[]>(`/api/v1/businesses${qs ? `?${qs}` : ""}`);
+    },
+
+    createBusiness: (body: {
+      name: string;
+      type?: string;
+      description?: string;
+      logo_url?: string;
+      contact?: Record<string, unknown>;
+      settings?: Record<string, unknown>;
+      capabilities?: Record<string, boolean>;
+      status?: string;
+    }) =>
+      request<Business>("/api/v1/businesses", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    getBusiness: (businessId: string) =>
+      request<Business>(`/api/v1/businesses/${businessId}`),
+
+    updateBusiness: (
+      businessId: string,
+      body: {
+        name?: string;
+        description?: string;
+        logo_url?: string;
+        contact?: Record<string, unknown>;
+        settings?: Record<string, unknown>;
+        capabilities?: Record<string, boolean>;
+        status?: string;
+      },
+    ) =>
+      request<Business>(`/api/v1/businesses/${businessId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      }),
+
+    listLocations: (businessId: string, activeOnly = true) =>
+      request<BusinessLocation[]>(
+        `/api/v1/businesses/${businessId}/locations?active_only=${activeOnly}`,
+      ),
+
+    createLocation: (
+      businessId: string,
+      body: {
+        name: string;
+        address: Record<string, unknown>;
+        lat: number;
+        lng: number;
+        hours?: Record<string, unknown>[];
+        timezone?: string;
+        is_active?: boolean;
+        service_area?: Record<string, unknown>;
+      },
+    ) =>
+      request<BusinessLocation>(`/api/v1/businesses/${businessId}/locations`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    getLocation: (businessId: string, locationId: string) =>
+      request<BusinessLocation>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}`,
+      ),
+
+    updateLocation: (
+      businessId: string,
+      locationId: string,
+      body: {
+        name?: string;
+        address?: Record<string, unknown>;
+        lat?: number;
+        lng?: number;
+        hours?: Record<string, unknown>[];
+        timezone?: string;
+        is_active?: boolean;
+        service_area?: Record<string, unknown>;
+      },
+    ) =>
+      request<BusinessLocation>(
+        `/api/v1/businesses/${businessId}/locations/${locationId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(body),
+        },
+      ),
   };
 }
 

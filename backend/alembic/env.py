@@ -13,6 +13,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.core.config import get_settings
 from app.core.db import Base
 from app.identity.models import OtpChallenge, User, UserRoleBinding  # noqa: F401
+from app.businesses.models import Business  # noqa: F401
+from app.locations.models import BusinessLocation  # noqa: F401
 from app.tenants.models import PlatformConfig, Tenant  # noqa: F401
 
 config = context.config

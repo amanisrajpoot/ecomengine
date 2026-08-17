@@ -13,6 +13,8 @@ from app.core.errors import AppError
 from app.identity import service as identity_service
 from app.identity.router import router as auth_router
 from app.identity.router import users_router
+from app.businesses.router import router as businesses_router
+from app.locations.router import router as locations_router
 from app.tenants.router import platform_router
 from app.tenants.router import router as tenants_router
 
@@ -65,5 +67,5 @@ async def meta() -> dict[str, str]:
     }
 
 
-for r in (auth_router, users_router, tenants_router, platform_router):
+for r in (auth_router, users_router, tenants_router, platform_router, businesses_router, locations_router):
     app.include_router(r, prefix="/api/v1")

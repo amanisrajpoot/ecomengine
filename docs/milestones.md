@@ -22,6 +22,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 - Types as capabilities (`FOOD`, `RETAIL`, `GROCERY`, `COURIER`)
 - Locations, hours, geo
 
+**Status:** implemented (API `0.2.0`, alembic `phase2_business_location`).
+
 ## Phase 3 — Catalog
 
 - Categories, products, variants, addons, bundles, images, availability

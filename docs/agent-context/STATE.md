@@ -6,18 +6,18 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 1 — platform foundation |
-| API version | `0.1.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-1-foundation-dfc8` |
+| Checkout | Phase 2 — business & location |
+| API version | `0.2.0` (`backend/app/core/config.py`) |
+| Base branch for new work | `cursor/phase-2-business-location-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| API | Auth, tenants, RBAC, bootstrap super admin |
-| Tests | `backend/tests/test_health.py`, `test_phase1_foundation.py` (7) |
+| API | Auth, tenants, RBAC, businesses, locations |
+| Tests | `test_health.py`, `test_phase1_foundation.py` (7), `test_phase2_business_location.py` (4) |
 
 ## Next recommended task
 
-**Phase 2 — Business & location.**
+**Phase 3 — Catalog.**
 
-Open [PHASES.md](./PHASES.md) Phase 2 section only — do not scan repo.
+Open [PHASES.md](./PHASES.md) Phase 3 section only — do not scan repo.
 
 ## Commands
 
@@ -31,7 +31,7 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 1: identity, tenants, alembic, JWT auth, OTP, RBAC deps
+- Phase 2: businesses CRUD, capability presets by type, nested locations, alembic `phase2_business_location`
 
 ## Known constraints
 

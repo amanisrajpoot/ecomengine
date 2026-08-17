@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 1 done**. Implement **Phase 2** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 2 done**. Implement **Phase 3** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -25,9 +25,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 2 — Business & location
 
+**Status:** implemented (v0.2.0).
+
+- Business CRUD with type presets (`FOOD`, `GROCERY`, `RETAIL`, `COURIER`)
+- Capability defaults per type; `BUSINESS_OWNER` on create
+- Nested locations with hours, geo, service area
+- Alembic `phase2_business_location`
+
 **Read:** `docs/domain-model.md` § Business & location (~64–92); SCHEMA businesses (~106–142)
 
-**Write:** `backend/app/businesses/*`; `backend/app/locations/*`; tests `test_phase2_*.py`; types `Business`, `BusinessLocation`; client list/create/update
+**Write:** (done) `businesses/*`, `locations/*`, `test_phase2_business_location.py`, types + api-client
 
 ---
 
