@@ -15,6 +15,10 @@ from app.catalog.models import Bundle, Variant
 from app.catalog.service import get_product
 from app.core.errors import AppError
 from app.fulfillment import service as fulfillment_service
+from app.inventory.order_hooks import (
+    consume_inventory_for_order,
+    release_inventory_for_order,
+)
 from app.orders.models import Order, OrderItem, OrderStatusEvent
 from app.orders.schemas import OrderCheckout, OrderTransition
 from app.orders.states import profile_for_business_type, registry
@@ -259,5 +263,13 @@ async def transition_order(
         payload=payload,
         actor_user_id=actor_user_id,
     )
+    if payload.to_status == "DELIVERED":
+        await consume_inventory_for_order(
+            db, order=order, actor_user_id=actor_user_id
+        )
+    elif payload.to_status == "CANCELLED":
+        await release_inventory_for_order(
+            db, order=order, actor_user_id=actor_user_id
+        )
     await db.commit()
     return await _get_order(db, tenant_id=tenant_id, order_id=order.id)

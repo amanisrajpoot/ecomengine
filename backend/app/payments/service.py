@@ -11,6 +11,7 @@ from app.core.errors import AppError
 from app.orders.schemas import OrderTransition
 from app.orders.service import get_order, transition_order
 from app.ledger import service as ledger_service
+from app.inventory.order_hooks import reserve_inventory_for_order
 from app.payments.gateway import PaymentStatus, get_gateway
 from app.payments.models import Payment, Refund
 from app.payments.schemas import PaymentCreate, RefundCreate
@@ -44,6 +45,8 @@ async def _confirm_order_payment(
             payload=OrderTransition(to_status="PAYMENT_CONFIRMED", reason="payment captured"),
             actor_user_id=actor_user_id,
         )
+        order = await get_order(db, tenant_id=tenant_id, order_id=order_id)
+    await reserve_inventory_for_order(db, order=order, actor_user_id=actor_user_id)
     await ledger_service.post_payment_captured(
         db,
         tenant_id=tenant_id,

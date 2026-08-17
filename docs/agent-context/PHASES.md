@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 13 done**. Implement **Phase 14** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 14 done**. Implement **Phase 15** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -204,9 +204,15 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 14 — Hyperlocal
 
+**Status:** implemented (v0.14.0).
+
+- Inventory reserve on `PAYMENT_CONFIRMED` for `HYPERLOCAL_DELIVERY`
+- Consume on `DELIVERED`, release on `CANCELLED`
+- Golden path test with GROCERY inventory
+
 **Read:** order-state-machines HYPERLOCAL; inventory reserve/consume; pricing Hyperlocal
 
-**Write:** `test_phase14_*.py` — inventory capability on GROCERY/RETAIL
+**Write:** (done) `inventory/order_hooks.py`, `test_phase14_hyperlocal.py`
 
 ---
 

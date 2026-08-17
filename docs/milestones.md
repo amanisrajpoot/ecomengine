@@ -94,6 +94,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Inventory + store discovery; minimal new core code
 
+**Status:** implemented (API `0.14.0`, `test_phase14_hyperlocal.py`).
+
 ## Phase 15 — Vertical 3: Courier
 
 - Pickup/drop package flow; proves generic engine

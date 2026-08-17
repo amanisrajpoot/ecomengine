@@ -1,6 +1,6 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 13**. `[empty]` = package `__init__.py` only.
+Status: **Phase 14**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
@@ -30,6 +30,7 @@ Status: **Phase 13**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_phase11_fulfillment.py` | Fulfillment checkout + lifecycle |
 | `backend/tests/test_phase12_delivery.py` | Partners, assign, stops |
 | `backend/tests/test_phase13_food_golden.py` | Food e2e golden path |
+| `backend/tests/test_phase14_hyperlocal.py` | Hyperlocal inventory path |
 | `backend/alembic/` | Migrations through `phase12_delivery` |
 
 ## Backend modules — expected files (do not Glob)
@@ -43,7 +44,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | `businesses` | models, schemas, service, router | domain-model Business | businesses ~106 | `main.py` |
 | `locations` | models, schemas, service, router | domain-model Location | business_locations ~126 | nested under businesses |
 | `catalog` | models, schemas, service, router | domain-model Catalog | catalog ~144 | `main.py` |
-| `inventory` | models, schemas, service, router | domain-model Inventory | inventory ~225 | `main.py` |
+| `inventory` | models, schemas, service, router, order_hooks | domain-model Inventory | inventory ~225 | `main.py` |
 | `cart` | models, schemas, service, router | domain-model Cart | carts ~264 | `main.py` |
 | `pricing` | schemas, service | pricing-engine.md | — | called from cart |
 | `taxation` | models, schemas, service, router | tax-engine.md | tax ~371 | `main.py` |
