@@ -42,28 +42,36 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md space-y-4">
-      <h1 className="text-2xl font-semibold">Rider sign in</h1>
-      <Card>
+    <div className="mx-auto max-w-md space-y-5">
+      <h1 className="text-2xl font-bold text-gray-900">Rider sign in</h1>
+      <Card variant="light">
         <form className="space-y-3" onSubmit={onSubmit}>
-          <Input label="Tenant ID" value={tenantId} onChange={(e) => setTenantId(e.target.value)} required />
-          <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <Input variant="light" label="Tenant ID" value={tenantId} onChange={(e) => setTenantId(e.target.value)} required />
+          <Input variant="light" label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <Input
+            variant="light"
             label="Password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button
+            type="submit"
+            variant="brand"
+            className="w-full bg-[var(--brand)] hover:bg-[var(--brand-dark)]"
+            disabled={loading}
+          >
             {loading ? "Signing in…" : "Sign in"}
           </Button>
         </form>
       </Card>
-      <p className="text-sm text-sky-200/70">
-        <Link href="/register" className="underline">Register</Link>
+      <p className="text-sm text-gray-500">
+        <Link href="/register" className="font-medium text-[var(--brand)] underline">
+          Create account
+        </Link>
       </p>
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </div>
   );
 }

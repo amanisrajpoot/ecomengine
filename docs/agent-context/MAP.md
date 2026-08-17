@@ -80,7 +80,7 @@ Do not search other `app/` folders unless sharing components:
 |-----|--------|-------------------------|--------|
 | `apps/customer-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/CartPeek.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/cart`, `/checkout`, `/orders`, `/orders/[orderId]`, `/courier` | consumer UX: bottom nav, search, cards |
 | `apps/merchant-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/OrderQueueCard.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/business/[businessId]/orders`, `/business/[businessId]/orders/[orderId]`, `/business/[businessId]/catalog`, `/business/[businessId]/catalog/new`, `/business/[businessId]/catalog/[productId]` | partner UX: bottom nav, KDS queue; `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts`, `lib/orderHelpers.ts` |
-| `apps/rider-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/onboarding`, `/jobs`, `/jobs/[deliveryId]` | `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts` |
+| `apps/rider-pwa` | `app/layout.tsx`, `components/AppShell.tsx`, `components/JobCard.tsx` | `/`, `/login`, `/register`, `/settings`, `/onboarding`, `/jobs`, `/jobs/[deliveryId]` | rider UX: bottom nav, job cards; `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts`, `lib/deliveryHelpers.ts` |
 | `apps/admin-web` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/settings`, `/tenants`, `/orders`, `/orders/[orderId]`, `/settlements`, `/users/roles` | `lib/api.ts`, `lib/session.ts` |
 
 New screens go next to those `app/` trees. Register the route in this table when added.

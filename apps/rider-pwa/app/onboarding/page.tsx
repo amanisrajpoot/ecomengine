@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import type { DeliveryPartnerProfile, Vehicle } from "@commerce/types";
 import { ApiError } from "@commerce/api-client";
-import { Button, Card, Input } from "@commerce/ui";
+import { Badge, Button, Card, Input, StatTile } from "@commerce/ui";
 
 import { getApiClient } from "@/lib/api";
 import { session } from "@/lib/session";
@@ -96,6 +96,17 @@ export default function OnboardingPage() {
     }
   }
 
+  async function goOffline() {
+    setError(null);
+    try {
+      const p = await getApiClient().updatePartnerProfile({ is_online: false });
+      setProfile(p);
+      setMessage("You are offline.");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not go offline");
+    }
+  }
+
   async function registerVehicle(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -113,55 +124,96 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Partner profile</h1>
-      {loading ? <p className="text-sm text-sky-200/60">Loading…</p> : null}
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Partner profile</h1>
+        <p className="text-sm text-gray-500">Go online to receive delivery assignments.</p>
+      </div>
+
+      {loading ? <p className="text-sm text-gray-500">Loading…</p> : null}
       {error ? (
-        <p className="text-sm text-red-300">
+        <p className="text-sm text-red-600">
           {error}{" "}
-          <Link href="/login" className="underline">Sign in</Link>
+          <Link href="/login" className="font-medium underline">Sign in</Link>
         </p>
       ) : null}
-      {message ? <p className="text-sm text-emerald-300">{message}</p> : null}
+      {message ? <p className="text-sm text-emerald-600">{message}</p> : null}
+
+      {profile ? (
+        <div className="grid grid-cols-2 gap-3">
+          <StatTile
+            label="Status"
+            value={profile.is_online ? "Online" : "Offline"}
+            accent={profile.is_online}
+            className={profile.is_online ? "border-blue-200 bg-blue-50" : ""}
+          />
+          <StatTile label="Vehicles" value={vehicles.length} />
+        </div>
+      ) : null}
 
       {!profile ? (
-        <Card title="Create profile">
-          <p className="mb-3 text-sm text-sky-200/70">
-            Requires <code>DELIVERY_PARTNER</code> role on your account.
+        <Card variant="light" title="Create profile">
+          <p className="mb-3 text-sm text-gray-500">
+            Requires <code className="text-xs">DELIVERY_PARTNER</code> role on your account.
           </p>
-          <Button onClick={createProfile}>Create partner profile</Button>
+          <Button variant="brand" className="bg-[var(--brand)] hover:bg-[var(--brand-dark)]" onClick={createProfile}>
+            Create partner profile
+          </Button>
         </Card>
       ) : (
-        <Card title="Status">
-          <p className="text-sm">
-            Online: <strong>{profile.is_online ? "Yes" : "No"}</strong> · {profile.status}
+        <Card variant="light" title="Availability">
+          <p className="text-sm text-gray-600">
+            {profile.is_online
+              ? "You are visible to dispatch for new assignments."
+              : "Go online with your current GPS coordinates."}
           </p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <Input label="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
-            <Input label="Longitude" value={lng} onChange={(e) => setLng(e.target.value)} />
+            <Input variant="light" label="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
+            <Input variant="light" label="Longitude" value={lng} onChange={(e) => setLng(e.target.value)} />
           </div>
-          <Button className="mt-3" onClick={goOnline}>Go online</Button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              variant="brand"
+              className="bg-[var(--brand)] hover:bg-[var(--brand-dark)]"
+              onClick={goOnline}
+            >
+              Go online
+            </Button>
+            {profile.is_online ? (
+              <Button
+                variant="secondary"
+                className="border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200"
+                onClick={goOffline}
+              >
+                Go offline
+              </Button>
+            ) : null}
+          </div>
         </Card>
       )}
 
-      <Card title="Vehicles">
+      <Card variant="light" title="Vehicles">
         {vehicles.length === 0 ? (
-          <p className="text-sm text-sky-200/60">No vehicles registered.</p>
+          <p className="text-sm text-gray-500">No vehicles registered yet.</p>
         ) : (
-          <ul className="mb-3 space-y-1 text-sm">
+          <ul className="mb-3 divide-y divide-gray-100">
             {vehicles.map((v) => (
-              <li key={v.id}>
-                {v.vehicle_type}
-                {v.registration ? ` · ${v.registration}` : ""}
+              <li key={v.id} className="flex items-center justify-between py-2 text-sm first:pt-0">
+                <span className="font-medium text-gray-900">{v.vehicle_type}</span>
+                {v.registration ? (
+                  <Badge variant="muted">{v.registration}</Badge>
+                ) : (
+                  <Badge variant="muted">No reg</Badge>
+                )}
               </li>
             ))}
           </ul>
         )}
         <form className="space-y-3" onSubmit={registerVehicle}>
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="text-emerald-200/80">Vehicle type</span>
+            <span className="text-gray-600">Vehicle type</span>
             <select
-              className="rounded-lg border border-emerald-700/40 bg-emerald-950/60 px-3 py-2"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
               value={vehicleType}
               onChange={(e) => setVehicleType(e.target.value)}
             >
@@ -171,11 +223,18 @@ export default function OnboardingPage() {
             </select>
           </label>
           <Input
+            variant="light"
             label="Registration (optional)"
             value={registration}
             onChange={(e) => setRegistration(e.target.value)}
           />
-          <Button type="submit" variant="secondary">Add vehicle</Button>
+          <Button
+            type="submit"
+            variant="secondary"
+            className="border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200"
+          >
+            Add vehicle
+          </Button>
         </form>
       </Card>
     </div>
