@@ -78,7 +78,7 @@ Do not search other `app/` folders unless sharing components:
 | App | Layout | Routes (customer-pwa) | Config |
 |-----|--------|-------------------------|--------|
 | `apps/customer-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/cart`, `/checkout`, `/orders`, `/orders/[orderId]`, `/courier` | `package.json`, `next.config.ts`, `lib/api.ts`, `lib/session.ts` |
-| `apps/merchant-pwa` | `app/layout.tsx` | `app/page.tsx` (shell) | same |
+| `apps/merchant-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/business/[businessId]/orders`, `/business/[businessId]/orders/[orderId]`, `/business/[businessId]/catalog`, `/business/[businessId]/catalog/new`, `/business/[businessId]/catalog/[productId]` | `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts` |
 | `apps/rider-pwa` | same | same | same |
 | `apps/admin-web` | same | same | same |
 

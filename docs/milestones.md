@@ -105,7 +105,7 @@ Dependency order matters more than calendar duration. Implement sequentially.
 ## Phases 16–19 — Experience apps
 
 - **Phase 16:** Customer PWA — browse, cart, checkout, orders, courier quote (`apps/customer-pwa`)
-- Phase 17: Merchant PWA
+- **Phase 17:** Merchant PWA — stores, orders, catalog (`apps/merchant-pwa`)
 - Phase 18: Rider PWA
 - Phase 19: Admin (incl. order debugger)
 

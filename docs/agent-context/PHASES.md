@@ -237,7 +237,7 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 | Phase | App | Start files |
 |-------|-----|-------------|
 | 16 | `apps/customer-pwa` | (done) routes under `app/`, `components/AppShell.tsx`, `lib/api.ts` |
-| 17 | `apps/merchant-pwa` | same pattern |
+| 17 | `apps/merchant-pwa` | (done) store dashboard, orders, catalog, `lib/orderTransitions.ts` |
 | 18 | `apps/rider-pwa` | same pattern |
 | 19 | `apps/admin-web` | same pattern |
 
