@@ -32,6 +32,7 @@ Status: **Phase 15**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_phase13_food_golden.py` | Food e2e golden path |
 | `backend/tests/test_phase14_hyperlocal.py` | Hyperlocal inventory path |
 | `backend/tests/test_phase15_courier.py` | Courier quote + golden path |
+| `backend/tests/test_phase20_ondc.py` | ONDC search → confirm → status |
 | `backend/alembic/` | Migrations through `phase12_delivery` |
 
 ## Backend modules — expected files (do not Glob)
@@ -60,7 +61,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | `notifications` | empty | architecture events | — | later |
 | `support` | empty | — | — | later |
 | `reviews` | empty | — | — | later |
-| `integrations` | empty | architecture adapters | — | Phase 20 `integrations/ondc/` |
+| `integrations` | `ondc/` router, schemas, service, mapper | architecture adapters | — | `main.py` includes `ondc_router` only |
 
 ## Packages (exists)
 
@@ -80,7 +81,7 @@ Do not search other `app/` folders unless sharing components:
 | `apps/customer-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/cart`, `/checkout`, `/orders`, `/orders/[orderId]`, `/courier` | `package.json`, `next.config.ts`, `lib/api.ts`, `lib/session.ts` |
 | `apps/merchant-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/business/[businessId]/orders`, `/business/[businessId]/orders/[orderId]`, `/business/[businessId]/catalog`, `/business/[businessId]/catalog/new`, `/business/[businessId]/catalog/[productId]` | `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts` |
 | `apps/rider-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/onboarding`, `/jobs`, `/jobs/[deliveryId]` | `lib/api.ts`, `lib/session.ts`, `lib/orderTransitions.ts` |
-| `apps/admin-web` | same | same | same |
+| `apps/admin-web` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/settings`, `/tenants`, `/orders`, `/orders/[orderId]`, `/settlements`, `/users/roles` | `lib/api.ts`, `lib/session.ts` |
 
 New screens go next to those `app/` trees. Register the route in this table when added.
 

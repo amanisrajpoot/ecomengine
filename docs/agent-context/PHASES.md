@@ -247,9 +247,15 @@ Plus `packages/ui`, `packages/api-client`, `packages/types` as ROUTES.md says.
 
 ## Phase 20 — ONDC
 
+**Status:** implemented (v0.16.0).
+
+- `POST /ondc/search|select|init|confirm|status` — Beckn-style BPP adapter
+- Maps to catalog, cart, order, payment services
+- Permission `integrations.ondc` (super/tenant admin)
+
 **Read:** `docs/architecture.md` adapters (~25–35, exclusions)
 
-**Write:** `backend/app/integrations/ondc/` only — core modules must not import ONDC
+**Write:** (done) `integrations/ondc/`, `test_phase20_ondc.py` — core modules must not import ONDC
 
 ---
 

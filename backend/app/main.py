@@ -27,6 +27,7 @@ from app.settlements.router import router as settlements_router
 from app.fulfillment.router import router as fulfillment_router
 from app.partners.router import router as partners_router
 from app.delivery.router import router as delivery_router
+from app.integrations.ondc.router import router as ondc_router
 from app.tenants.router import platform_router
 from app.tenants.router import router as tenants_router
 
@@ -79,5 +80,5 @@ async def meta() -> dict[str, str]:
     }
 
 
-for r in (auth_router, users_router, tenants_router, platform_router, businesses_router, locations_router, catalog_router, inventory_router, carts_router, taxation_router, pricing_router, orders_router, payments_router, ledger_router, settlements_router, fulfillment_router, partners_router, delivery_router):
+for r in (auth_router, users_router, tenants_router, platform_router, businesses_router, locations_router, catalog_router, inventory_router, carts_router, taxation_router, pricing_router, orders_router, payments_router, ledger_router, settlements_router, fulfillment_router, partners_router, delivery_router, ondc_router):
     app.include_router(r, prefix="/api/v1")
