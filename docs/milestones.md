@@ -111,7 +111,10 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phase 20 — ONDC adapter
 
-- Only after internal order/fulfillment works; adapters under `integrations/ondc`
+**Status:** implemented (API `0.16.0`, `test_phase20_ondc.py`).
+
+- Beckn-style BPP endpoints: search, select, init, confirm, status
+- Adapter calls core services; core never imports ONDC
 
 ---
 
