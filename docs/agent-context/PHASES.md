@@ -273,4 +273,16 @@ Plus `packages/ui`, `packages/api-client`, `packages/types` as ROUTES.md says.
 
 ---
 
+## Phase 26 — Playwright PWA E2E
+
+**Status:** implemented.
+
+- `e2e/` — Playwright smoke for customer, merchant, rider, admin PWAs
+- CI job `Playwright PWA smoke` starts four Next dev servers and runs browser tests
+- `pnpm test:e2e` locally
+
+**Write:** (done) `e2e/playwright.config.ts`, `e2e/tests/*.spec.ts`, CI workflow update
+
+---
+
 When a phase ships: set [STATE.md](./STATE.md) to the next phase; mark MAP modules non-empty; do not copy this file into chat.

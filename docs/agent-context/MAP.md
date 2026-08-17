@@ -72,6 +72,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | `packages/api-client/src/index.ts` | auth through delivery + `assignUserRole` | Merchant admin |
 | `packages/ui/src/index.ts` | Button, Card, Input, PriceDisplay, Badge, SearchBar, BusinessCard, ProductCard, CategoryChip, OrderTimeline, Skeleton, EmptyState, StatusBadge, StatTile, LiveMap | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
+| `e2e/` | Playwright smoke tests for all four frontends | `playwright.config.ts`, `tests/*.spec.ts` |
 
 ## Apps — on disk now
 
@@ -94,7 +95,7 @@ New screens go next to those `app/` trees. Register the route in this table when
 | `.github/workflows/ci.yml` | CI: backend pytest, golden E2E job, frontend typecheck |
 | `scripts/ci.sh` | Local CI script (`pnpm ci`) |
 | `.env.example` | Local env |
-| `package.json` | pnpm scripts: `typecheck`, `dev:*` |
+| `package.json` | pnpm scripts: `typecheck`, `ci`, `test:backend`, `test:golden`, `test:e2e`, `dev:*` |
 | `pnpm-workspace.yaml` | workspaces |
 | `docs/*.md` | Specs — use INDEX/SCHEMA offsets, do not read all |
 | `docs/agent-context/` | This pack |

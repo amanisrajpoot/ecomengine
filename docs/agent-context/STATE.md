@@ -6,31 +6,30 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 24 — maps / GPS live tracking |
+| Checkout | Phase 26 — Playwright PWA E2E |
 | API version | `0.17.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-24-maps-gps-tracking-dfc8` |
+| Base branch for new work | `cursor/phase-26-playwright-e2e-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| Live tracking | `GET /orders/{id}/tracking`, `LiveMap`, rider GPS ping |
-| Tests | through `test_phase24_tracking.py` (1) — **56 total** |
+| Browser E2E | Playwright smoke for customer, merchant, rider, admin PWAs |
+| Tests | backend **56** + golden **3** + Playwright **12** smoke |
 
 ## Next recommended task
 
-E2E golden tests in CI.
+Production hardening (rate limits, observability), or merge stacked PR chain to `main`.
 
 ## Commands
 
 ```bash
-cd backend && PYTHONPATH=. python3 -m pytest -q
-pnpm typecheck
-pnpm --filter @commerce/customer-pwa dev   # port 3000
-pnpm --filter @commerce/rider-pwa dev      # port 3002
+pnpm ci                    # backend + golden + typecheck (no browser)
+pnpm test:e2e              # Playwright smoke (starts 4 Next dev servers)
+pnpm test:golden           # Food + Hyperlocal + Courier only
 ```
 
 ## Last change
 
-- Phase 24: Order tracking API, Leaflet map UI, rider live GPS uploads
+- Phase 26: `@commerce/e2e` Playwright package + CI job
 
 ## Known constraints
 
-- Map tiles require network (OpenStreetMap); no WebSocket stream yet (poll-based)
-- Money: integer paise only
+- Playwright smoke does not drive full golden flows (backend integration covers those)
+- Map tiles require network; tracking is poll-based

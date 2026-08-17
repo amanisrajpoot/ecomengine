@@ -42,4 +42,7 @@ data/
 # Logs
 *.log
 npm-debug.log*
-pnpm-debug.log*
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
