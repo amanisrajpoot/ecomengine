@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 7 done**. Implement **Phase 8** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 8 done**. Implement **Phase 9** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -116,9 +116,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 8 — Payments
 
+**Status:** implemented (v0.8.0).
+
+- `PaymentGateway` interface; COD auto-capture; Razorpay stub
+- Idempotency-Key on payment create
+- Refunds; order → `PAYMENT_CONFIRMED` on capture
+- Alembic `phase8_payments`
+
 **Read:** domain-model Payments (~194–203); SCHEMA payments (~336–369); api-conventions Idempotency
 
-**Write:** `backend/app/payments/*` (gateway interface + COD + Razorpay later); `test_phase8_*.py`
+**Write:** (done) `payments/*`, `test_phase8_payments.py`, types + api-client
 
 ---
 
