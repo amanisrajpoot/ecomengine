@@ -1,6 +1,6 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 9**. `[empty]` = package `__init__.py` only.
+Status: **Phase 10**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
@@ -26,7 +26,8 @@ Status: **Phase 9**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_phase7_orders.py` | Checkout + FSM |
 | `backend/tests/test_phase8_payments.py` | COD, capture, refunds |
 | `backend/tests/test_phase9_ledger.py` | Ledger capture + refund |
-| `backend/alembic/` | Migrations through `phase9_ledger` |
+| `backend/tests/test_phase10_settlements.py` | Settlement calculate + lifecycle |
+| `backend/alembic/` | Migrations through `phase10_settlements` |
 
 ## Backend modules — expected files (do not Glob)
 
@@ -46,7 +47,7 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | `orders` | models, schemas, service, router, states | order-state-machines.md | orders ~290 | `main.py` |
 | `payments` | models, schemas, service, router, gateway | domain-model Payments | payments ~336 | `main.py` |
 | `ledger` | models, schemas, service, router | settlement-engine LedgerEntry | ledger ~394 | `main.py` |
-| `settlements` | empty | settlement-engine.md | settlements ~412 | `main.py` |
+| `settlements` | models, schemas, service, router, states | settlement-engine.md | settlements ~412 | `main.py` |
 | `fulfillment` | empty | fulfillment.md | fulfillments ~438 | `main.py` |
 | `delivery` | empty | fulfillment.md Delivery | deliveries ~451 | `main.py` |
 | `partners` | empty | fulfillment.md Partner | delivery_partner_profiles ~78 | `main.py` |

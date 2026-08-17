@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 9 done**. Implement **Phase 10** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 10 done**. Implement **Phase 11** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -146,9 +146,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 10 — Settlements
 
+**Status:** implemented (v0.10.0).
+
+- Aggregate unsettled ledger lines by party (MERCHANT, DELIVERY_PARTNER, PLATFORM)
+- `settlement_ledger_links` — one settlement link per ledger entry
+- Lifecycle: CALCULATED → RECONCILED → APPROVED → PAID
+- Alembic `phase10_settlements`
+
 **Read:** rest of `docs/settlement-engine.md`; SCHEMA settlements (~412–434)
 
-**Write:** `backend/app/settlements/*`; `test_phase10_*.py`
+**Write:** (done) `settlements/*`, `test_phase10_settlements.py`, types + api-client
 
 ---
 
