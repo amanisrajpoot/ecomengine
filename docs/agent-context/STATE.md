@@ -6,30 +6,31 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 27 — production hardening |
-| API version | `0.18.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-27-prod-hardening-dfc8` |
+| Checkout | Phase 28 — Playwright API-backed E2E |
+| API version | `0.19.0` (`backend/app/core/config.py`) |
+| Base branch for new work | `cursor/phase-28-playwright-api-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| Ops | Rate limits (429), `/metrics`, request ID + timing headers |
-| Tests | through `test_phase27_prod_hardening.py` (4) — **60 total**, **3 golden** |
+| Ops | CORS for dev/test PWAs; API client JSON Content-Type |
+| Tests | through `e2e/tests/*-api.spec.ts` (2) — **60 backend**, **2 Playwright API**, **12 smoke** |
 
 ## Next recommended task
 
-Merge stacked PR chain to `main`, or add Playwright flows wired to live API.
+Merge stacked PR chain to `main`, or extend API E2E (merchant/rider flows, checkout browser path).
 
 ## Commands
 
 ```bash
 pnpm ci
+pnpm test:e2e:api
 curl -s localhost:8000/health
-curl -s localhost:8000/metrics
 ```
 
 ## Last change
 
-- Phase 27: Rate limiting, Prometheus metrics, observability middleware
+- Phase 28: Playwright flows wired to live API (customer register + admin settings meta)
+- CORS for localhost PWAs in dev/test; api-client sets JSON Content-Type on POST bodies
 
 ## Known constraints
 
-- Rate limit uses Redis when available; in-memory fallback otherwise
+- E2E API uses SQLite `create_all` (not Alembic) via `scripts/start-e2e-api.sh`
 - Map tiles require network; tracking is poll-based

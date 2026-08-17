@@ -72,6 +72,9 @@ export function createApiClient(options: ApiClientOptions = {}) {
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
+    if (init.body !== undefined && init.body !== null && !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
 
     const response = await fetch(`${baseUrl}${path}`, { ...init, headers });
     if (!response.ok) {

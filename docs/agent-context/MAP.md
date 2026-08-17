@@ -1,12 +1,12 @@
 # Path map — open these files; do not walk the tree
 
-Status: **Phase 15**. `[empty]` = package `__init__.py` only.
+Status: **Phase 28**. `[empty]` = package `__init__.py` only.
 
 ## Backend — always-on (exists)
 
 | Path | Role |
 |------|------|
-| `backend/app/main.py` | FastAPI app; routers under `/api/v1`; lifespan bootstrap |
+| `backend/app/main.py` | FastAPI app; routers under `/api/v1`; CORS (dev/test); lifespan bootstrap |
 | `backend/app/core/config.py` | Settings + `app_version` |
 | `backend/app/core/db.py` | Engine / session / `Base` |
 | `backend/app/core/middleware.py` | Request ID, timing, metrics middleware |
@@ -73,10 +73,10 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 | Path | Role | Touch when |
 |------|------|------------|
 | `packages/types/src/index.ts` | User, Tenant, Business, catalog types | Any new API resource |
-| `packages/api-client/src/index.ts` | auth through delivery + `assignUserRole` | Merchant admin |
+| `packages/api-client/src/index.ts` | auth through delivery + `assignUserRole`; JSON Content-Type on bodies | Merchant admin |
 | `packages/ui/src/index.ts` | Button, Card, Input, PriceDisplay, Badge, SearchBar, BusinessCard, ProductCard, CategoryChip, OrderTimeline, Skeleton, EmptyState, StatusBadge, StatTile, LiveMap | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
-| `e2e/` | Playwright smoke tests for all four frontends | `playwright.config.ts`, `tests/*.spec.ts` |
+| `e2e/` | Playwright smoke + API-backed tests | `playwright.config.ts`, `playwright.api.config.ts`, `helpers/api.ts`, `tests/*.spec.ts` |
 
 ## Apps — on disk now
 
@@ -96,10 +96,12 @@ New screens go next to those `app/` trees. Register the route in this table when
 | Path | Role |
 |------|------|
 | `docker-compose.yml` | API, Postgres, Redis, MinIO |
-| `.github/workflows/ci.yml` | CI: backend pytest, golden E2E job, frontend typecheck |
+| `.github/workflows/ci.yml` | CI: backend pytest, golden E2E job, Playwright smoke + API jobs, typecheck |
 | `scripts/ci.sh` | Local CI script (`pnpm ci`) |
+| `scripts/start-e2e-api.sh` | SQLite API for Playwright API E2E |
+| `scripts/init-e2e-db.py` | `create_all` + bootstrap admin for E2E DB |
 | `.env.example` | Local env |
-| `package.json` | pnpm scripts: `typecheck`, `ci`, `test:backend`, `test:golden`, `test:e2e`, `dev:*` |
+| `package.json` | pnpm scripts: `typecheck`, `ci`, `test:backend`, `test:golden`, `test:e2e`, `test:e2e:api`, `dev:*` |
 | `pnpm-workspace.yaml` | workspaces |
 | `docs/*.md` | Specs — use INDEX/SCHEMA offsets, do not read all |
 | `docs/agent-context/` | This pack |

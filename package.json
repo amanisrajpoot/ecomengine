@@ -12,6 +12,7 @@
     "test:backend": "cd backend && PYTHONPATH=. python3 -m pytest -q",
     "test:golden": "cd backend && PYTHONPATH=. python3 -m pytest -q -m golden",
     "test:e2e": "pnpm --filter @commerce/e2e test",
+    "test:e2e:api": "pnpm --filter @commerce/e2e test:api",
     "ci": "bash scripts/ci.sh"
   },
   "engines": {
