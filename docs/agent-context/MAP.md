@@ -68,21 +68,21 @@ Canonical per module: `models.py`, `schemas.py`, `service.py`, `router.py`. Opti
 |------|------|------------|
 | `packages/types/src/index.ts` | User, Tenant, Business, catalog types | Any new API resource |
 | `packages/api-client/src/index.ts` | auth through catalog + inventory | Merchant admin |
-| `packages/ui/src/index.ts` | UI barrel | New shared component |
+| `packages/ui/src/index.ts` | Button, Card, Input, PriceDisplay, formatPaise | New shared component |
 | `packages/config/` | tsconfig | Tooling only |
 
-## Apps — on disk now (shells only)
+## Apps — on disk now
 
-Do not search other `app/` folders; these are the pages:
+Do not search other `app/` folders unless sharing components:
 
-| App | Layout | Home | Config |
-|-----|--------|------|--------|
-| `apps/customer-pwa` | `app/layout.tsx` | `app/page.tsx` | `package.json`, `next.config.ts`, `tailwind.config.ts` |
-| `apps/merchant-pwa` | same | same | same |
+| App | Layout | Routes (customer-pwa) | Config |
+|-----|--------|-------------------------|--------|
+| `apps/customer-pwa` | `app/layout.tsx`, `components/AppShell.tsx` | `/`, `/login`, `/register`, `/settings`, `/businesses`, `/business/[businessId]`, `/cart`, `/checkout`, `/orders`, `/orders/[orderId]`, `/courier` | `package.json`, `next.config.ts`, `lib/api.ts`, `lib/session.ts` |
+| `apps/merchant-pwa` | `app/layout.tsx` | `app/page.tsx` (shell) | same |
 | `apps/rider-pwa` | same | same | same |
 | `apps/admin-web` | same | same | same |
 
-New screens go next to those `app/` trees (e.g. `apps/customer-pwa/app/orders/page.tsx`). Register the route in this table when added.
+New screens go next to those `app/` trees. Register the route in this table when added.
 
 ## Repo root
 

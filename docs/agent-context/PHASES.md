@@ -232,11 +232,11 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 16 — Experience apps
 
-**Write under only the named app:**
+**Status:** Customer PWA implemented (`apps/customer-pwa`).
 
 | Phase | App | Start files |
 |-------|-----|-------------|
-| 16 | `apps/customer-pwa` | `app/page.tsx`, new routes under `app/` |
+| 16 | `apps/customer-pwa` | (done) routes under `app/`, `components/AppShell.tsx`, `lib/api.ts` |
 | 17 | `apps/merchant-pwa` | same pattern |
 | 18 | `apps/rider-pwa` | same pattern |
 | 19 | `apps/admin-web` | same pattern |

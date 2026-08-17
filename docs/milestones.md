@@ -104,7 +104,10 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 ## Phases 16–19 — Experience apps
 
-- Customer PWA, Merchant PWA, Rider PWA, Admin (incl. order debugger)
+- **Phase 16:** Customer PWA — browse, cart, checkout, orders, courier quote (`apps/customer-pwa`)
+- Phase 17: Merchant PWA
+- Phase 18: Rider PWA
+- Phase 19: Admin (incl. order debugger)
 
 ## Phase 20 — ONDC adapter
 
