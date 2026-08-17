@@ -14,6 +14,7 @@ from app.cart.service import get_cart, recalculate_cart_pricing
 from app.catalog.models import Bundle, Variant
 from app.catalog.service import get_product
 from app.core.errors import AppError
+from app.fulfillment import service as fulfillment_service
 from app.orders.models import Order, OrderItem, OrderStatusEvent
 from app.orders.schemas import OrderCheckout, OrderTransition
 from app.orders.states import profile_for_business_type, registry
@@ -195,6 +196,13 @@ async def checkout_from_cart(
         order=order,
         payload=OrderTransition(to_status="PAYMENT_PENDING", reason="checkout"),
         actor_user_id=customer_id,
+    )
+
+    await fulfillment_service.create_for_order(
+        db,
+        tenant_id=tenant_id,
+        order_id=order.id,
+        fulfillment_type=payload.fulfillment_type,
     )
 
     await db.commit()

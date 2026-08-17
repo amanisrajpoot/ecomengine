@@ -13,6 +13,7 @@ import type {
   Product,
   Settlement,
   SettlementDetail,
+  Fulfillment,
   ProductAddonLink,
   Refund,
   StockMovement,
@@ -740,6 +741,38 @@ export function createApiClient(options: ApiClientOptions = {}) {
       body: { to_status: string; reason?: string },
     ) =>
       request<Settlement>(`/api/v1/settlements/${settlementId}/transition`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    listFulfillments: (params?: {
+      status?: string;
+      type?: string;
+      business_id?: string;
+    }) => {
+      const search = new URLSearchParams();
+      if (params?.status) search.set("status", params.status);
+      if (params?.type) search.set("type", params.type);
+      if (params?.business_id) search.set("business_id", params.business_id);
+      const qs = search.toString();
+      return request<Fulfillment[]>(`/api/v1/fulfillments${qs ? `?${qs}` : ""}`);
+    },
+
+    getFulfillment: (fulfillmentId: string) =>
+      request<Fulfillment>(`/api/v1/fulfillments/${fulfillmentId}`),
+
+    getOrderFulfillment: (orderId: string) =>
+      request<Fulfillment>(`/api/v1/orders/${orderId}/fulfillment`),
+
+    transitionFulfillment: (
+      fulfillmentId: string,
+      body: {
+        to_status: string;
+        reason?: string;
+        scheduled_for?: string;
+      },
+    ) =>
+      request<Fulfillment>(`/api/v1/fulfillments/${fulfillmentId}/transition`, {
         method: "POST",
         body: JSON.stringify(body),
       }),

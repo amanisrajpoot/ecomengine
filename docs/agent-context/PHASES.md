@@ -2,7 +2,7 @@
 
 Source of sequence: `docs/milestones.md` headings. **Do not read that file** unless you are changing phase order.
 
-Checkout now: **Phase 10 done**. Implement **Phase 11** next ([STATE.md](./STATE.md)).
+Checkout now: **Phase 11 done**. Implement **Phase 12** next ([STATE.md](./STATE.md)).
 
 Each phase lists **read** (specs, with schema slice) and **write** (create/edit). Skip later phases.
 
@@ -161,9 +161,16 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 
 ## Phase 11 — Fulfillment
 
+**Status:** implemented (v0.11.0).
+
+- `fulfillments` one per order (unique `order_id`)
+- Types: DELIVERY, PICKUP, SELF_PICKUP, SCHEDULED, MULTI_STOP
+- Auto-create on checkout; lifecycle PENDING → ACTIVE → COMPLETED
+- Alembic `phase11_fulfillment`
+
 **Read:** `docs/fulfillment.md` through Fulfillment types; SCHEMA fulfillments (~438–449)
 
-**Write:** `backend/app/fulfillment/*`; `test_phase11_*.py`
+**Write:** (done) `fulfillment/*`, `test_phase11_fulfillment.py`, types + api-client
 
 ---
 

@@ -6,18 +6,18 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 10 — settlements |
-| API version | `0.10.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-10-settlements-dfc8` |
+| Checkout | Phase 11 — fulfillment |
+| API version | `0.11.0` (`backend/app/core/config.py`) |
+| Base branch for new work | `cursor/phase-11-fulfillment-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| API | settlements from ledger, lifecycle transitions, order linkage |
-| Tests | through `test_phase10_settlements.py` (3) — **40 total** |
+| API | fulfillments decoupled from orders, checkout hook, lifecycle |
+| Tests | through `test_phase11_fulfillment.py` (3) — **43 total** |
 
 ## Next recommended task
 
-**Phase 11 — Fulfillment.**
+**Phase 12 — Delivery.**
 
-Open [PHASES.md](./PHASES.md) Phase 11 section only — do not scan repo.
+Open [PHASES.md](./PHASES.md) Phase 12 section only — do not scan repo.
 
 ## Commands
 
@@ -31,10 +31,10 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 10: Settlement calculate from ledger, RECONCILED→APPROVED→PAID transitions
+- Phase 11: Fulfillment entity per order, types, PENDING→ACTIVE→COMPLETED
 
 ## Known constraints
 
-- Fulfillment decoupling in Phase 11
+- Delivery module in Phase 12
 - Money: integer paise only
 - ONDC adapter only in Phase 20
