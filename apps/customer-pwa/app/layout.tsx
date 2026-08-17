@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next";
+
+import { ClientAppShell } from "@/components/ClientAppShell";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Commerce Engine — Customer PWA",
-  description: "Commerce Engine Customer PWA scaffold",
+  description: "Customer shopping experience for Commerce Engine",
   manifest: "/manifest.webmanifest",
 };
 
@@ -14,7 +17,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ClientAppShell>{children}</ClientAppShell>
+      </body>
     </html>
   );
 }
