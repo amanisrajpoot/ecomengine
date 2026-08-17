@@ -56,6 +56,9 @@ async def reset_db() -> None:
             email=settings.bootstrap_super_admin_email,
             password=settings.bootstrap_super_admin_password,
         )
+        from app.taxation.service import ensure_default_tax_rules
+
+        await ensure_default_tax_rules(db)
 
 
 @pytest.fixture

@@ -46,6 +46,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Independent GST engine (customer vs platform vs settlement kinds)
 
+**Status:** implemented (API `0.6.0`, alembic `phase6_tax`).
+
 ## Phase 7 — Orders
 
 - Universal order + configurable state machines

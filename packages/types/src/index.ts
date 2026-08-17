@@ -272,3 +272,34 @@ export interface Cart {
 export interface CartWithPricing extends Cart {
   pricing?: PriceBreakdown | null;
 }
+
+export interface TaxRule {
+  id: string;
+  tenant_id: TenantId | null;
+  code: string;
+  category: string;
+  jurisdiction: string;
+  rate_bps: number;
+  inclusive: boolean;
+  payer: string;
+  kind: string;
+  effective_from: string;
+  effective_to: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TaxCalculationLine {
+  code: string;
+  kind: string;
+  category: string;
+  rate_bps: number;
+  taxable_paise: number;
+  amount_paise: number;
+  payer: string;
+}
+
+export interface TaxCalculationResult {
+  tax_paise: number;
+  lines: TaxCalculationLine[];
+}
