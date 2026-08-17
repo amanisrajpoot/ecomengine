@@ -152,6 +152,23 @@ PERMISSIONS: dict[str, set[Role]] = {
         Role.SUPER_ADMIN,
         Role.TENANT_ADMIN,
     },
+    "fulfillment.read": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.STAFF,
+        Role.CUSTOMER,
+        Role.DELIVERY_PARTNER,
+    },
+    "fulfillment.manage": {
+        Role.SUPER_ADMIN,
+        Role.TENANT_ADMIN,
+        Role.BUSINESS_OWNER,
+        Role.BUSINESS_MANAGER,
+        Role.STAFF,
+        Role.DELIVERY_PARTNER,
+    },
 }
 
 

@@ -76,6 +76,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Decouple fulfillment from order
 
+**Status:** implemented (API `0.11.0`, alembic `phase11_fulfillment`).
+
 ## Phase 12 — Delivery
 
 - Partners, vehicles, assignment V1, tracking hooks

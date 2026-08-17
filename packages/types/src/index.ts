@@ -416,3 +416,15 @@ export interface Settlement {
 export interface SettlementDetail extends Settlement {
   ledger_entry_ids: string[];
 }
+
+export interface Fulfillment {
+  id: string;
+  tenant_id: TenantId;
+  order_id: string;
+  type: string;
+  status: string;
+  scheduled_for: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
