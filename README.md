@@ -50,7 +50,7 @@ pnpm --filter @commerce/customer-pwa dev
 
 ## Documentation
 
-Start at [docs/README.md](docs/README.md).
+Start at [docs/README.md](docs/README.md). Agents: [docs/agent-context/INDEX.md](docs/agent-context/INDEX.md) then [STATE.md](docs/agent-context/STATE.md).
 
 ## License
 

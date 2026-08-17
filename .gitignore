@@ -32,6 +32,7 @@ htmlcov/
 .DS_Store
 .idea/
 .vscode/
+!.cursor/rules/
 *.swp
 
 # Docker / data volumes

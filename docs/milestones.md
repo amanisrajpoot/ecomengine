@@ -14,6 +14,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 - Multi-tenancy (`tenant_id`)
 - `PlatformConfig` / `TenantConfig` / `BusinessConfig`
 
+**Status:** implemented (API `0.1.0`, alembic `phase1_foundation`).
+
 ## Phase 2 — Business & location
 
 - Business onboarding

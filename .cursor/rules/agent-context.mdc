@@ -1,0 +1,16 @@
+---
+description: Route through agent-context maps; never scan the whole repo
+alwaysApply: true
+---
+
+Do not Glob the workspace to discover files. Do not read all of `docs/`.
+
+Per conversation, once: `docs/agent-context/INDEX.md` then `STATE.md`. Then open only:
+
+- `PHASES.md` for the next numbered phase, or
+- `ROUTES.md` for the change type, or
+- `MAP.md` for a known module
+
+Use `SCHEMA.md` offsets instead of loading `docs/schema.md` whole. Grep only inside the mapped directory.
+
+When you add a file, update `MAP.md` (and PHASES/INDEX if needed) in the same PR so the index stays complete.
