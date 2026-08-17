@@ -285,4 +285,17 @@ Plus `packages/ui`, `packages/api-client`, `packages/types` as ROUTES.md says.
 
 ---
 
+## Phase 27 — Production hardening
+
+**Status:** implemented (v0.18.0).
+
+- Per-client rate limiting (Redis + memory fallback) → `429 RATE_LIMITED`
+- Observability middleware: `X-Request-ID`, `X-Response-Time-Ms`, structured request logs
+- `GET /metrics` Prometheus text; enriched `GET /health`
+- Tests disabled in default pytest via `RATE_LIMIT_ENABLED=false`
+
+**Write:** (done) `core/middleware.py`, `core/rate_limit.py`, `core/metrics.py`, `test_phase27_prod_hardening.py`
+
+---
+
 When a phase ships: set [STATE.md](./STATE.md) to the next phase; mark MAP modules non-empty; do not copy this file into chat.

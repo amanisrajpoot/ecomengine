@@ -9,6 +9,9 @@ Status: **Phase 15**. `[empty]` = package `__init__.py` only.
 | `backend/app/main.py` | FastAPI app; routers under `/api/v1`; lifespan bootstrap |
 | `backend/app/core/config.py` | Settings + `app_version` |
 | `backend/app/core/db.py` | Engine / session / `Base` |
+| `backend/app/core/middleware.py` | Request ID, timing, metrics middleware |
+| `backend/app/core/rate_limit.py` | Redis + memory rate limiting |
+| `backend/app/core/metrics.py` | In-process Prometheus counters |
 | `backend/app/core/base.py` | ORM mixins |
 | `backend/app/core/errors.py` | `AppError` |
 | `backend/app/core/security.py` | JWT + passwords + OTP |
@@ -34,6 +37,7 @@ Status: **Phase 15**. `[empty]` = package `__init__.py` only.
 | `backend/tests/test_phase15_courier.py` | Courier quote + golden path |
 | `backend/tests/test_phase20_ondc.py` | ONDC search → confirm → status |
 | `backend/tests/test_phase24_tracking.py` | Order tracking + partner GPS ping |
+| `backend/tests/test_phase27_prod_hardening.py` | Rate limit + metrics + observability headers |
 | `backend/alembic/` | Migrations through `phase12_delivery` |
 
 ## Backend modules — expected files (do not Glob)

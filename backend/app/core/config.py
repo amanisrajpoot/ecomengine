@@ -9,11 +9,15 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "commerce-engine"
-    app_version: str = "0.17.0"
+    app_version: str = "0.18.0"
     environment: str = "development"
 
     database_url: str = "postgresql+asyncpg://commerce:commerce@localhost:5432/commerce"
     redis_url: str = "redis://localhost:6379/0"
+
+    rate_limit_enabled: bool = True
+    rate_limit_per_minute: int = 120
+    rate_limit_window_seconds: int = 60
 
     jwt_secret: str = "dev-change-me-in-production"
     jwt_algorithm: str = "HS256"
