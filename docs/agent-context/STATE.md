@@ -16,16 +16,14 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 ## Next recommended task
 
-**Phase 1 — Platform foundation** (auth, identity, RBAC, tenancy, config).
+**Phase 1 — Platform foundation.**
 
-Read after INDEX + this file:
+Do **not** scan the repo. Open:
 
-1. `docs/milestones.md` (Phase 1 section only)
-2. `docs/permissions.md`
-3. `docs/api-conventions.md`
-4. `docs/schema.md` (tenants, users, role bindings — skip later tables)
-5. `backend/app/main.py`, `backend/app/core/`
-6. `backend/app/identity/`, `backend/app/tenants/` (packages exist, empty)
+1. [PHASES.md](./PHASES.md) — **Phase 1 section only**
+2. Files that section lists (identity, tenants, core, permissions, schema slices)
+
+Then follow [ROUTES.md](./ROUTES.md) “Add or change a backend API”.
 
 ## Commands
 
@@ -41,7 +39,7 @@ Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Agent-context pack: `docs/agent-context/`, `AGENTS.md`, `.cursor/rules/agent-context.mdc`
+- Expanded agent-context: INDEX dispatcher + MAP + ROUTES + PHASES + SCHEMA line index
 
 ## Known constraints
 

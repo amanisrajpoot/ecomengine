@@ -1,12 +1,16 @@
 ---
-description: Load the compact agent index instead of the full docs tree
+description: Route through agent-context maps; never scan the whole repo
 alwaysApply: true
 ---
 
-Token budget: do not read all of `docs/` or recap every phase.
+Do not Glob the workspace to discover files. Do not read all of `docs/`.
 
-First coding step in a conversation: read `docs/agent-context/INDEX.md` and `docs/agent-context/STATE.md` once. Then open only the files the INDEX row lists.
+Per conversation, once: `docs/agent-context/INDEX.md` then `STATE.md`. Then open only:
 
-Follow `docs/agent-context/PROTOCOL.md`. After a feature ships, update `STATE.md` in the same PR (replace lines, keep it ≤80 lines).
+- `PHASES.md` for the next numbered phase, or
+- `ROUTES.md` for the change type, or
+- `MAP.md` for a known module
 
-Use Grep before Read. Prefer `offset`/`limit` on large specs.
+Use `SCHEMA.md` offsets instead of loading `docs/schema.md` whole. Grep only inside the mapped directory.
+
+When you add a file, update `MAP.md` (and PHASES/INDEX if needed) in the same PR so the index stays complete.
