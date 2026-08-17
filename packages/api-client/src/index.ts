@@ -11,6 +11,8 @@ import type {
   InventoryItem,
   LedgerPostingGroup,
   Product,
+  Settlement,
+  SettlementDetail,
   ProductAddonLink,
   Refund,
   StockMovement,
@@ -701,6 +703,46 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
     getLedgerEventGroup: (eventGroupId: string) =>
       request<LedgerPostingGroup>(`/api/v1/ledger/event-groups/${eventGroupId}`),
+
+    calculateSettlement: (body: {
+      party_type: string;
+      party_id: string;
+      period_start: string;
+      period_end: string;
+      currency?: string;
+    }) =>
+      request<Settlement>("/api/v1/settlements/calculate", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+
+    listSettlements: (params?: {
+      party_type?: string;
+      party_id?: string;
+      status?: string;
+    }) => {
+      const search = new URLSearchParams();
+      if (params?.party_type) search.set("party_type", params.party_type);
+      if (params?.party_id) search.set("party_id", params.party_id);
+      if (params?.status) search.set("status", params.status);
+      const qs = search.toString();
+      return request<Settlement[]>(`/api/v1/settlements${qs ? `?${qs}` : ""}`);
+    },
+
+    getSettlement: (settlementId: string) =>
+      request<SettlementDetail>(`/api/v1/settlements/${settlementId}`),
+
+    listOrderSettlements: (orderId: string) =>
+      request<Settlement[]>(`/api/v1/orders/${orderId}/settlements`),
+
+    transitionSettlement: (
+      settlementId: string,
+      body: { to_status: string; reason?: string },
+    ) =>
+      request<Settlement>(`/api/v1/settlements/${settlementId}/transition`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
   };
 }
 

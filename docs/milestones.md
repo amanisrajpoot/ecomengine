@@ -70,6 +70,8 @@ Dependency order matters more than calendar duration. Implement sequentially.
 
 - Merchant / rider / platform lifecycle
 
+**Status:** implemented (API `0.10.0`, alembic `phase10_settlements`).
+
 ## Phase 11 — Fulfillment
 
 - Decouple fulfillment from order

@@ -397,3 +397,22 @@ export interface LedgerPostingGroup {
   order_id: string | null;
   entries: LedgerEntry[];
 }
+
+export interface Settlement {
+  id: string;
+  tenant_id: TenantId;
+  party_type: string;
+  party_id: string;
+  status: string;
+  period_start: string;
+  period_end: string;
+  total_paise: number;
+  currency: string;
+  report: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SettlementDetail extends Settlement {
+  ledger_entry_ids: string[];
+}

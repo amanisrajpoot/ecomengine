@@ -29,6 +29,7 @@ from app.taxation.models import TaxRule  # noqa: F401
 from app.orders.models import Order, OrderItem, OrderStatusEvent  # noqa: F401
 from app.payments.models import Payment, Refund  # noqa: F401
 from app.ledger.models import LedgerEntry  # noqa: F401
+from app.settlements.models import Settlement, SettlementLedgerLink  # noqa: F401
 from app.tenants.models import PlatformConfig, Tenant  # noqa: F401
 
 config = context.config
