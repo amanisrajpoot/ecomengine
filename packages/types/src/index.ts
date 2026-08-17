@@ -481,6 +481,33 @@ export interface Delivery {
   stops?: DeliveryStop[];
 }
 
+export interface TrackingStop {
+  id: string;
+  sequence: number;
+  stop_type: string;
+  lat: number;
+  lng: number;
+  status: string;
+}
+
+export interface TrackingRider {
+  partner_id: string;
+  lat: number;
+  lng: number;
+  updated_at: string;
+  is_online: boolean;
+}
+
+export interface OrderTracking {
+  order_id: string;
+  order_status: string;
+  delivery_id: string | null;
+  delivery_status: string | null;
+  eta: string | null;
+  rider: TrackingRider | null;
+  stops: TrackingStop[];
+}
+
 export interface CourierQuoteRequest {
   business_id: string;
   pickup: { lat: number; lng: number; address?: Record<string, unknown> };

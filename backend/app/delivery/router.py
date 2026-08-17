@@ -16,6 +16,7 @@ from app.delivery.schemas import (
     DeliveryCreate,
     DeliveryRead,
     DeliveryStopRead,
+    OrderTrackingRead,
     StopComplete,
 )
 
@@ -144,3 +145,16 @@ async def complete_stop(
         payload=payload,
     )
     return _to_read(delivery)
+
+
+@router.get("/orders/{order_id}/tracking", response_model=OrderTrackingRead)
+async def get_order_tracking(
+    order_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    ctx: AuthContext = Depends(require_permission("orders.read")),
+    tenant_id: uuid.UUID | None = Depends(resolve_tenant_id),
+) -> OrderTrackingRead:
+    _ = ctx
+    tid = _require_tenant(tenant_id)
+    snapshot = await service.get_order_tracking(db, tenant_id=tid, order_id=order_id)
+    return OrderTrackingRead.model_validate(snapshot)

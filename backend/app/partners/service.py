@@ -96,6 +96,22 @@ async def update_partner_profile(
     return profile
 
 
+async def update_partner_location(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    user_id: uuid.UUID,
+    lat: float,
+    lng: float,
+) -> DeliveryPartnerProfile:
+    profile = await get_partner_profile_for_user(db, tenant_id=tenant_id, user_id=user_id)
+    profile.current_lat = lat
+    profile.current_lng = lng
+    await db.commit()
+    await db.refresh(profile)
+    return profile
+
+
 async def list_available_partners(
     db: AsyncSession, *, tenant_id: uuid.UUID, online_only: bool = True
 ) -> list[DeliveryPartnerProfile]:
