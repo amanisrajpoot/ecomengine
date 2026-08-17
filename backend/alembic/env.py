@@ -23,6 +23,7 @@ from app.catalog.models import (  # noqa: F401
     ProductAddonLink,
     Variant,
 )
+from app.inventory.models import InventoryItem, StockMovement  # noqa: F401
 from app.tenants.models import PlatformConfig, Tenant  # noqa: F401
 
 config = context.config
