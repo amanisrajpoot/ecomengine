@@ -224,3 +224,27 @@ async def complete_stop(
 
     await db.commit()
     return await _get_delivery(db, tenant_id=tenant_id, delivery_id=delivery_id)
+
+
+async def list_my_deliveries(
+    db: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    user_id: uuid.UUID,
+    active_only: bool = True,
+) -> list[Delivery]:
+    profile = await partners_service.get_partner_profile_for_user(
+        db, tenant_id=tenant_id, user_id=user_id
+    )
+    stmt = (
+        select(Delivery)
+        .options(selectinload(Delivery.stops))
+        .where(
+            Delivery.tenant_id == tenant_id,
+            Delivery.partner_id == profile.id,
+        )
+        .order_by(Delivery.created_at.desc())
+    )
+    if active_only:
+        stmt = stmt.where(Delivery.status.in_(["ASSIGNED", "IN_PROGRESS"]))
+    return list(await db.scalars(stmt))

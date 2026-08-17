@@ -238,7 +238,7 @@ Each phase lists **read** (specs, with schema slice) and **write** (create/edit)
 |-------|-----|-------------|
 | 16 | `apps/customer-pwa` | (done) routes under `app/`, `components/AppShell.tsx`, `lib/api.ts` |
 | 17 | `apps/merchant-pwa` | (done) store dashboard, orders, catalog, `lib/orderTransitions.ts` |
-| 18 | `apps/rider-pwa` | same pattern |
+| 18 | `apps/rider-pwa` | (done) jobs, POD, partner onboarding, `GET /deliveries/me` |
 | 19 | `apps/admin-web` | same pattern |
 
 Plus `packages/ui`, `packages/api-client`, `packages/types` as ROUTES.md says.
