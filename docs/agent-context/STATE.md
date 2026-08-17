@@ -6,32 +6,30 @@ Update this file **in the same PR** as the feature. Replace lines; do not append
 
 | Field | Value |
 |-------|--------|
-| Checkout | Phase 20 — ONDC adapter |
+| Checkout | Phase 21 — customer UI polish |
 | API version | `0.16.0` (`backend/app/core/config.py`) |
-| Base branch for new work | `cursor/phase-20-ondc-adapter-dfc8` |
+| Base branch for new work | `cursor/phase-21-customer-ui-polish-dfc8` |
 | Branch name template | `cursor/<short-name>-dfc8` |
-| ONDC | Beckn-style search/select/init/confirm/status under `/api/v1/ondc` |
+| Customer PWA UX | Swiggy-style home, cards, bottom nav, cart peek, tracking |
 | Tests | through `test_phase20_ondc.py` (2) — **55 total** |
 
 ## Next recommended task
 
-MVP complete (Phases 0–20). Hardening: UI polish, E2E golden tests in CI, production deploy.
+Merchant / rider UI polish, or E2E golden tests in CI.
 
 ## Commands
 
 ```bash
 cd backend && PYTHONPATH=. python3 -m pytest -q
 pnpm typecheck
-alembic upgrade head   # Postgres / Docker deploy
+pnpm --filter @commerce/customer-pwa dev   # port 3000
 ```
-
-Docker: `cp .env.example .env && docker compose up --build`
 
 ## Last change
 
-- Phase 20: ONDC adapter in `integrations/ondc/` (core does not import ONDC)
+- Phase 21: Customer PWA consumer UX (search, categories, product cards, order timeline)
 
 ## Known constraints
 
+- Maps / live GPS tracking not yet in UI
 - Money: integer paise only
-- ONDC only via adapter layer
